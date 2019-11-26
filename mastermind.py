@@ -23,37 +23,5 @@ class Game:
         self.reveal()  # reveal pattern after successful creation Game class object
 
     def reveal(self):
-        """ Method for printing pattern """
-        print(self.pattern)
-
-
-# some tests
-
-a = Game()
-
-b = Game([1, 2, 3, 4])
-
-try:
-    c = Game(2)
-except ValueError:
-    print("c error")
-
-try:
-    d = Game([1, 2, 3])
-except ValueError:
-    print("d error")
-
-try:
-    e = Game([6, 6, 5, 5])
-except ValueError:
-    print("e error")
-
-try:
-    f = Game([6, 6, 5.4, 5])
-except ValueError:
-    print("f error")
-
-try:
-    g = Game([6, 6, "a", 5])
-except ValueError:
-    print("g error")
+        """ Method for returning pattern """
+        return self.pattern
