@@ -1,15 +1,15 @@
-from random import randint
-
 ###
 # My version of famous game Mastermind
+# mastermind.py
+# Main file
 ###
 
-PEGS = 4    # defining how many pegs will be in the game
-COLORS = 6  # defining how many colors will be in the game
+from random import randint
+from settings import PEGS, COLORS
 
 
 class Game:
-    """ Game class contains whole game, the pattern and the tries"""
+    """ Game class contains whole game, the pattern and the tries """
     def __init__(self, code=None):
         # check if code is given, if not -> randomize new set of pegs
         if code is None:

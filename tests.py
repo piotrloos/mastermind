@@ -1,8 +1,15 @@
+###
+# My version of famous game Mastermind
+# tests.py
+# Unittests for mastermind
+###
+
 import unittest
 from mastermind import Game
 
 
 class GameCreationTests(unittest.TestCase):
+    """ Testing class for creations new game """
     def test_new_game_with_correct_code(self):
         code = [1, 2, 3, 4]
         a = Game(code)
