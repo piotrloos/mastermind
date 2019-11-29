@@ -106,6 +106,8 @@ class PegsCalculateTests(unittest.TestCase):
         self.a = Mastermind(solution_pattern=(2, 8, 8, 3, 5, 3), pegs=6, colors=10)
 
     def test_example_game(self):
+        self.assertFalse(self.a.game_finished)
+        self.assertTupleEqual(self.a.guess_pattern((1, 6, 9, 7, 10, 4)), (0, 0))
         self.assertTupleEqual(self.a.guess_pattern((1, 6, 5, 6, 8, 4)), (0, 2))
         self.assertTupleEqual(self.a.guess_pattern((9, 2, 3, 7, 2, 10)), (0, 2))
         self.assertTupleEqual(self.a.guess_pattern((8, 8, 10, 5, 10, 3)), (2, 2))

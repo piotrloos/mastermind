@@ -38,8 +38,8 @@ class Mastermind:
 
         self.guess_dict = {}  # initialize dictionary of guesses
         self.guess_count = 0  # initialize guess counter
-        self.game_finished = False  # initialize flag which indicates whether pattern is guessed
-        # print(self.reveal_pattern())  # reveal pattern after successful creation Mastermind class object
+        self.game_finished = False  # initialize flag which indicates whether game is finished
+        self.game_won = False  # initialize flag which indicates whether player correctly guessed the pattern
 
     def validate_pattern(self, pattern):
         """ Method for validating given pattern """
@@ -76,6 +76,7 @@ class Mastermind:
             self.guess_dict[guess_pattern] = self.calculate_pattern(guess_pattern)  # save the result to the dictionary
             if self.guess_dict[guess_pattern] == (self.pegs, 0):  # check if the pattern is guessed correctly
                 self.game_finished = True
+                self.game_won = True
 
         return self.guess_dict[guess_pattern]
 
