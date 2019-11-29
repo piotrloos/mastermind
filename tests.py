@@ -103,7 +103,7 @@ class PegsCalculateTests(unittest.TestCase):
     """ Testing class for calculate black and white pegs """
 
     def setUp(self):
-        self.a = Mastermind(solution_pattern=(2, 8, 8, 3, 5, 3), pegs=6, colors=10)
+        self.a = Mastermind(solution_pattern=(2, 8, 8, 3, 5, 3), pegs=6, colors=10, tries=20)
 
     def test_example_game(self):
         self.assertFalse(self.a.game_finished)

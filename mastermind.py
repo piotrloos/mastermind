@@ -5,13 +5,13 @@
 ########################################
 
 from random import randint
-from settings import PEGS, COLORS
+from settings import PEGS, COLORS, TRIES
 
 
 class Mastermind:
     """ Mastermind class contains whole game, the solution pattern and the guesses """
 
-    def __init__(self, solution_pattern=None, pegs=PEGS, colors=COLORS):
+    def __init__(self, solution_pattern=None, pegs=PEGS, colors=COLORS, tries=TRIES):
         """ Method for preparing new game with given settings """
 
         # check if given pegs number is correct
@@ -25,6 +25,12 @@ class Mastermind:
             self.colors = colors
         else:
             raise ValueError("Incorrect number of colors.")
+
+        # check if given tries number is correct
+        if tries in range(1, 32):  # from 1 to 32
+            self.tries = tries
+        else:
+            raise ValueError("Incorrect number of tries.")
 
         # check if solution_pattern is given, if not -> randomize new pattern
         if solution_pattern is None:
@@ -40,6 +46,18 @@ class Mastermind:
         self.guess_count = 0  # initialize guess counter
         self.game_finished = False  # initialize flag which indicates whether game is finished
         self.game_won = False  # initialize flag which indicates whether player correctly guessed the pattern
+
+    def input_pattern(self, pattern_string):
+        """ Method for inputting pattern from player """
+
+        try:
+            pattern = tuple(int(x) for x in pattern_string.split())
+        except ValueError:
+            return None
+        if not self.validate_pattern(pattern):
+            return None
+        else:
+            return pattern
 
     def validate_pattern(self, pattern):
         """ Method for validating given pattern """
@@ -70,13 +88,15 @@ class Mastermind:
         if not self.validate_pattern(guess_pattern):  # check if given pattern is correct
             raise ValueError("Incorrect guess pattern.")
 
-        self.guess_count += 1  # increment the guess counter
-
         if guess_pattern not in self.guess_dict:  # check if given pattern was already calculated
             self.guess_dict[guess_pattern] = self.calculate_pattern(guess_pattern)  # save the result to the dictionary
             if self.guess_dict[guess_pattern] == (self.pegs, 0):  # check if the pattern is guessed correctly
                 self.game_finished = True
                 self.game_won = True
+
+        self.guess_count += 1  # increment the guess counter
+        if self.guess_count >= self.tries:
+            self.game_finished = True
 
         return self.guess_dict[guess_pattern]
 

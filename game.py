@@ -11,17 +11,13 @@ def main():
     """ Main I/O function """
 
     print("Welcome in my Mastermind!")
-    game = Mastermind((2, 2, 3, 3))
+    game = Mastermind()
     print("Generated {} pegs pattern from {} colors.".format(game.pegs, game.colors))
-    pattern = None
+    print("You have {} tries to guess the pattern.".format(game.tries))
 
     while not game.game_finished:
 
-        try:
-            pattern = tuple(int(x) for x in input("Guess number {}: ".format(game.guess_count + 1)).split())
-        except ValueError:
-            pass
-
+        pattern = game.input_pattern(input("Guess number {}: ".format(game.guess_count + 1)))
         if game.validate_pattern(pattern):
             print("{}: {} -> {}".format(game.guess_count + 1, pattern, game.guess_pattern(pattern)))
         else:
