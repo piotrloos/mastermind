@@ -43,9 +43,9 @@ class Mastermind:
                 raise ValueError("Incorrect solution pattern.")
 
         self.guess_dict = {}  # initialize dictionary of guesses
-        self.guess_count = 0  # initialize guess counter
+        self.guess_count = 1  # initialize guess counter
         self.game_finished = False  # initialize flag which indicates whether game is finished
-        self.game_won = False  # initialize flag which indicates whether player correctly guessed the pattern
+        self.game_won = False  # initialize flag which indicates whether the player correctly guessed the pattern
 
     def input_pattern(self, pattern_string):
         """ Method for inputting pattern from player """
@@ -90,12 +90,14 @@ class Mastermind:
 
         if guess_pattern not in self.guess_dict:  # check if given pattern was already calculated
             self.guess_dict[guess_pattern] = self.calculate_pattern(guess_pattern)  # save the result to the dictionary
-            if self.guess_dict[guess_pattern] == (self.pegs, 0):  # check if the pattern is guessed correctly
-                self.game_finished = True
-                self.game_won = True
 
-        self.guess_count += 1  # increment the guess counter
-        if self.guess_count >= self.tries:
+        if self.guess_dict[guess_pattern] == (self.pegs, 0):  # check if the pattern is guessed correctly
+            self.game_finished = True
+            self.game_won = True
+        else:
+            self.guess_count += 1  # increment the guess counter
+
+        if self.guess_count > self.tries:  # check if the player still can guess
             self.game_finished = True
 
         return self.guess_dict[guess_pattern]
