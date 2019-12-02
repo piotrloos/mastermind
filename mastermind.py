@@ -4,8 +4,9 @@
 # Main class file                      #
 ########################################
 
-from random import randint
+from random import randint, shuffle, sample
 from settings import PEGS, COLORS, TRIES
+from itertools import product
 
 
 class Mastermind:
@@ -102,8 +103,17 @@ class Mastermind:
 
         return self.guess_dict[guess_pattern]
 
-    def hint_pattern(self):
-        pass
+    def hint_generator(self):
+        """ Method for yielding the first pattern that could be the solution based on all previous guesses """
+
+        ###  for hint_pattern in product(sample(range(1, self.colors + 1), self.colors), repeat=self.pegs):
+
+        # generate all possible patterns using itertools.product function
+        for hint_pattern in product(range(1, self.colors + 1), repeat=self.pegs):
+            if all(self.guess_dict[pattern] == self.calculate_pattern(pattern, hint_pattern)
+                   for pattern in self.guess_dict.keys()
+                   ):  # check all previous guesses and their result comparing to hint_pattern
+                yield hint_pattern
 
     def reveal_pattern(self):
         """ Method for returning solution pattern """
