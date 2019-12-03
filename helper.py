@@ -1,17 +1,41 @@
+########################################
+# My version of famous game Mastermind #
+# helper.py                            #
+# Game helper file                     #
+#                  Piotr Loos (c) 2019 #
+########################################
+
 from mastermind import Mastermind
 
-game = Mastermind(pegs=7, colors=10)
 
-result = None
-while result != (game.pegs, 0):
+def main():
+    """ Main I/O file for helper """
 
-    try:
-        pattern = next(game.hint_generator())
-    except StopIteration:
-        print("No solution!")
-        break
+    print()
+    print("Welcome in my Mastermind helper!")
+    game = Mastermind(generate=False, pegs=7, colors=10)
+    print("Searching for {}-peg solution using {} colors.".format(game.pegs, game.colors))
+    print()
 
-    result = tuple(int(peg) for peg in input("{} -> ".format(pattern)).split())
-    game.guesses[pattern] = result
+    result = None
+    pattern = None
+    game.hint = game.hint_generator()
 
-print("Solution pattern is {}".format(pattern))
+    while result != (game.pegs, 0):
+
+        try:
+            pattern = next(game.hint)
+        except StopIteration:
+            print("No solution!")
+            game.active = False
+            break
+
+        result = game.input_result(input("{} -> ".format(pattern)))
+        game.guesses[pattern] = result
+
+    if game.active:
+        print("Solution pattern is {}".format(pattern))
+
+
+if __name__ == "__main__":
+    main()

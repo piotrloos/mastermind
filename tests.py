@@ -22,7 +22,7 @@ class MastermindCreationTests(unittest.TestCase):
     def test_new_game_without_given_pattern(self):
         a = Mastermind()
         self.assertTrue(a.active)
-        self.assertTrue(a.validate(a.reveal_solution()))
+        self.assertTrue(a.validate_pattern(a.reveal_solution()))
         self.assertFalse(a.active)
 
     def test_new_game_with_incorrect_pattern1(self):

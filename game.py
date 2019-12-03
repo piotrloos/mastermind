@@ -1,7 +1,7 @@
 ########################################
 # My version of famous game Mastermind #
 # game.py                              #
-# Main file                            #
+# Main game file                       #
 #                  Piotr Loos (c) 2019 #
 ########################################
 
@@ -9,7 +9,7 @@ from mastermind import Mastermind
 
 
 def main():
-    """ Main I/O function """
+    """ Main I/O file for game """
 
     print()
     print("Welcome in my Mastermind!")
@@ -20,7 +20,7 @@ def main():
 
     while game.active:
 
-        pattern = game.input(input("Guess number {}: ".format(game.tries_counter)))
+        pattern = game.input_pattern(input("Guess number {}: ".format(game.tries_counter)))
 
         if pattern is None:
             print("Incorrect pattern. Try again.")
