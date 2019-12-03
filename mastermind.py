@@ -44,7 +44,9 @@ class Mastermind:
             else:
                 raise ValueError("Incorrect solution pattern.")
 
-        self.guesses = {}  # initialize dictionary of guesses
+        self.guesses = dict()  # initialize dictionary of guesses
+        self.wrongs = set()  # initialize set of wrong patterns
+        self.colors_set = set(range(1, self.colors + 1))  # initialize set of colors (for performance)
         self.tries_counter = 1  # initialize tries counter
         self.active = True  # initialize flag which indicates whether game is active
         self.won = False  # initialize flag which indicates whether the player correctly guessed the solution
@@ -66,7 +68,7 @@ class Mastermind:
         """ Method for validating given pattern """
 
         return isinstance(pattern, tuple) and len(pattern) == self.pegs and all(
-            peg in range(1, self.colors + 1) for peg in pattern)
+            peg in self.colors_set for peg in pattern)
 
     def calculate(self, pattern1, pattern2=None):
         """ Method for calculating black and white pegs from guess pattern """
@@ -81,7 +83,7 @@ class Mastermind:
         # white_black_pegs defines how many guess pegs are in proper color regardless to location
         # white_pegs defines how many guess pegs are in proper color and wrong location
         # to calculate white_pegs it's needed to subtract black_pegs from white_black_pegs
-        white_black_pegs = sum(min(pattern1.count(peg), pattern2.count(peg)) for peg in range(1, self.colors + 1))
+        white_black_pegs = sum(min(pattern1.count(peg), pattern2.count(peg)) for peg in self.colors_set)
 
         return black_pegs, white_black_pegs - black_pegs  # return tuple with black and white pegs
 
@@ -112,11 +114,14 @@ class Mastermind:
         ###  for hint_pattern in product(sample(range(1, self.colors + 1), self.colors), repeat=self.pegs):
 
         # generate all possible patterns using itertools.product function
-        for hint_pattern in product(range(1, self.colors + 1), repeat=self.pegs):
-            if all(self.guesses[pattern] == self.calculate(pattern, hint_pattern)
-                   for pattern in self.guesses.keys()
-                   ):  # check all previous guesses and their result comparing to hint_pattern
+        for hint_pattern in product(self.colors_set, repeat=self.pegs):
+            if hint_pattern not in self.wrongs and all(self.guesses[pattern] == self.calculate(pattern, hint_pattern)
+                                                       for pattern in self.guesses.keys()
+                                                       ):
+                # check all previous guesses and their result comparing to hint_pattern
                 yield hint_pattern
+            else:
+                self.wrongs.add(hint_pattern)
 
     def reveal_solution(self):
         """ Method for returning solution pattern """
