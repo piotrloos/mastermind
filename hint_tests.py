@@ -29,7 +29,7 @@ c = b.hint_generator()
 #     print(next(c))
 # print()
 
-b.guess_pattern(next(c))
+b.guess(next(c))
 # b.guess_pattern((4, 4, 4, 4))
 c = b.hint_generator()
 
@@ -39,14 +39,14 @@ c = b.hint_generator()
 #     print(next(c))
 # print()
 
-b.guess_pattern(next(c))
+b.guess(next(c))
 # b.guess_pattern((5, 2, 3, 4))
 
 c = b.hint_generator()
-b.guess_pattern(next(c))
+b.guess(next(c))
 
 c = b.hint_generator()
-b.guess_pattern(next(c))
+b.guess(next(c))
 
 c = b.hint_generator()
 print(len([x for x in c]))
