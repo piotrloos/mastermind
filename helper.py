@@ -13,20 +13,20 @@ def main():
 
     print()
     print("Welcome in my Mastermind helper!")
-    game = Mastermind(generate=False, pegs=7, colors=10)
+    game = Mastermind(generate=False, pegs=4, colors=6)
     print("Searching for {}-peg solution using {} colors.".format(game.pegs, game.colors))
     print()
 
     result = None
     pattern = None
-    game.hint = game.hint_generator()
+    game.hint = game.hint_generator(shuffle=True)
 
     while result != (game.pegs, 0):
 
         try:
             pattern = next(game.hint)
         except StopIteration:
-            print("No solution!")
+            print("No solution found!")
             game.active = False
             break
 
@@ -34,6 +34,7 @@ def main():
         game.guesses[pattern] = result
 
     if game.active:
+        print()
         print("Solution pattern is {}".format(pattern))
 
 

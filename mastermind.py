@@ -5,9 +5,9 @@
 #                  Piotr Loos (c) 2019 #
 ########################################
 
-from random import randint
+from random import randint, sample
 from settings import PEGS, COLORS, MAX_TRIES
-from itertools import product
+# from itertools import product
 
 
 class Mastermind:
@@ -131,16 +131,30 @@ class Mastermind:
 
         return result
 
-    def hint_generator(self):
+    def hint_generator(self, shuffle=True):
         """ Method for yielding the first pattern that could be the solution based on all previous guesses """
 
-        # generate all possible patterns using itertools.product function (Cartesian product)
-        for hint_pattern in product(self.colors_set, repeat=self.pegs):
+        # generate all possible patterns using my own function
+        # it's similar to Cartesian product (from itertools import product),
+        # but operates on tuples (not lists) and works direct on Mastermind variables
+
+        patterns = [[]]
+
+        if shuffle:
+            for _ in range(self.pegs):
+                patterns = ((*x, y) for x in patterns for y in sample(self.colors_set, self.colors))
+        else:
+            for _ in range(self.pegs):
+                patterns = ((*x, y) for x in patterns for y in self.colors_set)
+
+        # for hint_pattern in product(self.colors_set, repeat=self.pegs):
+        for hint_pattern in patterns:
+
+            # check all previous guesses and their result comparing to hint_pattern
             if all(self.guesses[pattern] == self.calculate(pattern, hint_pattern)
                    for pattern in self.guesses.keys()
                    ):
-                # check all previous guesses and their result comparing to hint_pattern
-                yield hint_pattern
+                yield hint_pattern  # yields pattern if it can be a solution
 
     def reveal_solution(self):
         """ Method for returning solution pattern """

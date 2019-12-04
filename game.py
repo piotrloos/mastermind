@@ -34,6 +34,7 @@ def main():
               )
     else:
         print("You reached guess limit. Unfortunately you lost.")
+        print("The solution pattern was {}.".format(game.reveal_solution()))
 
 
 if __name__ == "__main__":
