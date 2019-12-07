@@ -15,7 +15,7 @@ def main():
     print("Welcome to Mastermind Game!")
     game = Mastermind()
     print("I have prepared {}-peg pattern using {} colors.".format(game.pegs, game.colors))
-    print("You have {} tries to guess the solution.".format(game.max_tries))
+    print("You have {}".format(game.max_tries), "try" if game.max_tries == 1 else "tries", "to guess the solution.")
     print()
 
     while game.active:
@@ -29,11 +29,11 @@ def main():
 
     print()
     if game.won:
-        print("You found the solution in {}".format(game.counter), "guesses." if game.counter > 1 else "guess.")
+        print("You found the solution in {}".format(game.counter), "try." if game.counter == 1 else "tries.")
     else:
         print("Reached guess limit. Game over!")
 
-    print("The solution pattern is {}. Thanks for playing!".format(game.solution))
+    print("The solution pattern is {}.".format(game.solution))
 
 
 if __name__ == "__main__":

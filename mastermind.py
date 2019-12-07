@@ -6,26 +6,28 @@
 ########################################
 
 from random import randint, sample
-from settings import PEGS, COLORS, MAX_TRIES
+from settings import COLORS, PEGS, MAX_TRIES
 
 
 class Mastermind:
     """ Mastermind class contains whole game, the solution pattern and the guesses """
 
-    def __init__(self, solution=None, generate=True, pegs=PEGS, colors=COLORS, max_tries=MAX_TRIES):
+    def __init__(self, solution=None, generate=True,
+                 colors=COLORS, pegs=PEGS, max_tries=MAX_TRIES,
+                 hints_sample_mode=1):
         """ Method for preparing new game with given settings """
-
-        # check if given pegs number is correct
-        if pegs in range(2, 13):  # from 2 to 12
-            self.pegs = pegs
-        else:
-            raise ValueError("Incorrect number of pegs.")
 
         # check if given colors number is correct
         if colors in range(2, 11):  # from 2 to 10
             self.colors = colors
         else:
             raise ValueError("Incorrect number of colors.")
+
+        # check if given pegs number is correct
+        if pegs in range(2, 13):  # from 2 to 12
+            self.pegs = pegs
+        else:
+            raise ValueError("Incorrect number of pegs.")
 
         # check if given max_tries number is correct
         if max_tries in range(1, 33):  # from 1 to 32
@@ -51,16 +53,18 @@ class Mastermind:
         self.counter = 1  # initialize tries counter
         self.active = True  # initialize flag which indicates whether game is active
         self.won = False  # initialize flag which indicates whether the player correctly guessed the solution
+        self.no_solution = False  # initialize flag which indicates whether there was no possible solution error
+        self.hints_sample_mode = hints_sample_mode  # set mode for sampling hints in hint_generator
 
     def input_pattern(self, pattern_string):
         """ Method for inputting pattern from player """
 
-        try:
+        try:  # try to convert pattern_string to tuple (pattern format)
             pattern = tuple(int(peg) for peg in pattern_string.split(maxsplit=self.pegs - 1))
         except ValueError:
             return None
 
-        if self.validate_pattern(pattern):
+        if self.validate_pattern(pattern):  # check if pattern is correct
             return pattern
         else:
             return None
@@ -74,12 +78,12 @@ class Mastermind:
     def input_result(self, result_string):
         """ Method for inputting result from player """
 
-        try:
+        try:  # try to convert result_string to tuple (result format)
             result = tuple(int(peg) for peg in result_string.split(maxsplit=1))
         except ValueError:
             return None
 
-        if self.validate_result(result):
+        if self.validate_result(result):  # check if result is correct
             return result
         else:
             return None
@@ -97,18 +101,10 @@ class Mastermind:
         if pattern in self.guesses.keys():  # check if given pattern was already calculated
             result = self.guesses[pattern]  # retrieve result from dictionary
         else:
-            result = self.calculate(pattern)  # calculate the result
+            result = self.calculate_result(pattern)  # calculate the result
             self.guesses[pattern] = result  # save the result to the dictionary
 
-        if result == (self.pegs, 0):  # check if the pattern is guessed correctly
-            self.active = False
-            self.won = True
-        else:
-            self.counter += 1
-
-        if self.counter > self.max_tries:  # check if the player still can guess
-            self.active = False
-
+        self.check_end_of_game(result)
         return result
 
     def add_result(self, pattern, result):
@@ -116,16 +112,22 @@ class Mastermind:
 
         self.guesses[pattern] = result
 
+        self.check_end_of_game(result)
+        return None
+
+    def check_end_of_game(self, result):
+        """ Method for checking if the game should end """
+
         if result == (self.pegs, 0):  # check if the pattern is guessed correctly
             self.active = False
             self.won = True
         else:
-            self.counter += 1
+            self.counter += 1  # prepare for next turn
 
         if self.counter > self.max_tries:  # check if the player still can guess
             self.active = False
 
-    def calculate(self, pattern1, pattern2=None):
+    def calculate_result(self, pattern1, pattern2=None):
         """ Method for calculating black and white pegs from guess pattern """
 
         # there is a possibility to calculate pattern relative to another pattern, not always solution
@@ -145,7 +147,7 @@ class Mastermind:
 
         return black_pegs, white_black_pegs - black_pegs  # return tuple with black and white pegs
 
-    def hint_generator(self, shuffle=True):
+    def hint_generator(self):
         """ Method for yielding the first pattern that could be the solution based on all previous guesses """
 
         # generate all possible patterns using my own function
@@ -154,16 +156,20 @@ class Mastermind:
 
         patterns = ((),)  # initialize with tuple containing empty tuple
 
-        if shuffle:
+        if self.hints_sample_mode == 1:  # shuffle set of colors to build patterns from (on every iteration)
             for _ in range(self.pegs):
                 patterns = ((*pattern, peg) for pattern in patterns for peg in sample(self.colors_set, self.colors))
-        else:
+        else:  # no shuffle patterns list, they will be in ascending order
             for _ in range(self.pegs):
                 patterns = ((*pattern, peg) for pattern in patterns for peg in self.colors_set)
 
-        # for hint_pattern in product(self.colors_set, repeat=self.pegs):
-        for hint_pattern in patterns:
+        if self.hints_sample_mode == 2:  # shuffle all patterns set (at once)
+            patterns_set = set(patterns)
+            patterns = sample(patterns_set, len(patterns_set))  # now patterns are list, not generator
 
+        for hint_pattern in patterns:
             # check all previous guesses and their result comparing to hint_pattern
-            if all(self.guesses[pattern] == self.calculate(pattern, hint_pattern) for pattern in self.guesses.keys()):
+            if all(self.guesses[pattern] == self.calculate_result(pattern, hint_pattern)
+                   for pattern in self.guesses.keys()
+                   ):
                 yield hint_pattern  # yields pattern if it can be a solution
