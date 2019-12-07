@@ -16,13 +16,13 @@ class MastermindCreationTests(unittest.TestCase):
         pattern = (1, 2, 3, 4)
         a = Mastermind(pattern)
         self.assertTrue(a.active)
-        self.assertTupleEqual(a.reveal_solution(), pattern)
+        self.assertTupleEqual(a.solution, pattern)
         self.assertFalse(a.active)
 
     def test_new_game_without_given_pattern(self):
         a = Mastermind()
         self.assertTrue(a.active)
-        self.assertTrue(a.validate_pattern(a.reveal_solution()))
+        self.assertTrue(a.validate_pattern(a.solution))
         self.assertFalse(a.active)
 
     def test_new_game_with_incorrect_pattern1(self):
@@ -52,12 +52,12 @@ class CustomGameCreationTests(unittest.TestCase):
     def test_new_game_with_more_pegs_number(self):
         pattern = (1, 2, 3, 4, 5)
         a = Mastermind(pattern, pegs=5)
-        self.assertTupleEqual(a.reveal_solution(), pattern)
+        self.assertTupleEqual(a.solution, pattern)
 
     def test_new_game_with_less_pegs_number(self):
         pattern = (1, 2)
         a = Mastermind(pattern, pegs=2)
-        self.assertTupleEqual(a.reveal_solution(), pattern)
+        self.assertTupleEqual(a.solution, pattern)
 
     def test_new_game_with_incorrect_pegs_number(self):
         pattern = (1,)
@@ -67,12 +67,12 @@ class CustomGameCreationTests(unittest.TestCase):
     def test_new_game_with_more_colors_number(self):
         pattern = (1, 2, 7, 8)
         a = Mastermind(pattern, colors=8)
-        self.assertTupleEqual(a.reveal_solution(), pattern)
+        self.assertTupleEqual(a.solution, pattern)
 
     def test_new_game_with_less_colors_number(self):
         pattern = (1, 2, 1, 2)
         a = Mastermind(pattern, colors=2)
-        self.assertTupleEqual(a.reveal_solution(), pattern)
+        self.assertTupleEqual(a.solution, pattern)
 
     def test_new_game_with_incorrect_colors_number(self):
         pattern = (1, 1, 1, 1)
@@ -82,7 +82,7 @@ class CustomGameCreationTests(unittest.TestCase):
     def test_new_game_with_custom_correct_settings(self):
         pattern = (8, 4, 1, 3, 8, 5)
         a = Mastermind(pattern, pegs=6, colors=8)
-        self.assertTupleEqual(a.reveal_solution(), pattern)
+        self.assertTupleEqual(a.solution, pattern)
 
     def test_new_game_with_custom_incorrect_settings1(self):
         pattern = (4, 7, 5, 2, 8)
@@ -108,16 +108,16 @@ class PegsCalculateTests(unittest.TestCase):
 
     def test_example_game(self):
         self.assertTrue(self.a.active)
-        self.assertTupleEqual(self.a.guess((1, 6, 9, 7, 10, 4)), (0, 0))
-        self.assertTupleEqual(self.a.guess((1, 6, 5, 6, 8, 4)), (0, 2))
-        self.assertTupleEqual(self.a.guess((9, 2, 3, 7, 2, 10)), (0, 2))
-        self.assertTupleEqual(self.a.guess((8, 8, 10, 5, 10, 3)), (2, 2))
-        self.assertTupleEqual(self.a.guess((3, 8, 10, 10, 1, 5)), (1, 2))
-        self.assertTupleEqual(self.a.guess((5, 4, 10, 8, 3, 8)), (0, 4))
-        self.assertTupleEqual(self.a.guess((10, 5, 8, 9, 5, 8)), (2, 1))
-        self.assertTupleEqual(self.a.guess((7, 7, 8, 3, 8, 5)), (2, 2))
-        self.assertTupleEqual(self.a.guess((2, 8, 6, 3, 5, 3)), (5, 0))
-        self.assertTupleEqual(self.a.guess((8, 3, 2, 5, 3, 8)), (0, 6))
+        self.assertTupleEqual(self.a.add_pattern((1, 6, 9, 7, 10, 4)), (0, 0))
+        self.assertTupleEqual(self.a.add_pattern((1, 6, 5, 6, 8, 4)), (0, 2))
+        self.assertTupleEqual(self.a.add_pattern((9, 2, 3, 7, 2, 10)), (0, 2))
+        self.assertTupleEqual(self.a.add_pattern((8, 8, 10, 5, 10, 3)), (2, 2))
+        self.assertTupleEqual(self.a.add_pattern((3, 8, 10, 10, 1, 5)), (1, 2))
+        self.assertTupleEqual(self.a.add_pattern((5, 4, 10, 8, 3, 8)), (0, 4))
+        self.assertTupleEqual(self.a.add_pattern((10, 5, 8, 9, 5, 8)), (2, 1))
+        self.assertTupleEqual(self.a.add_pattern((7, 7, 8, 3, 8, 5)), (2, 2))
+        self.assertTupleEqual(self.a.add_pattern((2, 8, 6, 3, 5, 3)), (5, 0))
+        self.assertTupleEqual(self.a.add_pattern((8, 3, 2, 5, 3, 8)), (0, 6))
         self.assertTrue(self.a.active)
-        self.assertTupleEqual(self.a.guess((2, 8, 8, 3, 5, 3)), (6, 0))
+        self.assertTupleEqual(self.a.add_pattern((2, 8, 8, 3, 5, 3)), (6, 0))
         self.assertFalse(self.a.active)

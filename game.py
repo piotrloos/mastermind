@@ -9,32 +9,31 @@ from mastermind import Mastermind
 
 
 def main():
-    """ Main I/O file for game """
+    """ Main I/O file for Mastermind Game """
 
     print()
-    print("Welcome in my Mastermind!")
+    print("Welcome to Mastermind Game!")
     game = Mastermind()
-    print("Generated {}-peg pattern using {} colors.".format(game.pegs, game.colors))
+    print("I have prepared {}-peg pattern using {} colors.".format(game.pegs, game.colors))
     print("You have {} tries to guess the solution.".format(game.max_tries))
     print()
 
     while game.active:
 
-        pattern = game.input_pattern(input("Guess number {}: ".format(game.tries_counter)))
+        pattern = game.input_pattern(input("{}: ".format(game.counter)))
 
         if pattern is None:
-            print("Incorrect pattern. Try again.")
+            print("Incorrect pattern. Enter again.")
         else:
-            print("{}: {} -> {}".format(game.tries_counter, pattern, game.guess(pattern)))
-            print()
+            print("{}: {} -> {}".format(game.counter, pattern, game.add_pattern(pattern)))
 
+    print()
     if game.won:
-        print("You won in {}".format(game.tries_counter),
-              "guesses." if game.tries_counter > 1 else "guess. Congratulations!"
-              )
+        print("You found the solution in {}".format(game.counter), "guesses." if game.counter > 1 else "guess.")
     else:
-        print("You reached guess limit. Unfortunately you lost.")
-        print("The solution pattern was {}.".format(game.reveal_solution()))
+        print("Reached guess limit. Game over!")
+
+    print("The solution pattern is {}. Thanks for playing!".format(game.solution))
 
 
 if __name__ == "__main__":

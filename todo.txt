@@ -1,0 +1,13 @@
+walidacja wpisanego result w klasie
+rozdzielenie klas na Game i Helper dziedziczone po Mastermind
+opcje sample i shuffle w hint_generator
+przyspieszenie hint_generator:
+    wielowątkowość
+    ocena ważności wyniku i sprawdzanie all() po ważności
+    szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
+    budowanie listy patterns w formie generatora, a nie od razu
+parametry wejściowe przy uruchamianiu gry
+licznik prób dla Helpera
+formatowanie patternów (wpisywanie i wyświetlanie małych/dużych liter itp.)
+możliwość gry komputera samego ze sobą
+testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
