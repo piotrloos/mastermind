@@ -5,7 +5,7 @@
 #                  Piotr Loos (c) 2019 #
 ########################################
 
-from mastermind import Mastermind
+from mastermind import Game
 
 
 def main():
@@ -13,7 +13,7 @@ def main():
 
     print()
     print("Welcome to Mastermind Game!")
-    game = Mastermind()
+    game = Game()
     print("I have prepared {}-peg pattern using {} colors.".format(game.pegs, game.colors))
     print("You have {}".format(game.max_tries), "try" if game.max_tries == 1 else "tries", "to guess the solution.")
     print()

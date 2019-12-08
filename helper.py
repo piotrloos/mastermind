@@ -5,7 +5,7 @@
 #                  Piotr Loos (c) 2019 #
 ########################################
 
-from mastermind import Mastermind
+from mastermind import Helper
 
 
 def main():
@@ -13,39 +13,36 @@ def main():
 
     print()
     print("Welcome to Mastermind Helper!")
-    game = Mastermind(generate=False, colors=10, pegs=6, hints_sample_mode=0)
-    print("You have prepared {}-peg pattern using {} colors.".format(game.pegs, game.colors))
-    print("I have {}".format(game.max_tries), "try" if game.max_tries == 1 else "tries", "to guess the solution.")
+    helper = Helper(colors=10, pegs=7, hints_sample_mode=1)
+    print("You have prepared {}-peg pattern using {} colors.".format(helper.pegs, helper.colors))
+    print("I have {}".format(helper.max_tries), "try" if helper.max_tries == 1 else "tries", "to guess the solution.")
     print()
 
     pattern = None
-    game.hint = game.hint_generator()
 
-    while not game.status:
+    while not helper.status:
 
-        try:
-            pattern = next(game.hint)
-        except StopIteration:
-            game.status = 3
+        pattern = helper.get_hint()
+        if pattern is None:
             break
 
         while True:
             # map(lambda x: chr(x+96), pattern)
-            result = game.input_result(input("{}: {} -> ".format(game.counter, pattern)))
+            result = helper.input_result(input("{}: {} -> ".format(helper.counter, pattern)))
 
             if result is None:
                 print("Incorrect result value. Enter again.")
             else:
-                game.add_result(pattern, result)
+                helper.add_result(pattern, result)
                 break
 
     print()
-    if game.status == 1:
-        print("The solution pattern is {}".format(pattern))
-        print("I found the solution in {}".format(game.counter), "try." if game.counter == 1 else "tries.")
-    elif game.status == 2:
+    if helper.status == 1:
+        print("The solution pattern is {}.".format(pattern))
+        print("I found the solution in {}".format(helper.counter), "try." if helper.counter == 1 else "tries.")
+    elif helper.status == 2:
         print("I reached tries limit. Game over!")
-    elif game.status == 3:
+    elif helper.status == 3:
         print("No possible solution found!")
 
 

@@ -12,9 +12,7 @@ from settings import COLORS, PEGS, MAX_TRIES
 class Mastermind:
     """ Mastermind class contains whole game, the solution pattern and the guesses """
 
-    def __init__(self, solution=None, generate=True,
-                 colors=COLORS, pegs=PEGS, max_tries=MAX_TRIES,
-                 hints_sample_mode=1):
+    def __init__(self, colors=COLORS, pegs=PEGS, max_tries=MAX_TRIES):
         """ Method for preparing new game with given settings """
 
         # check if given colors number is correct
@@ -35,23 +33,55 @@ class Mastermind:
         else:
             raise ValueError("Incorrect number of max_tries.")
 
-        # check if given hints_sample_mode is correct
-        if hints_sample_mode in range(0, 3):  # from 0 to 2
-            self.hints_sample_mode = hints_sample_mode
-        else:
-            raise ValueError("Incorrect hints sample mode.")
-
         self.guesses = dict()  # initialize dictionary of guesses
         self.colors_set = set(range(1, self.colors + 1))  # initialize set of colors (for performance)
+        self.solution = None
         self.counter = 1  # initialize tries counter
         self.status = 0  # 0 = game is active, 1 = solution is found, 2 = reached tries limit, 3 = no possible solution
 
-        # check if solution is given, if not -> randomize new pattern (if needed)
-        if solution is None:
-            if generate:
-                self.solution = tuple(randint(1, self.colors) for _ in range(self.pegs))
+    def calculate_result(self, pattern1, pattern2=None):
+        """ Method for calculating black and white pegs from guess pattern """
+
+        # there is a possibility to calculate pattern relative to another pattern, not always solution
+        if pattern2 is None:
+            if self.solution is None:
+                raise ValueError("No solution pattern to calculate.")
             else:
-                self.solution = None
+                pattern2 = self.solution
+
+        # black_pegs defines how many guess pegs are in proper color and in proper location
+        black_pegs = sum(peg1 == peg2 for peg1, peg2 in zip(pattern1, pattern2))
+
+        # white_black_pegs defines how many guess pegs are in proper color regardless to location
+        # white_pegs defines how many guess pegs are in proper color and wrong location
+        # to calculate white_pegs it's needed to subtract black_pegs from white_black_pegs
+        white_black_pegs = sum(min(pattern1.count(peg), pattern2.count(peg)) for peg in self.colors_set)
+
+        return black_pegs, white_black_pegs - black_pegs  # return tuple with black and white pegs
+
+    def check_end_criteria(self, result):
+        """ Method for checking if the game should end """
+
+        if result == (self.pegs, 0):  # check if the pattern is guessed correctly
+            self.status = 1
+        else:
+            self.counter += 1  # prepare for next turn
+
+        if self.counter > self.max_tries:  # check if the player still can guess
+            self.status = 2
+
+
+class Game(Mastermind):
+    """ Game class inherits from Mastermind class """
+
+    def __init__(self, solution=None, **kwargs):
+        """ Method for initializing Game class object """
+
+        super().__init__(**kwargs)
+
+        # check if solution is given, if not -> randomize new pattern
+        if solution is None:
+            self.solution = tuple(randint(1, self.colors) for _ in range(self.pegs))
         else:
             # check if given solution is correct
             if self.validate_pattern(solution):
@@ -78,6 +108,34 @@ class Mastermind:
         return isinstance(pattern, tuple) and len(pattern) == self.pegs and all(
             peg in self.colors_set for peg in pattern)
 
+    def add_pattern(self, pattern):
+        """ Method for adding pattern by the player """
+
+        if pattern in self.guesses.keys():  # check if given pattern was already calculated
+            result = self.guesses[pattern]  # retrieve result from dictionary
+        else:
+            result = self.calculate_result(pattern)  # calculate the result
+            self.guesses[pattern] = result  # save the result to the dictionary
+
+        self.check_end_criteria(result)
+        return result
+
+
+class Helper(Mastermind):
+    """ Helper class inherits from Mastermind class """
+
+    def __init__(self, hints_sample_mode=1, **kwargs):
+        """ Method for initializing Helper class object """
+
+        super().__init__(**kwargs)
+        self.hint = self.hint_generator()
+
+        # check if given hints_sample_mode is correct
+        if hints_sample_mode in range(0, 3):  # from 0 to 2
+            self.hints_sample_mode = hints_sample_mode
+        else:
+            raise ValueError("Incorrect hints sample mode.")
+
     def input_result(self, result_string):
         """ Method for inputting result from player """
 
@@ -98,56 +156,13 @@ class Mastermind:
             peg in range(0, self.pegs + 1) for peg in [result[0], result[1], result[0] + result[1]]
         )
 
-    def add_pattern(self, pattern):
-        """ Method for adding pattern by the player """
-
-        if pattern in self.guesses.keys():  # check if given pattern was already calculated
-            result = self.guesses[pattern]  # retrieve result from dictionary
-        else:
-            result = self.calculate_result(pattern)  # calculate the result
-            self.guesses[pattern] = result  # save the result to the dictionary
-
-        self.check_end_of_game(result)
-        return result
-
     def add_result(self, pattern, result):
         """ Method for adding result by the player """
 
         self.guesses[pattern] = result
 
-        self.check_end_of_game(result)
+        self.check_end_criteria(result)
         return None
-
-    def check_end_of_game(self, result):
-        """ Method for checking if the game should end """
-
-        if result == (self.pegs, 0):  # check if the pattern is guessed correctly
-            self.status = 1
-        else:
-            self.counter += 1  # prepare for next turn
-
-        if self.counter > self.max_tries:  # check if the player still can guess
-            self.status = 2
-
-    def calculate_result(self, pattern1, pattern2=None):
-        """ Method for calculating black and white pegs from guess pattern """
-
-        # there is a possibility to calculate pattern relative to another pattern, not always solution
-        if pattern2 is None:
-            if self.solution is None:
-                raise ValueError("No solution pattern to calculate.")
-            else:
-                pattern2 = self.solution
-
-        # black_pegs defines how many guess pegs are in proper color and in proper location
-        black_pegs = sum(peg1 == peg2 for peg1, peg2 in zip(pattern1, pattern2))
-
-        # white_black_pegs defines how many guess pegs are in proper color regardless to location
-        # white_pegs defines how many guess pegs are in proper color and wrong location
-        # to calculate white_pegs it's needed to subtract black_pegs from white_black_pegs
-        white_black_pegs = sum(min(pattern1.count(peg), pattern2.count(peg)) for peg in self.colors_set)
-
-        return black_pegs, white_black_pegs - black_pegs  # return tuple with black and white pegs
 
     def hint_generator(self):
         """ Method for yielding the first pattern that could be the solution based on all previous guesses """
@@ -175,3 +190,12 @@ class Mastermind:
                    for pattern in self.guesses.keys()
                    ):
                 yield hint_pattern  # yields pattern if it can be a solution
+
+    def get_hint(self):
+        """ Method for getting the next hint pattern """
+
+        try:
+            return next(self.hint)
+        except StopIteration:
+            self.status = 3
+            return None
