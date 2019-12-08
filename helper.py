@@ -21,13 +21,12 @@ def main():
     pattern = None
     game.hint = game.hint_generator()
 
-    while game.active:
+    while not game.status:
 
         try:
             pattern = next(game.hint)
         except StopIteration:
-            game.active = False
-            game.no_solution = True
+            game.status = 3
             break
 
         while True:
@@ -41,14 +40,13 @@ def main():
                 break
 
     print()
-    if game.won:
+    if game.status == 1:
         print("The solution pattern is {}".format(pattern))
         print("I found the solution in {}".format(game.counter), "try." if game.counter == 1 else "tries.")
-    else:
-        if game.no_solution:
-            print("No solution found!")
-        else:
-            print("Reached guess limit. Game over!")
+    elif game.status == 2:
+        print("I reached tries limit. Game over!")
+    elif game.status == 3:
+        print("No possible solution found!")
 
 
 if __name__ == "__main__":

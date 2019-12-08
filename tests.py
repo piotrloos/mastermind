@@ -14,16 +14,14 @@ class MastermindCreationTests(unittest.TestCase):
 
     def test_new_game_with_correct_pattern(self):
         pattern = (1, 2, 3, 4)
-        a = Mastermind(pattern)
-        self.assertTrue(a.active)
+        a = Mastermind(solution=pattern)
+        self.assertEqual(a.status, 0)
         self.assertTupleEqual(a.solution, pattern)
-        self.assertFalse(a.active)
 
     def test_new_game_without_given_pattern(self):
         a = Mastermind()
-        self.assertTrue(a.active)
+        self.assertEqual(a.status, 0)
         self.assertTrue(a.validate_pattern(a.solution))
-        self.assertFalse(a.active)
 
     def test_new_game_with_incorrect_pattern1(self):
         with self.assertRaises(ValueError):
@@ -107,7 +105,7 @@ class PegsCalculateTests(unittest.TestCase):
         self.a = Mastermind(solution=(2, 8, 8, 3, 5, 3), pegs=6, colors=10, max_tries=20)
 
     def test_example_game(self):
-        self.assertTrue(self.a.active)
+        self.assertEqual(self.a.status, 0)
         self.assertTupleEqual(self.a.add_pattern((1, 6, 9, 7, 10, 4)), (0, 0))
         self.assertTupleEqual(self.a.add_pattern((1, 6, 5, 6, 8, 4)), (0, 2))
         self.assertTupleEqual(self.a.add_pattern((9, 2, 3, 7, 2, 10)), (0, 2))
@@ -118,6 +116,6 @@ class PegsCalculateTests(unittest.TestCase):
         self.assertTupleEqual(self.a.add_pattern((7, 7, 8, 3, 8, 5)), (2, 2))
         self.assertTupleEqual(self.a.add_pattern((2, 8, 6, 3, 5, 3)), (5, 0))
         self.assertTupleEqual(self.a.add_pattern((8, 3, 2, 5, 3, 8)), (0, 6))
-        self.assertTrue(self.a.active)
+        self.assertEqual(self.a.status, 0)
         self.assertTupleEqual(self.a.add_pattern((2, 8, 8, 3, 5, 3)), (6, 0))
-        self.assertFalse(self.a.active)
+        self.assertEqual(self.a.status, 1)

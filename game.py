@@ -18,7 +18,7 @@ def main():
     print("You have {}".format(game.max_tries), "try" if game.max_tries == 1 else "tries", "to guess the solution.")
     print()
 
-    while game.active:
+    while not game.status:
 
         pattern = game.input_pattern(input("{}: ".format(game.counter)))
 
@@ -28,10 +28,10 @@ def main():
             print("{}: {} -> {}".format(game.counter, pattern, game.add_pattern(pattern)))
 
     print()
-    if game.won:
+    if game.status == 1:
         print("You found the solution in {}".format(game.counter), "try." if game.counter == 1 else "tries.")
-    else:
-        print("Reached guess limit. Game over!")
+    elif game.status == 2:
+        print("You reached tries limit. Game over!")
 
     print("The solution pattern is {}.".format(game.solution))
 

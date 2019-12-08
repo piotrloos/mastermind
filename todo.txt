@@ -1,5 +1,4 @@
 przeniesienie StopIteration w Helperze do klasy, lepsza obsługa ruchu w Helperze
-obsługa self.exit_code zamiast pól self.active, self.won, self.error itp.
 formatowanie patternów (wpisywanie i wyświetlanie małych/dużych liter itp.), liczenie kolorów od 0
 rozdzielenie klas na osobne klasy Game i Helper dziedziczone po Mastermind
 parametry wejściowe przy uruchamianiu gry

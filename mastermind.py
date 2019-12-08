@@ -35,6 +35,17 @@ class Mastermind:
         else:
             raise ValueError("Incorrect number of max_tries.")
 
+        # check if given hints_sample_mode is correct
+        if hints_sample_mode in range(0, 3):  # from 0 to 2
+            self.hints_sample_mode = hints_sample_mode
+        else:
+            raise ValueError("Incorrect hints sample mode.")
+
+        self.guesses = dict()  # initialize dictionary of guesses
+        self.colors_set = set(range(1, self.colors + 1))  # initialize set of colors (for performance)
+        self.counter = 1  # initialize tries counter
+        self.status = 0  # 0 = game is active, 1 = solution is found, 2 = reached tries limit, 3 = no possible solution
+
         # check if solution is given, if not -> randomize new pattern (if needed)
         if solution is None:
             if generate:
@@ -47,14 +58,6 @@ class Mastermind:
                 self.solution = solution
             else:
                 raise ValueError("Incorrect solution pattern.")
-
-        self.guesses = dict()  # initialize dictionary of guesses
-        self.colors_set = set(range(1, self.colors + 1))  # initialize set of colors (for performance)
-        self.counter = 1  # initialize tries counter
-        self.active = True  # initialize flag which indicates whether game is active
-        self.won = False  # initialize flag which indicates whether the player correctly guessed the solution
-        self.no_solution = False  # initialize flag which indicates whether there was no possible solution error
-        self.hints_sample_mode = hints_sample_mode  # set mode for sampling hints in hint_generator
 
     def input_pattern(self, pattern_string):
         """ Method for inputting pattern from player """
@@ -119,13 +122,12 @@ class Mastermind:
         """ Method for checking if the game should end """
 
         if result == (self.pegs, 0):  # check if the pattern is guessed correctly
-            self.active = False
-            self.won = True
+            self.status = 1
         else:
             self.counter += 1  # prepare for next turn
 
         if self.counter > self.max_tries:  # check if the player still can guess
-            self.active = False
+            self.status = 2
 
     def calculate_result(self, pattern1, pattern2=None):
         """ Method for calculating black and white pegs from guess pattern """
