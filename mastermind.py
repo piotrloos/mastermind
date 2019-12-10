@@ -34,7 +34,7 @@ class Mastermind:
             raise ValueError("Incorrect number of max_tries.")
 
         self.guesses = dict()  # initialize dictionary of guesses
-        self.colors_set = set(range(1, self.colors + 1))  # initialize set of colors (for performance)
+        self.colors_set = set(range(self.colors))  # initialize set of colors (for performance)
         self.solution = None
         self.counter = 1  # initialize tries counter
         self.status = 0  # 0 = game is active, 1 = solution is found, 2 = reached tries limit, 3 = no possible solution
@@ -70,6 +70,10 @@ class Mastermind:
         if self.counter > self.max_tries:  # check if the player still can guess
             self.status = 2
 
+    @staticmethod
+    def print_pattern(pattern):
+        return "[ " + " ".join(chr(peg + 97) for peg in pattern) + " ]"
+
 
 class Game(Mastermind):
     """ Game class inherits from Mastermind class """
@@ -81,7 +85,7 @@ class Game(Mastermind):
 
         # check if solution is given, if not -> randomize new pattern
         if solution is None:
-            self.solution = tuple(randint(1, self.colors) for _ in range(self.pegs))
+            self.solution = tuple(randint(0, self.colors - 1) for _ in range(self.pegs))
         else:
             # check if given solution is correct
             if self.validate_pattern(solution):
@@ -93,7 +97,7 @@ class Game(Mastermind):
         """ Method for inputting pattern from player """
 
         try:  # try to convert pattern_string to tuple (pattern format)
-            pattern = tuple(int(peg) for peg in pattern_string.split(maxsplit=self.pegs - 1))
+            pattern = tuple(ord(peg) - 97 for peg in pattern_string.split(maxsplit=self.pegs - 1))
         except ValueError:
             return None
 

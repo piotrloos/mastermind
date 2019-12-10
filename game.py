@@ -25,7 +25,7 @@ def main():
         if pattern is None:
             print("Incorrect pattern. Enter again.")
         else:
-            print("{}: {} -> {}".format(game.counter, pattern, game.add_pattern(pattern)))
+            print("{}: {} -> {}".format(game.counter, game.print_pattern(pattern), game.add_pattern(pattern)))
 
     print()
     if game.status == 1:
@@ -33,7 +33,7 @@ def main():
     elif game.status == 2:
         print("You reached tries limit. Game over!")
 
-    print("The solution pattern is {}.".format(game.solution))
+    print("The solution pattern is {}.".format(game.print_pattern(game.solution)))
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ def main():
 
     print()
     print("Welcome to Mastermind Helper!")
-    helper = Helper(colors=10, pegs=7, hints_sample_mode=1)
+    helper = Helper(colors=6, pegs=4, hints_sample_mode=2)
     print("You have prepared {}-peg pattern using {} colors.".format(helper.pegs, helper.colors))
     print("I have {}".format(helper.max_tries), "try" if helper.max_tries == 1 else "tries", "to guess the solution.")
     print()
@@ -27,8 +27,7 @@ def main():
             break
 
         while True:
-            # map(lambda x: chr(x+96), pattern)
-            result = helper.input_result(input("{}: {} -> ".format(helper.counter, pattern)))
+            result = helper.input_result(input("{}: {} -> ".format(helper.counter, helper.print_pattern(pattern))))
 
             if result is None:
                 print("Incorrect result value. Enter again.")
@@ -38,7 +37,7 @@ def main():
 
     print()
     if helper.status == 1:
-        print("The solution pattern is {}.".format(pattern))
+        print("The solution pattern is {}.".format(helper.print_pattern(pattern)))
         print("I found the solution in {}".format(helper.counter), "try." if helper.counter == 1 else "tries.")
     elif helper.status == 2:
         print("I reached tries limit. Game over!")

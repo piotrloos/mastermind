@@ -1,6 +1,7 @@
 lepsza obsługa ruchu w Helperze
-formatowanie patternów (wpisywanie i wyświetlanie małych/dużych liter itp.), Colorama, liczenie kolorów od 0
+formatowanie patternów (Colorama)
 parametry wejściowe przy uruchamianiu gry
+klasy na Pattern i Result
 przyspieszenie hint_generator:
     ocena ważności wyniku i sprawdzanie all() po ważności
     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
