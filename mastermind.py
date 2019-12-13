@@ -39,7 +39,7 @@ class Mastermind:
         self.counter = 1  # initialize tries counter
         self.status = 0  # 0 = game is active, 1 = solution is found, 2 = reached tries limit, 3 = no possible solution
 
-    def calculate_result(self, pattern1, pattern2=None):
+    def calculate(self, pattern1, pattern2=None):
         """ Method for calculating black and white pegs from guess pattern """
 
         # there is a possibility to calculate pattern relative to another pattern, not always solution
@@ -81,7 +81,7 @@ class Game(Mastermind):
     def __init__(self, solution=None, **kwargs):
         """ Method for initializing Game class object """
 
-        super().__init__(**kwargs)
+        super().__init__(**kwargs)  # initialize Mastermind class object
 
         # check if solution is given, if not -> randomize new pattern
         if solution is None:
@@ -118,7 +118,7 @@ class Game(Mastermind):
         if pattern in self.guesses.keys():  # check if given pattern was already calculated
             result = self.guesses[pattern]  # retrieve result from dictionary
         else:
-            result = self.calculate_result(pattern)  # calculate the result
+            result = self.calculate(pattern)  # calculate the result
             self.guesses[pattern] = result  # save the result to the dictionary
 
         self.check_end_criteria(result)
@@ -128,17 +128,19 @@ class Game(Mastermind):
 class Helper(Mastermind):
     """ Helper class inherits from Mastermind class """
 
-    def __init__(self, hints_sample_mode=1, **kwargs):
+    def __init__(self, hint_mode=1, **kwargs):
         """ Method for initializing Helper class object """
 
-        super().__init__(**kwargs)
-        self.hint = self.hint_generator()
+        super().__init__(**kwargs)  # initialize Mastermind class object
 
-        # check if given hints_sample_mode is correct
-        if hints_sample_mode in range(0, 3):  # from 0 to 2
-            self.hints_sample_mode = hints_sample_mode
+        # check if given hint_mode is correct
+        if hint_mode in range(0, 3):  # from 0 to 2
+            self.hint_mode = hint_mode
         else:
-            raise ValueError("Incorrect hints sample mode.")
+            raise ValueError("Incorrect hints shuffle mode.")
+
+        self.hint = self.hint_generator()  # initialize hint pattern generator
+        self.next_hint_pattern = self.next_pattern()  # get first pattern
 
     def input_result(self, result_string):
         """ Method for inputting result from player """
@@ -166,7 +168,7 @@ class Helper(Mastermind):
         self.guesses[pattern] = result
 
         self.check_end_criteria(result)
-        return None
+        # return None
 
     def hint_generator(self):
         """ Method for yielding the first pattern that could be the solution based on all previous guesses """
@@ -175,31 +177,54 @@ class Helper(Mastermind):
         # it's similar to Cartesian product (import itertools.product),
         # but operates on tuples (not lists) and works direct on Mastermind variables
 
-        patterns = ((),)  # initialize with tuple containing empty tuple
+        patterns = (),  # initialize with tuple containing empty tuple
 
-        if self.hints_sample_mode == 1:  # shuffle set of colors to build patterns from (on every iteration)
+        # build list (generator) of all possible patterns
+        if self.hint_mode == 1:  # shuffle set of colors to build patterns from (on every iteration)
             for _ in range(self.pegs):
                 patterns = ((*pattern, peg) for pattern in patterns for peg in sample(self.colors_set, self.colors))
         else:  # no shuffle patterns list, they will be in ascending order
             for _ in range(self.pegs):
                 patterns = ((*pattern, peg) for pattern in patterns for peg in self.colors_set)
 
-        if self.hints_sample_mode == 2:  # shuffle all patterns set (at once)
+        if self.hint_mode == 2:  # shuffle all patterns set (at once)
             patterns_set = set(patterns)
             patterns = sample(patterns_set, len(patterns_set))  # now patterns are list, not generator
 
         for hint_pattern in patterns:
-            # check all previous guesses and their result comparing to hint_pattern
-            if all(self.guesses[pattern] == self.calculate_result(pattern, hint_pattern)
-                   for pattern in self.guesses.keys()
-                   ):
+            if self.hint_checker(hint_pattern):
                 yield hint_pattern  # yields pattern if it can be a solution
 
-    def get_hint(self):
+    def hint_checker(self, hint_pattern):
+        """ Method for checking if given pattern can be a hint based on all previous guesses """
+
+        return all(self.guesses[pattern] == self.calculate(pattern, hint_pattern) for pattern in self.guesses.keys())
+
+    def next_pattern(self, set_status=True):
         """ Method for getting the next hint pattern """
 
         try:
             return next(self.hint)
         except StopIteration:
+            if set_status:
+                self.status = 3
+            return None
+
+    def get_hint(self):
+        """ Method for generating the next hint pattern and checking if exists another solution """
+
+        if self.next_hint_pattern is None:
             self.status = 3
             return None
+        else:
+            if self.hint_checker(self.next_hint_pattern):
+                hint_pattern = self.next_hint_pattern
+            else:
+                hint_pattern = self.next_pattern()
+
+        self.next_hint_pattern = self.next_pattern(set_status=False)
+
+        if self.next_hint_pattern is None and hint_pattern is not None:
+            print("Only one possible pattern!")  # for tests
+
+        return hint_pattern

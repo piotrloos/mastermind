@@ -12,3 +12,5 @@ poukrywanie metod i pól wewnętrznych w klasie
 testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
 pola klasy tylko do odczytu z zewnątrz (odpowiednie property)
 więcej testów dla Game i Helpera
+uporządkować komunikację między front-endem a back-endem
+settery, gettery i @property w klasach
