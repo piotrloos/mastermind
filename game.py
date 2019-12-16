@@ -20,7 +20,7 @@ def main():
 
     while not game.status:
 
-        pattern = game.input_pattern(input("{}: ".format(game.counter)))
+        pattern = game.input_pattern(input(game.prompt()))
 
         if pattern is None:
             print("Incorrect pattern. Enter again.")

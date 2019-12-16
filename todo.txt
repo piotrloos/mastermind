@@ -6,7 +6,7 @@ przyspieszenie hint_generator:
     ocena ważności wyniku i sprawdzanie all() po ważności
     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
     wielowątkowość
-liczenie możliwych patternów hint_generatora (lub chociaż czy jest jeszcze inne rozwiązanie)
+liczenie możliwych patternów hint_generatora
 możliwość gry komputera samego ze sobą
 poukrywanie metod i pól wewnętrznych w klasie
 testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
@@ -14,3 +14,5 @@ pola klasy tylko do odczytu z zewnątrz (odpowiednie property)
 więcej testów dla Game i Helpera
 uporządkować komunikację między front-endem a back-endem
 settery, gettery i @property w klasach
+poprawienie split w input_pattern (wysypuje się ord() dla dwóch liter)
+zmiana opisów/komentarzy pod deficjami metod na bardziej precyzyjne

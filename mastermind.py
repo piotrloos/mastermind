@@ -64,14 +64,20 @@ class Mastermind:
 
         if result == (self.pegs, 0):  # check if the pattern is guessed correctly
             self.status = 1
+            return True
         else:
             self.counter += 1  # prepare for next turn
 
         if self.counter > self.max_tries:  # check if the player still can guess
             self.status = 2
+            return True
+
+        return False
 
     @staticmethod
     def print_pattern(pattern):
+        """ Method for formatting pattern """
+
         return "[ " + " ".join(chr(peg + 97) for peg in pattern) + " ]"
 
 
@@ -124,6 +130,11 @@ class Game(Mastermind):
         self.check_end_criteria(result)
         return result
 
+    def prompt(self):
+        """ Method for returning prompt string """
+
+        return "{}: ".format(self.counter)
+
 
 class Helper(Mastermind):
     """ Helper class inherits from Mastermind class """
@@ -140,7 +151,8 @@ class Helper(Mastermind):
             raise ValueError("Incorrect hints shuffle mode.")
 
         self.hint = self.hint_generator()  # initialize hint pattern generator
-        self.next_hint_pattern = self.next_pattern()  # get first pattern
+        self.current_pattern = self.hint_next()  # get first pattern
+        self.next_pattern = self.hint_next(set_status=False)  # get second pattern
 
     def input_result(self, result_string):
         """ Method for inputting result from player """
@@ -162,13 +174,13 @@ class Helper(Mastermind):
             peg in range(0, self.pegs + 1) for peg in [result[0], result[1], result[0] + result[1]]
         )
 
-    def add_result(self, pattern, result):
+    def add_result(self, result):
         """ Method for adding result by the player """
 
-        self.guesses[pattern] = result
+        self.guesses[self.current_pattern] = result
 
-        self.check_end_criteria(result)
-        # return None
+        if not self.check_end_criteria(result):
+            self.queue_next_pattern()
 
     def hint_generator(self):
         """ Method for yielding the first pattern that could be the solution based on all previous guesses """
@@ -192,15 +204,15 @@ class Helper(Mastermind):
             patterns = sample(patterns_set, len(patterns_set))  # now patterns are list, not generator
 
         for hint_pattern in patterns:
-            if self.hint_checker(hint_pattern):
+            if self.hint_check(hint_pattern):
                 yield hint_pattern  # yields pattern if it can be a solution
 
-    def hint_checker(self, hint_pattern):
+    def hint_check(self, hint_pattern):
         """ Method for checking if given pattern can be a hint based on all previous guesses """
 
         return all(self.guesses[pattern] == self.calculate(pattern, hint_pattern) for pattern in self.guesses.keys())
 
-    def next_pattern(self, set_status=True):
+    def hint_next(self, set_status=True):
         """ Method for getting the next hint pattern """
 
         try:
@@ -210,21 +222,24 @@ class Helper(Mastermind):
                 self.status = 3
             return None
 
-    def get_hint(self):
+    def queue_next_pattern(self):
         """ Method for generating the next hint pattern and checking if exists another solution """
 
-        if self.next_hint_pattern is None:
+        if self.next_pattern is None:
             self.status = 3
-            return None
+            return
         else:
-            if self.hint_checker(self.next_hint_pattern):
-                hint_pattern = self.next_hint_pattern
+            if self.hint_check(self.next_pattern):
+                self.current_pattern = self.next_pattern
             else:
-                hint_pattern = self.next_pattern()
+                self.current_pattern = self.hint_next()
 
-        self.next_hint_pattern = self.next_pattern(set_status=False)
+        self.next_pattern = self.hint_next(set_status=False)
 
-        if self.next_hint_pattern is None and hint_pattern is not None:
+        if self.current_pattern is not None and self.next_pattern is None:
             print("Only one possible pattern!")  # for tests
 
-        return hint_pattern
+    def prompt(self):
+        """ Method for returning prompt string """
+
+        return "{}: {} -> ".format(self.counter, self.print_pattern(self.current_pattern))
