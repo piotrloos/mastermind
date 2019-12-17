@@ -99,18 +99,21 @@ class Game(Mastermind):
             else:
                 raise ValueError("Incorrect solution pattern.")
 
+        self.last_pattern = None
+
     def input_pattern(self, pattern_string):
         """ Method for inputting pattern from player """
 
         try:  # try to convert pattern_string to tuple (pattern format)
             pattern = tuple(ord(peg) - 97 for peg in pattern_string.split(maxsplit=self.pegs - 1))
         except ValueError:
-            return None
+            return None  # there was an error
 
         if self.validate_pattern(pattern):  # check if pattern is correct
-            return pattern
+            self.last_pattern = pattern
+            return self.add_pattern(pattern)  # OK
         else:
-            return None
+            return None  # there was an error
 
     def validate_pattern(self, pattern):
         """ Method for validating given pattern """
@@ -158,14 +161,15 @@ class Helper(Mastermind):
         """ Method for inputting result from player """
 
         try:  # try to convert result_string to tuple (result format)
-            result = tuple(int(peg) for peg in result_string.split(maxsplit=1))
+            result = tuple(int(result_peg) for result_peg in result_string.split(maxsplit=1))
         except ValueError:
-            return None
+            return True  # there was an error
 
         if self.validate_result(result):  # check if result is correct
-            return result
+            self.add_result(result)
+            return False  # OK
         else:
-            return None
+            return True  # there was an error
 
     def validate_result(self, result):
         """ Method for validating given result """

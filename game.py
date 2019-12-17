@@ -20,12 +20,12 @@ def main():
 
     while not game.status:
 
-        pattern = game.input_pattern(input(game.prompt()))
+        result = game.input_pattern(input(game.prompt()))
 
-        if pattern is None:
+        if result is None:
             print("Incorrect pattern. Enter again.")
         else:
-            print("{}: {} -> {}".format(game.counter, game.print_pattern(pattern), game.add_pattern(pattern)))
+            print("{}: {} -> {}".format(game.counter, game.print_pattern(game.last_pattern), result))
 
     print()
     if game.status == 1:

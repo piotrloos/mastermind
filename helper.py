@@ -13,19 +13,14 @@ def main():
 
     print()
     print("Welcome to Mastermind Helper!")
-    helper = Helper(colors=8, pegs=6, hint_mode=2)
+    helper = Helper(colors=6, pegs=4, hint_mode=2)
     print("You have prepared {}-peg pattern using {} colors.".format(helper.pegs, helper.colors))
     print("I have {}".format(helper.max_tries), "try" if helper.max_tries == 1 else "tries", "to guess the solution.")
     print()
 
     while not helper.status:
-
-        result = helper.input_result(input(helper.prompt()))
-
-        if result is None:
+        if helper.input_result(input(helper.prompt())):
             print("Incorrect result value. Enter again.")
-        else:
-            helper.add_result(result)
 
     print()
     if helper.status == 1:
