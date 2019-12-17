@@ -1,18 +1,28 @@
-lepsza obsługa ruchu w Helperze
-formatowanie patternów (Colorama)
-parametry wejściowe przy uruchamianiu gry
-klasy na Pattern i Result
-przyspieszenie hint_generator:
-    ocena ważności wyniku i sprawdzanie all() po ważności
-    szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
-    wielowątkowość
-liczenie możliwych patternów hint_generatora
-możliwość gry komputera samego ze sobą
-poukrywanie metod i pól wewnętrznych w klasie
-testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
-pola klasy tylko do odczytu z zewnątrz (odpowiednie property)
-więcej testów dla Game i Helpera
-uporządkować komunikację między front-endem a back-endem
-settery, gettery i @property w klasach
-poprawienie split w input_pattern (wysypuje się ord() dla dwóch liter)
-zmiana opisów/komentarzy pod deficjami metod na bardziej precyzyjne
+# do zrobienia:
+
+# TODO: poukrywanie metod i pól wewnętrznych w klasie
+# TODO: pola klasy tylko do odczytu z zewnątrz (odpowiednie property)
+# TODO: settery, gettery i @property w klasach
+
+# TODO: poprawienie split w input_pattern (wysypuje się ord() dla dwóch liter)
+
+# TODO: parametry wejściowe przy uruchamianiu gry
+
+# TODO: liczenie możliwych patternów hint_generatora - klasa na hint_generator?
+
+# TODO: zmiana opisów/komentarzy pod deficjami metod na bardziej precyzyjne
+# TODO: zmiana nazwy Helpera np. na Solver
+# TODO: uporządkować kod w wielu miejscach
+
+# później, pomysły itp.:
+
+# TODO: formatowanie patternów (Colorama)
+# TODO: klasy na Pattern i Result
+# TODO: przyspieszenie hint_generator:
+# TODO:     ocena ważności wyniku i sprawdzanie all() po ważności
+# TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
+# TODO:     wielowątkowość
+# TODO: możliwość gry komputera samego ze sobą
+# TODO: testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
+# TODO: więcej testów dla Game i Helpera
+# TODO: formatowianie patternów za pomocą małych/dużych liter, liczb

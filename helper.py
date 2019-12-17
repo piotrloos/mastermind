@@ -13,7 +13,7 @@ def main():
 
     print()
     print("Welcome to Mastermind Helper!")
-    helper = Helper(colors=6, pegs=4, hint_mode=2)
+    helper = Helper(colors=8, pegs=7, hint_mode=0)
     print("You have prepared {}-peg pattern using {} colors.".format(helper.pegs, helper.colors))
     print("I have {}".format(helper.max_tries), "try" if helper.max_tries == 1 else "tries", "to guess the solution.")
     print()

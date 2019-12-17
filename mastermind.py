@@ -38,6 +38,7 @@ class Mastermind:
         self.solution = None
         self.counter = 1  # initialize tries counter
         self.status = 0  # 0 = game is active, 1 = solution is found, 2 = reached tries limit, 3 = no possible solution
+        self.hint_number = self.colors ** self.pegs  # calculate number of all possible patterns
 
     def calculate(self, pattern1, pattern2=None):
         """ Method for calculating black and white pegs from guess pattern """
@@ -207,9 +208,16 @@ class Helper(Mastermind):
             patterns_set = set(patterns)
             patterns = sample(patterns_set, len(patterns_set))  # now patterns are list, not generator
 
+        hint_counter = 0
+        length = len(str(self.hint_number))
+
         for hint_pattern in patterns:
+            hint_counter += 1
+
             if self.hint_check(hint_pattern):
+                print("{:>{l}d} / {:>{l}d} ({:6.2f}%)".format(hint_counter, self.hint_number, 100 * hint_counter/self.hint_number, l=length))
                 yield hint_pattern  # yields pattern if it can be a solution
+        print("{:>{l}d} / {:>{l}d} ({:6.2f}%)".format(hint_counter, self.hint_number, 100 * hint_counter / self.hint_number, l=length))
 
     def hint_check(self, hint_pattern):
         """ Method for checking if given pattern can be a hint based on all previous guesses """
