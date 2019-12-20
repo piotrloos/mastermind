@@ -1,39 +1,68 @@
 ########################################
 # My version of famous game Mastermind #
 # game.py                              #
-# Main game file                       #
+# CodeMaker file                       #
 #                  Piotr Loos (c) 2019 #
 ########################################
 
-from mastermind import Game
+from mastermind import CodeMaker
 
 
 def main():
-    """ Main I/O file for Mastermind Game """
+    """ Main I/O file for Mastermind CodeMaker """
 
     print()
-    print("Welcome to Mastermind Game!")
-    game = Game()
-    print("I have prepared {}-peg pattern using {} colors.".format(game.pegs, game.colors))
-    print("You have {}".format(game.max_tries), "try" if game.max_tries == 1 else "tries", "to guess the solution.")
+    print("Welcome to Mastermind!")
+    cm = CodeMaker()
+    print(
+        "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors (letters)."
+        .format(
+            pegs=cm.pegs_number,
+            colors=cm.colors_number,
+        )
+    )
+    print(
+        "You are the CodeBreaker and you have {turns}"
+        .format(
+            turns=cm.turns_limit
+        ),
+        "turn" if cm.turns_limit == 1 else "turns",
+        "to guess the solution pattern."
+    )
     print()
 
-    while not game.status:
-
-        result = game.input_pattern(input(game.prompt()))
-
-        if result is None:
+    while not cm.game_status:
+        response = cm.input_for_codemaker(input(cm.prompt))
+        if response is None:
             print("Incorrect pattern. Enter again.")
         else:
-            print("{}: {} -> {}".format(game.counter, game.print_pattern(game.last_pattern), result))
+            print(
+                "{turn}: {pattern} -> {response}"
+                .format(
+                    turn=cm.turns_counter,
+                    pattern=cm.last_pattern,
+                    response=response,
+                )
+            )
 
     print()
-    if game.status == 1:
-        print("You found the solution in {}".format(game.counter), "try." if game.counter == 1 else "tries.")
-    elif game.status == 2:
-        print("You reached tries limit. Game over!")
+    if cm.game_status == 1:
+        print(
+            "You found the solution in {turns}"
+            .format(
+                turns=cm.turns_counter
+            ),
+            "turn." if cm.turns_counter == 1 else "turns."
+        )
+    elif cm.game_status == 2:
+        print("You reached turns limit. Game over!")
 
-    print("The solution pattern is {}.".format(game.print_pattern(game.solution)))
+    print(
+        "The solution pattern is {pattern}."
+        .format(
+            pattern=cm.solution_pattern
+        )
+    )
 
 
 if __name__ == "__main__":

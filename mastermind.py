@@ -6,252 +6,378 @@
 ########################################
 
 from random import randint, sample
-from settings import COLORS, PEGS, MAX_TRIES
+from settings import COLORS, PEGS, TURNS
 
 
 class Mastermind:
-    """ Mastermind class contains whole game, the solution pattern and the guesses """
+    """ Contains whole game, base class for CodeMaker and CodeBreaker classes """
 
-    def __init__(self, colors=COLORS, pegs=PEGS, max_tries=MAX_TRIES):
-        """ Method for preparing new game with given settings """
+    def __init__(self, colors=COLORS, pegs=PEGS, turns=TURNS):
+        """ Initializes new game with given settings """
 
         # check if given colors number is correct
         if colors in range(2, 11):  # from 2 to 10
-            self.colors = colors
+            self._colors_number = colors
         else:
             raise ValueError("Incorrect number of colors.")
 
         # check if given pegs number is correct
-        if pegs in range(2, 13):  # from 2 to 12
-            self.pegs = pegs
+        if pegs in range(2, 9):  # from 2 to 8
+            self._pegs_number = pegs
         else:
             raise ValueError("Incorrect number of pegs.")
 
-        # check if given max_tries number is correct
-        if max_tries in range(1, 33):  # from 1 to 32
-            self.max_tries = max_tries
+        # check if given turns limit is correct
+        if turns in range(1, 21):  # from 1 to 20
+            self._turns_limit = turns
         else:
-            raise ValueError("Incorrect number of max_tries.")
+            raise ValueError("Incorrect number of turns limit.")
 
-        self.guesses = dict()  # initialize dictionary of guesses
-        self.colors_set = set(range(self.colors))  # initialize set of colors (for performance)
-        self.solution = None
-        self.counter = 1  # initialize tries counter
-        self.status = 0  # 0 = game is active, 1 = solution is found, 2 = reached tries limit, 3 = no possible solution
-        self.hint_number = self.colors ** self.pegs  # calculate number of all possible patterns
+        self._turns_counter = 1  # initialize turns counter
+        self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
+        self._patterns_number = self._colors_number ** self._pegs_number  # calculate number of all possible patterns
+        self._solution_pattern = None  # initialize object variable for solution pattern
+        self._colors_set = set(range(self._colors_number))  # initialize set of colors (for performance)
+        self._turns = dict()  # initialize dictionary of turns
 
-    def calculate(self, pattern1, pattern2=None):
-        """ Method for calculating black and white pegs from guess pattern """
+    @property
+    def colors_number(self):
+        return self._colors_number
 
-        # there is a possibility to calculate pattern relative to another pattern, not always solution
+    @property
+    def pegs_number(self):
+        return self._pegs_number
+
+    @property
+    def turns_limit(self):
+        return self._turns_limit
+
+    @property
+    def turns_counter(self):
+        return self._turns_counter
+
+    @property
+    def game_status(self):
+        return self._game_status
+
+    @property
+    def patterns_number(self):
+        return self._patterns_number
+
+    @property
+    def solution_pattern(self):
+        if self._game_status == 0:  # no access to the solution when game is active
+            raise PermissionError
+        else:
+            return self._format_pattern(self._solution_pattern)
+
+    def _calculate_response(self, pattern1, pattern2=None):
+        """ Returns calculated response (black and white pegs) for given pattern """
+
+        # there is a possibility to calculate response for pattern relative to another pattern, not always the solution
         if pattern2 is None:
-            if self.solution is None:
-                raise ValueError("No solution pattern to calculate.")
+            if self._solution_pattern is None:
+                raise ValueError("No solution pattern to calculate response.")
             else:
-                pattern2 = self.solution
+                pattern2 = self._solution_pattern
 
-        # black_pegs defines how many guess pegs are in proper color and in proper location
-        black_pegs = sum(peg1 == peg2 for peg1, peg2 in zip(pattern1, pattern2))
+        # `black_pegs` defines how many pegs are in proper color and in proper location
+        black_pegs = sum(
+            int(pattern1_peg == pattern2_peg)
+            for pattern1_peg, pattern2_peg in zip(pattern1, pattern2)
+        )
 
-        # white_black_pegs defines how many guess pegs are in proper color regardless to location
-        # white_pegs defines how many guess pegs are in proper color and wrong location
-        # to calculate white_pegs it's needed to subtract black_pegs from white_black_pegs
-        white_black_pegs = sum(min(pattern1.count(peg), pattern2.count(peg)) for peg in self.colors_set)
+        # `black_white_pegs` defines how many pegs are in proper color regardless to location
+        black_white_pegs = sum(
+            min(pattern1.count(pattern_peg), pattern2.count(pattern_peg))
+            for pattern_peg in self._colors_set
+        )
 
-        return black_pegs, white_black_pegs - black_pegs  # return tuple with black and white pegs
+        # `white_pegs` defines how many pegs are in proper color and wrong location
+        # to calculate `white_pegs` it's needed to subtract `black_pegs` from `black_white_pegs`
+        return black_pegs, black_white_pegs - black_pegs  # return response tuple with black and white pegs
 
-    def check_end_criteria(self, result):
-        """ Method for checking if the game should end """
+    def _check_game_end(self, response):
+        """ Checks if the game should end (after current turn) """
 
-        if result == (self.pegs, 0):  # check if the pattern is guessed correctly
-            self.status = 1
+        if response == (self._pegs_number, 0):  # check if the pattern is guessed correctly # TODO: response from class?
+            self._game_status = 1
             return True
-        else:
-            self.counter += 1  # prepare for next turn
 
-        if self.counter > self.max_tries:  # check if the player still can guess
-            self.status = 2
+        if self._turns_counter >= self._turns_limit:  # check if the player reached turns limit
+            self._game_status = 2
             return True
 
+        self._turns_counter += 1  # prepare for next turn  # TODO: move out there, and repair
         return False
 
     @staticmethod
-    def print_pattern(pattern):
-        """ Method for formatting pattern """
+    def _format_pattern(pattern):
+        """ Returns formatted pattern """
 
-        return "[ " + " ".join(chr(peg + 97) for peg in pattern) + " ]"
+        # convert each peg into letter
+        return "[ " + " ".join(chr(pattern_peg + 97) for pattern_peg in pattern) + " ]"
 
 
-class Game(Mastermind):
-    """ Game class inherits from Mastermind class """
+class CodeMaker(Mastermind):
+    """ Contains CodeMaker mode, inherits from Mastermind class """
 
     def __init__(self, solution=None, **kwargs):
-        """ Method for initializing Game class object """
+        """ Initializes CodeMaker class object """
 
         super().__init__(**kwargs)  # initialize Mastermind class object
 
-        # check if solution is given, if not -> randomize new pattern
+        # check if `solution` is given, if not -> randomize new pattern
         if solution is None:
-            self.solution = tuple(randint(0, self.colors - 1) for _ in range(self.pegs))
+            self._solution_pattern = tuple(randint(0, self._colors_number - 1) for _ in range(self._pegs_number))
         else:
-            # check if given solution is correct
-            if self.validate_pattern(solution):
-                self.solution = solution
+            # check if given `solution` is correct
+            if self._validate_pattern(solution):
+                self._solution_pattern = solution
             else:
                 raise ValueError("Incorrect solution pattern.")
 
-        self.last_pattern = None
+        self._last_pattern = None
 
-    def input_pattern(self, pattern_string):
-        """ Method for inputting pattern from player """
+    @property
+    def last_pattern(self):
+        """ Returns formatted `last_pattern` string """
 
-        try:  # try to convert pattern_string to tuple (pattern format)
-            pattern = tuple(ord(peg) - 97 for peg in pattern_string.split(maxsplit=self.pegs - 1))
-        except ValueError:
-            return None  # there was an error
+        return self._format_pattern(self._last_pattern)
 
-        if self.validate_pattern(pattern):  # check if pattern is correct
-            self.last_pattern = pattern
-            return self.add_pattern(pattern)  # OK
-        else:
-            return None  # there was an error
-
-    def validate_pattern(self, pattern):
-        """ Method for validating given pattern """
-
-        return isinstance(pattern, tuple) and len(pattern) == self.pegs and all(
-            peg in self.colors_set for peg in pattern)
-
-    def add_pattern(self, pattern):
-        """ Method for adding pattern by the player """
-
-        if pattern in self.guesses.keys():  # check if given pattern was already calculated
-            result = self.guesses[pattern]  # retrieve result from dictionary
-        else:
-            result = self.calculate(pattern)  # calculate the result
-            self.guesses[pattern] = result  # save the result to the dictionary
-
-        self.check_end_criteria(result)
-        return result
-
+    @property
     def prompt(self):
-        """ Method for returning prompt string """
+        """ Returns prompt string for input function """
 
-        return "{}: ".format(self.counter)
+        return (
+            "{turn:>{width}d}: "
+            .format(
+                turn=self.turns_counter,
+                width=len(str(self.turns_limit)),
+            )
+        )
+
+    def _validate_pattern(self, pattern):
+        """ Checks if given `pattern` is correct """
+
+        return (
+            isinstance(pattern, tuple)
+            and len(pattern) == self._pegs_number
+            and all(pattern_peg in self._colors_set for pattern_peg in pattern)
+        )
+
+    def input_for_codemaker(self, pattern_string):
+        """ Takes `pattern_string` from CodeBreaker (human), converts and verifies it, then takes turn """
+
+        try:  # try to convert `pattern_string` to tuple (pattern format)
+            pattern = tuple(
+                ord(pattern_peg) - 97  # TODO: input digits, lowercase or uppercase letters
+                for pattern_peg in pattern_string.strip().split(' ', maxsplit=self._pegs_number - 1)
+            )
+        except ValueError:
+            return None  # there was an error  # TODO: raise ValueError with explanation
+
+        if self._validate_pattern(pattern):  # check if pattern is correct
+            self._last_pattern = pattern
+            return self.take_turn_as_codemaker(pattern)  # OK
+        else:
+            return None  # there was an error
+
+    def take_turn_as_codemaker(self, pattern):
+        """ Takes turn as CodeMaker (with pattern from CodeBreaker) - without pattern validation, returns response """
+
+        if pattern in self._turns.keys():  # check if given pattern was already calculated
+            response = self._turns[pattern]  # retrieve response from dictionary
+        else:
+            response = self._calculate_response(pattern)  # calculate the response
+            self._turns[pattern] = response  # save the response to the dictionary
+
+        self._check_game_end(response)
+        return response
 
 
-class Helper(Mastermind):
-    """ Helper class inherits from Mastermind class """
+class CodeBreaker(Mastermind):
+    """ Contains CodeBreaker mode, inherits from Mastermind class """
 
     def __init__(self, hint_mode=1, **kwargs):
-        """ Method for initializing Helper class object """
+        """ Initializes CodeBreaker class object """
 
         super().__init__(**kwargs)  # initialize Mastermind class object
 
-        # check if given hint_mode is correct
-        if hint_mode in range(0, 3):  # from 0 to 2
-            self.hint_mode = hint_mode
+        # check if given hint shuffle mode is correct
+        if hint_mode in {0, 1, 2}:
+            self._hint_shuffle_mode = hint_mode
         else:
-            raise ValueError("Incorrect hints shuffle mode.")
+            raise ValueError("Incorrect hint shuffle mode.")
 
-        self.hint = self.hint_generator()  # initialize hint pattern generator
-        self.current_pattern = self.hint_next()  # get first pattern
-        self.next_pattern = self.hint_next(set_status=False)  # get second pattern
+        self._hint = self._hint_generator()  # initialize hint pattern generator
+        self._hint_counter = 0  # initialize hint counter
+        self._current_pattern = self._hint_next()  # get first pattern
+        self._next_pattern = self._hint_next(set_status=False)  # get second pattern
+        self._hint_only_one_possibility = False  # initialize the only one possibility flag
 
-    def input_result(self, result_string):
-        """ Method for inputting result from player """
+    @property
+    def hint_counter(self):
+        return self._hint_counter
 
-        try:  # try to convert result_string to tuple (result format)
-            result = tuple(int(result_peg) for result_peg in result_string.split(maxsplit=1))
-        except ValueError:
-            return True  # there was an error
+    @property
+    def current_pattern(self):
+        """ Returns formatted `current_pattern` string """
 
-        if self.validate_result(result):  # check if result is correct
-            self.add_result(result)
-            return False  # OK
+        return self._format_pattern(self._current_pattern)
+
+    @property
+    def hint_percent(self):
+        """ Returns current hint percentage value """
+
+        return self._hint_counter / self._patterns_number * 100
+
+    @property
+    def hint_only_one_possibility(self):
+        """ Returns formatted `hint_only_one_possibility` flag """
+
+        if self._hint_only_one_possibility:
+            return " (*)"
         else:
-            return True  # there was an error
+            return ""
 
-    def validate_result(self, result):
-        """ Method for validating given result """
+    @property
+    def prompt(self):
+        """ Returns prompt string for input function """
 
-        return isinstance(result, tuple) and len(result) == 2 and all(
-            peg in range(0, self.pegs + 1) for peg in [result[0], result[1], result[0] + result[1]]
+        return (
+            "{turn:>{width}d}: {pattern}{possibility} -> "
+            .format(
+                turn=self.turns_counter,
+                width=len(str(self.turns_limit)),
+                pattern=self.current_pattern,
+                possibility=self.hint_only_one_possibility,
+            )
         )
 
-    def add_result(self, result):
-        """ Method for adding result by the player """
+    def _validate_response(self, response):
+        """ Checks if given response (a tuple built from black pegs and white pegs) is correct """
 
-        self.guesses[self.current_pattern] = result
+        return (
+            isinstance(response, tuple)
+            and len(response) == 2
+            and all(
+                response_peg in range(0, self._pegs_number + 1)
+                for response_peg in {response[0], response[1], response[0] + response[1]}
+            )
+        )
+        # both black and white pegs number (and sum of them also) should be from 0 to pegs number
 
-        if not self.check_end_criteria(result):
-            self.queue_next_pattern()
+    def input_for_codebreaker(self, response_string):
+        """ Takes `response_string` from CodeMaker (human), converts and verifies it, then takes turn """
 
-    def hint_generator(self):
-        """ Method for yielding the first pattern that could be the solution based on all previous guesses """
+        try:  # try to convert `response_string` to tuple (response format)
+            response = tuple(
+                int(response_peg) for response_peg in response_string.strip().split(' ', maxsplit=1)
+            )
+        except ValueError:
+            return True  # there was an error  # TODO: raise ValueError with explanation
 
-        # generate all possible patterns using my own function
+        if self._validate_response(response):  # check if response is correct
+            self.take_turn_codebreaker(response)
+            return False  # OK  # TODO: method should return hint pattern?
+        else:
+            return True  # there was an error
+
+    def take_turn_codebreaker(self, response):
+        """ Takes turn as CodeBreaker (with response from CodeMaker) - without response validation, returns pattern """
+
+        self._turns[self._current_pattern] = response  # add this turn to the turns dictionary
+
+        if not self._check_game_end(response):
+            # prepare for next codebreaker turn
+            if self._next_pattern is None:
+                self._game_status = 3
+                return
+            else:
+                if self._hint_check(self._next_pattern):
+                    self._current_pattern = self._next_pattern
+                else:
+                    self._current_pattern = self._hint_next()
+
+            self._next_pattern = self._hint_next(set_status=False)
+
+            if self._current_pattern is not None and self._next_pattern is None:
+                print("Only one possible pattern!")  # for tests # TODO: del
+                self._hint_only_one_possibility = True
+            else:
+                self._hint_only_one_possibility = False
+            # TODO: compact this `if` into one line
+            # TODO: function should return `current_pattern`
+
+    def _hint_generator(self):
+        """ Yields the first pattern that can be a solution based on all previous turns """
+
+        # generates all possible patterns using my own function
         # it's similar to Cartesian product (import itertools.product),
-        # but operates on tuples (not lists) and works direct on Mastermind variables
+        # but operates on tuples (not lists) and works direct on Mastermind class variables
 
-        patterns = (),  # initialize with tuple containing empty tuple
+        all_patterns = (),  # initialize with tuple containing empty tuple
 
         # build list (generator) of all possible patterns
-        if self.hint_mode == 1:  # shuffle set of colors to build patterns from (on every iteration)
-            for _ in range(self.pegs):
-                patterns = ((*pattern, peg) for pattern in patterns for peg in sample(self.colors_set, self.colors))
-        else:  # no shuffle patterns list, they will be in ascending order
-            for _ in range(self.pegs):
-                patterns = ((*pattern, peg) for pattern in patterns for peg in self.colors_set)
+        if self._hint_shuffle_mode == 1:  # shuffle set of colors to build patterns from (on every iteration)
+            for _ in range(self._pegs_number):
+                all_patterns = (
+                    (*pattern, pattern_peg)
+                    for pattern in all_patterns
+                    for pattern_peg in sample(self._colors_set, self._colors_number)  # sample returns a new list
+                )
+        else:  # don't shuffle patterns list, they will be in ascending order
+            for _ in range(self._pegs_number):
+                all_patterns = (
+                    (*pattern, pattern_peg)
+                    for pattern in all_patterns
+                    for pattern_peg in self._colors_set
+                )
 
-        if self.hint_mode == 2:  # shuffle all patterns set (at once)
-            patterns_set = set(patterns)
-            patterns = sample(patterns_set, len(patterns_set))  # now patterns are list, not generator
+        if self._hint_shuffle_mode == 2:  # shuffle all patterns set (at once)
+            all_patterns = sample(set(all_patterns), self._patterns_number)  # now patterns are list, not generator
 
-        hint_counter = 0
-        length = len(str(self.hint_number))
+        width = len(str(self._patterns_number))  # tests  # TODO: move out from there
 
-        for hint_pattern in patterns:
-            hint_counter += 1
+        for hint_pattern in all_patterns:
+            self._hint_counter += 1
 
-            if self.hint_check(hint_pattern):
-                print("{:>{l}d} / {:>{l}d} ({:6.2f}%)".format(hint_counter, self.hint_number, 100 * hint_counter/self.hint_number, l=length))
+            if self._hint_check(hint_pattern):
+                print(  # tests  # TODO: move out from there
+                    "{hint:>{width}d} / {all:>{width}d} ({percent:6.2f}%)"
+                    .format(
+                        hint=self.hint_counter,
+                        all=self.patterns_number,
+                        percent=self.hint_percent,
+                        width=width,
+                    )
+                )
                 yield hint_pattern  # yields pattern if it can be a solution
-        print("{:>{l}d} / {:>{l}d} ({:6.2f}%)".format(hint_counter, self.hint_number, 100 * hint_counter / self.hint_number, l=length))
+        print(  # tests  # TODO: move out from there
+            "{hint:>{width}d} / {all:>{width}d} ({percent:6.2f}%)"
+            .format(
+                hint=self.hint_counter,
+                all=self.patterns_number,
+                percent=self.hint_percent,
+                width=width,
+            )
+        )
 
-    def hint_check(self, hint_pattern):
-        """ Method for checking if given pattern can be a hint based on all previous guesses """
+    def _hint_check(self, hint_pattern):
+        """ Checks if given `hint_pattern` can be a solution based on all previous turns """
 
-        return all(self.guesses[pattern] == self.calculate(pattern, hint_pattern) for pattern in self.guesses.keys())
+        return all(
+            self._turns[turn_pattern] == self._calculate_response(turn_pattern, hint_pattern)
+            for turn_pattern in self._turns.keys()
+        )
 
-    def hint_next(self, set_status=True):
-        """ Method for getting the next hint pattern """
+    def _hint_next(self, set_status=True):
+        """ Gets the next hint pattern and handles the StopIteration exception """
 
         try:
-            return next(self.hint)
+            return next(self._hint)
         except StopIteration:
             if set_status:
-                self.status = 3
+                self._game_status = 3
             return None
-
-    def queue_next_pattern(self):
-        """ Method for generating the next hint pattern and checking if exists another solution """
-
-        if self.next_pattern is None:
-            self.status = 3
-            return
-        else:
-            if self.hint_check(self.next_pattern):
-                self.current_pattern = self.next_pattern
-            else:
-                self.current_pattern = self.hint_next()
-
-        self.next_pattern = self.hint_next(set_status=False)
-
-        if self.current_pattern is not None and self.next_pattern is None:
-            print("Only one possible pattern!")  # for tests
-
-    def prompt(self):
-        """ Method for returning prompt string """
-
-        return "{}: {} -> ".format(self.counter, self.print_pattern(self.current_pattern))

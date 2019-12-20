@@ -7,4 +7,4 @@
 
 COLORS = 6  # defining how many colors will be in the game
 PEGS = 4    # defining how many pegs will be in the game
-MAX_TRIES = 10  # defining how many tries the player will have in the game
+TURNS = 10  # defining how many turns the player will have in the game
