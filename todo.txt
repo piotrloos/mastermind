@@ -2,18 +2,17 @@
 
 # TODO: naprawić `turn_counter` dla CodeMakera
 
-# TODO: poukrywanie metod i pól wewnętrznych w klasie
-# TODO: pola klasy tylko do odczytu z zewnątrz (odpowiednie property)
-# TODO: settery, gettery i @property w klasach
-
 # TODO: poprawienie split w `input_pattern` (wysypuje się ord() dla dwóch liter)
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb
 # TODO: wyświetlanie `_colors_set` przy uruchamianiu
+# TODO: osobna metoda random pattern
+
+# TODO: komunikacja błędów między front-endem a back-endem za pomocą wyjątków
+# TODO: metody dla gracza powinny zwracać string, metody dla komputera powinny zwracać tuple
 
 # TODO: liczenie możliwych patternów hint_generatora - klasa na `hint_generator`?
 
-# TODO: metody dla gracza powinny zwracać string, metody dla komputera powinny zwracać tuple
-# TODO: komunikacja błędów między front-endem a back-endem za pomocą wyjątków
+# TODO: rozdzielenie klas `CodeMaker` i `CodeBreaker` na część ludzką dziedziczoną po części komputerowej
 
 # TODO: uporządkować kod w wielu miejscach
 
@@ -21,7 +20,7 @@
 
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: formatowanie patternów (Colorama)
-# TODO: klasy na Pattern i Result - nie spowolni to gry?
+# TODO: klasy na Pattern i Response - nie spowolni to gry?
 # TODO: przyspieszenie `hint_generator`:
 # TODO:     ocena ważności wyniku i sprawdzanie all() po ważności
 # TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)

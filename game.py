@@ -12,8 +12,13 @@ def main():
     """ Main I/O file for Mastermind CodeMaker """
 
     print()
-    print("Welcome to Mastermind!")
+    print("##############################")
+    print("#   Welcome to Mastermind!   #")
+    print("##############################")
+    print()
+
     cm = CodeMaker()
+
     print(
         "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors (letters)."
         .format(

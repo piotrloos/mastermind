@@ -12,8 +12,13 @@ def main():
     """ Main I/O file for Mastermind CodeBreaker """
 
     print()
-    print("Welcome to Mastermind!")
-    cb = CodeBreaker(colors=8, pegs=6, hint_mode=0)
+    print("##############################")
+    print("#   Welcome to Mastermind!   #")
+    print("##############################")
+    print()
+
+    cb = CodeBreaker(colors=10, pegs=6, hint_mode=2)
+
     print(
         "You are the CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors (letters)."
         .format(

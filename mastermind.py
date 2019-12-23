@@ -33,6 +33,7 @@ class Mastermind:
         else:
             raise ValueError("Incorrect number of turns limit.")
 
+        self._turns_width = len(str(self._turns_limit))  # calculate width for `_turns_counter` formatting
         self._turns_counter = 1  # initialize turns counter
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
         self._patterns_number = self._colors_number ** self._pegs_number  # calculate number of all possible patterns
@@ -108,14 +109,14 @@ class Mastermind:
             self._game_status = 2
             return True
 
-        self._turns_counter += 1  # prepare for next turn  # TODO: move out there, and repair
+        self._turns_counter += 1  # prepare for next turn  # TODO: move out there, and repair for CodeMaker
         return False
 
     @staticmethod
     def _format_pattern(pattern):
         """ Returns formatted pattern """
 
-        # convert each peg into letter
+        # convert each peg into letter  # TODO: implement different styles of formatting pattern
         return "[ " + " ".join(chr(pattern_peg + 97) for pattern_peg in pattern) + " ]"
 
 
@@ -152,13 +153,13 @@ class CodeMaker(Mastermind):
         return (
             "{turn:>{width}d}: "
             .format(
-                turn=self.turns_counter,
-                width=len(str(self.turns_limit)),
+                turn=self._turns_counter,
+                width=self._turns_width,
             )
         )
 
     def _validate_pattern(self, pattern):
-        """ Checks if given `pattern` is correct """
+        """ Checks if given `pattern` is formally correct """
 
         return (
             isinstance(pattern, tuple)
@@ -167,31 +168,31 @@ class CodeMaker(Mastermind):
         )
 
     def input_for_codemaker(self, pattern_string):
-        """ Takes `pattern_string` from CodeBreaker (human), converts and verifies it, then takes turn """
+        """ Takes `pattern_string` from CodeBreaker (human), verifies it, takes turn and returns formatted response """
 
         try:  # try to convert `pattern_string` to tuple (pattern format)
             pattern = tuple(
-                ord(pattern_peg) - 97  # TODO: input digits, lowercase or uppercase letters
-                for pattern_peg in pattern_string.strip().split(' ', maxsplit=self._pegs_number - 1)
+                ord(pattern_peg) - 97  # TODO: input digits, lowercase or uppercase letters - special method?
+                for pattern_peg in pattern_string.strip().split(' ', maxsplit=self._pegs_number - 1)  # divide into pegs
             )
         except ValueError:
             return None  # there was an error  # TODO: raise ValueError with explanation
 
-        if self._validate_pattern(pattern):  # check if pattern is correct
-            self._last_pattern = pattern
-            return self.take_turn_as_codemaker(pattern)  # OK
-        else:
+        if not self._validate_pattern(pattern):  # check if pattern is correct
             return None  # there was an error
+
+        self._last_pattern = pattern
+        if pattern in self._turns.keys():  # check if given pattern was already calculated
+            response = self._turns[pattern]  # retrieve response from dictionary  # TODO: need to check_game_end!
+        else:
+            response = self.take_turn_as_codemaker(pattern)
+        return response  # TODO: return more human response (string)
 
     def take_turn_as_codemaker(self, pattern):
         """ Takes turn as CodeMaker (with pattern from CodeBreaker) - without pattern validation, returns response """
 
-        if pattern in self._turns.keys():  # check if given pattern was already calculated
-            response = self._turns[pattern]  # retrieve response from dictionary
-        else:
-            response = self._calculate_response(pattern)  # calculate the response
-            self._turns[pattern] = response  # save the response to the dictionary
-
+        response = self._calculate_response(pattern)  # calculate the response
+        self._turns[pattern] = response  # save the response to the dictionary  # TODO: need to save response to dict?
         self._check_game_end(response)
         return response
 
@@ -199,13 +200,13 @@ class CodeMaker(Mastermind):
 class CodeBreaker(Mastermind):
     """ Contains CodeBreaker mode, inherits from Mastermind class """
 
-    def __init__(self, hint_mode=1, **kwargs):
+    def __init__(self, hint_mode=1, **kwargs):  # TODO: add new param - next_hint mode or calc solutions_number mode
         """ Initializes CodeBreaker class object """
 
         super().__init__(**kwargs)  # initialize Mastermind class object
 
         # check if given hint shuffle mode is correct
-        if hint_mode in {0, 1, 2}:
+        if hint_mode in {0, 1, 2, 3}:
             self._hint_shuffle_mode = hint_mode
         else:
             raise ValueError("Incorrect hint shuffle mode.")
@@ -236,10 +237,7 @@ class CodeBreaker(Mastermind):
     def hint_only_one_possibility(self):
         """ Returns formatted `hint_only_one_possibility` flag """
 
-        if self._hint_only_one_possibility:
-            return " (*)"
-        else:
-            return ""
+        return " (*)" if self._hint_only_one_possibility else ""
 
     @property
     def prompt(self):
@@ -248,15 +246,15 @@ class CodeBreaker(Mastermind):
         return (
             "{turn:>{width}d}: {pattern}{possibility} -> "
             .format(
-                turn=self.turns_counter,
-                width=len(str(self.turns_limit)),
-                pattern=self.current_pattern,
-                possibility=self.hint_only_one_possibility,
+                turn=self._turns_counter,
+                width=self._turns_width,
+                pattern=self.current_pattern,  # formatted
+                possibility=self.hint_only_one_possibility,  # formatted
             )
         )
 
     def _validate_response(self, response):
-        """ Checks if given response (a tuple built from black pegs and white pegs) is correct """
+        """ Checks if given response (a tuple built from black pegs and white pegs) is formally correct """
 
         return (
             isinstance(response, tuple)
@@ -264,25 +262,25 @@ class CodeBreaker(Mastermind):
             and all(
                 response_peg in range(0, self._pegs_number + 1)
                 for response_peg in {response[0], response[1], response[0] + response[1]}
+                # both black and white pegs number (and sum of them also) should be between 0 and pegs number
             )
         )
-        # both black and white pegs number (and sum of them also) should be from 0 to pegs number
 
     def input_for_codebreaker(self, response_string):
-        """ Takes `response_string` from CodeMaker (human), converts and verifies it, then takes turn """
+        """ Takes `response_string` from CodeMaker (human), verifies it, takes turn and returns formatted pattern """
 
         try:  # try to convert `response_string` to tuple (response format)
             response = tuple(
-                int(response_peg) for response_peg in response_string.strip().split(' ', maxsplit=1)
+                int(response_peg) for response_peg in response_string.strip().split(' ', maxsplit=1)  # only one divide
             )
         except ValueError:
             return True  # there was an error  # TODO: raise ValueError with explanation
 
-        if self._validate_response(response):  # check if response is correct
-            self.take_turn_codebreaker(response)
-            return False  # OK  # TODO: method should return hint pattern?
-        else:
+        if not self._validate_response(response):  # check if response is correct
             return True  # there was an error
+
+        self.take_turn_codebreaker(response)
+        return False  # OK  # TODO: method should return hint pattern?
 
     def take_turn_codebreaker(self, response):
         """ Takes turn as CodeBreaker (with response from CodeMaker) - without response validation, returns pattern """
@@ -302,32 +300,33 @@ class CodeBreaker(Mastermind):
 
             self._next_pattern = self._hint_next(set_status=False)
 
-            if self._current_pattern is not None and self._next_pattern is None:
-                print("Only one possible pattern!")  # for tests # TODO: del
-                self._hint_only_one_possibility = True
-            else:
-                self._hint_only_one_possibility = False
-            # TODO: compact this `if` into one line
+            self._hint_only_one_possibility = self._current_pattern is not None and self._next_pattern is None
             # TODO: function should return `current_pattern`
 
     def _hint_generator(self):
         """ Yields the first pattern that can be a solution based on all previous turns """
 
         # generates all possible patterns using my own function
-        # it's similar to Cartesian product (import itertools.product),
+        # it's similar to Cartesian product (`import itertools.product`),
         # but operates on tuples (not lists) and works direct on Mastermind class variables
 
-        all_patterns = (),  # initialize with tuple containing empty tuple
+        all_patterns = (),  # initialize `all_patterns` with tuple containing empty tuple
 
-        # build list (generator) of all possible patterns
-        if self._hint_shuffle_mode == 1:  # shuffle set of colors to build patterns from (on every iteration)
+        # `hint_shuffle_mode`s are:
+        # 0 = don't shuffle `_colors_set` before build; don't shuffle `all_patterns` after build
+        # 1 =    do shuffle `_colors_set` before build; don't shuffle `all_patterns` after build
+        # 2 = don't shuffle `_colors_set` before build;    do shuffle `all_patterns` after build
+        # 3 =    do shuffle `_colors_set` before build;    do shuffle `all_patterns` after build
+
+        # build list (in fact generator for last peg) of all possible patterns
+        if self._hint_shuffle_mode in {1, 3}:  # shuffle `_colors_set` to build patterns from (on every iteration)
             for _ in range(self._pegs_number):
                 all_patterns = (
                     (*pattern, pattern_peg)
                     for pattern in all_patterns
-                    for pattern_peg in sample(self._colors_set, self._colors_number)  # sample returns a new list
+                    for pattern_peg in sample(self._colors_set, self._colors_number)  # `sample` returns a new list
                 )
-        else:  # don't shuffle patterns list, they will be in ascending order
+        else:  # {0, 2} - don't shuffle `_colors_set`, so `all_patterns` will contain patterns in ascending order
             for _ in range(self._pegs_number):
                 all_patterns = (
                     (*pattern, pattern_peg)
@@ -335,8 +334,10 @@ class CodeBreaker(Mastermind):
                     for pattern_peg in self._colors_set
                 )
 
-        if self._hint_shuffle_mode == 2:  # shuffle all patterns set (at once)
-            all_patterns = sample(set(all_patterns), self._patterns_number)  # now patterns are list, not generator
+        if self._hint_shuffle_mode in {2, 3}:  # shuffle `all_patterns` (at once)
+            all_patterns = sample(set(all_patterns), self._patterns_number)
+            # `all_patterns` are now list, not generator
+        # else {0, 1} - don't shuffle `all_patterns`
 
         width = len(str(self._patterns_number))  # tests  # TODO: move out from there
 
@@ -354,8 +355,10 @@ class CodeBreaker(Mastermind):
                     )
                 )
                 yield hint_pattern  # yields pattern if it can be a solution
+
+        # after yield the last pattern
         print(  # tests  # TODO: move out from there
-            "{hint:>{width}d} / {all:>{width}d} ({percent:6.2f}%)"
+            "{hint:>{width}d} / {all:>{width}d} ({percent:6.2f}%)"  # should be always 100.00%
             .format(
                 hint=self.hint_counter,
                 all=self.patterns_number,
@@ -373,7 +376,7 @@ class CodeBreaker(Mastermind):
         )
 
     def _hint_next(self, set_status=True):
-        """ Gets the next hint pattern and handles the StopIteration exception """
+        """ Gets the next hint pattern and handles the `StopIteration` exception """
 
         try:
             return next(self._hint)
