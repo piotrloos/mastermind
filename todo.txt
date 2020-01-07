@@ -7,9 +7,6 @@
 # TODO: wyświetlanie `_colors_set` przy uruchamianiu
 # TODO: osobna metoda random pattern
 
-# TODO: komunikacja błędów między front-endem a back-endem za pomocą wyjątków
-# TODO: metody dla gracza powinny zwracać string, metody dla komputera powinny zwracać tuple
-
 # TODO: liczenie możliwych patternów hint_generatora - klasa na `hint_generator`?
 
 # TODO: rozdzielenie klas `CodeMaker` i `CodeBreaker` na część ludzką dziedziczoną po części komputerowej
@@ -28,3 +25,5 @@
 # TODO: możliwość gry komputera samego ze sobą
 # TODO: testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
 # TODO: więcej testów dla CodeMakera i CodeBreakera
+# TODO: opcja poddania się
+# TODO: skrót do wyjścia z gry

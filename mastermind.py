@@ -67,8 +67,8 @@ class Mastermind:
 
     @property
     def solution_pattern(self):
-        if self._game_status == 0:  # no access to the solution when game is active
-            raise PermissionError
+        if self._game_status == 0:
+            raise PermissionError("No access to the solution when game is active.")
         else:
             return self._format_pattern(self._solution_pattern)
 
@@ -138,23 +138,14 @@ class CodeMaker(Mastermind):
             else:
                 raise ValueError("Incorrect solution pattern.")
 
-        self._last_pattern = None
-
-    @property
-    def last_pattern(self):
-        """ Returns formatted `last_pattern` string """
-
-        return self._format_pattern(self._last_pattern)
-
     @property
     def prompt(self):
         """ Returns prompt string for input function """
 
         return (
-            "{turn:>{width}d}: "
+            "Enter pattern number {turn}: "
             .format(
                 turn=self._turns_counter,
-                width=self._turns_width,
             )
         )
 
@@ -175,21 +166,35 @@ class CodeMaker(Mastermind):
                 ord(pattern_peg) - 97  # TODO: input digits, lowercase or uppercase letters - special method?
                 for pattern_peg in pattern_string.strip().split(' ', maxsplit=self._pegs_number - 1)  # divide into pegs
             )
-        except ValueError:
-            return None  # there was an error  # TODO: raise ValueError with explanation
+        except (TypeError, ValueError):
+            raise ValueError("Given pattern is incorrect! Enter again.")
 
-        if not self._validate_pattern(pattern):  # check if pattern is correct
-            return None  # there was an error
+        if not self._validate_pattern(pattern):  # check if `pattern` is correct
+            raise ValueError("Given pattern is incorrect! Enter again.")
 
-        self._last_pattern = pattern
+        turn = self._turns_counter
+
         if pattern in self._turns.keys():  # check if given pattern was already calculated
-            response = self._turns[pattern]  # retrieve response from dictionary  # TODO: need to check_game_end!
+            response = self._turns[pattern]  # retrieve response from dictionary
+            self._check_game_end(response)
         else:
             response = self.take_turn_as_codemaker(pattern)
-        return response  # TODO: return more human response (string)
+
+        return (
+            "{turn:>{width}d}: {pattern} -> {response}"
+            .format(
+                turn=turn,
+                width=self._turns_width,
+                pattern=self._format_pattern(pattern),
+                response=response,
+                )
+            )
 
     def take_turn_as_codemaker(self, pattern):
         """ Takes turn as CodeMaker (with pattern from CodeBreaker) - without pattern validation, returns response """
+
+        if self._game_status != 0:
+            raise PermissionError("Game is ended! You can't take turn.")
 
         response = self._calculate_response(pattern)  # calculate the response
         self._turns[pattern] = response  # save the response to the dictionary  # TODO: need to save response to dict?
@@ -244,10 +249,9 @@ class CodeBreaker(Mastermind):
         """ Returns prompt string for input function """
 
         return (
-            "{turn:>{width}d}: {pattern}{possibility} -> "
+            "Turn number {turn}. Enter response for pattern {pattern}{possibility}: "
             .format(
                 turn=self._turns_counter,
-                width=self._turns_width,
                 pattern=self.current_pattern,  # formatted
                 possibility=self.hint_only_one_possibility,  # formatted
             )
@@ -273,35 +277,50 @@ class CodeBreaker(Mastermind):
             response = tuple(
                 int(response_peg) for response_peg in response_string.strip().split(' ', maxsplit=1)  # only one divide
             )
-        except ValueError:
-            return True  # there was an error  # TODO: raise ValueError with explanation
+        except (TypeError, ValueError):
+            raise ValueError("Given response is incorrect! Enter again.")
 
-        if not self._validate_response(response):  # check if response is correct
-            return True  # there was an error
+        if not self._validate_response(response):  # check if `response` is correct
+            raise ValueError("Given response is incorrect! Enter again.")
 
-        self.take_turn_codebreaker(response)
-        return False  # OK  # TODO: method should return hint pattern?
+        pattern = self.take_turn_as_codebreaker(response)
 
-    def take_turn_codebreaker(self, response):
+        if pattern is None:  # TODO: whole `if` is to be deleted
+            return "!"  # TODO: temporarily - should be ""
+        else:
+            return (
+                "My next pattern is {pattern}{possibility}"
+                .format(
+                    pattern=self._format_pattern(pattern),  # formatted
+                    possibility=self.hint_only_one_possibility,  # formatted
+                )
+            )
+
+    def take_turn_as_codebreaker(self, response):
         """ Takes turn as CodeBreaker (with response from CodeMaker) - without response validation, returns pattern """
+
+        if self._game_status != 0:
+            raise PermissionError("Game is ended! You can't take turn.")
 
         self._turns[self._current_pattern] = response  # add this turn to the turns dictionary
 
-        if not self._check_game_end(response):
-            # prepare for next codebreaker turn
-            if self._next_pattern is None:
-                self._game_status = 3
-                return
-            else:
-                if self._hint_check(self._next_pattern):
-                    self._current_pattern = self._next_pattern
-                else:
-                    self._current_pattern = self._hint_next()
+        if self._check_game_end(response):
+            return None
 
-            self._next_pattern = self._hint_next(set_status=False)
+        # prepare for next codebreaker turn
+        if self._next_pattern is None:  # TODO: move this check to check_game_end() method - after turns_limit!
+            self._game_status = 3
+            return None  # TODO: temporarily
 
-            self._hint_only_one_possibility = self._current_pattern is not None and self._next_pattern is None
-            # TODO: function should return `current_pattern`
+        if self._hint_check(self._next_pattern):
+            self._current_pattern = self._next_pattern
+        else:
+            self._current_pattern = self._hint_next()
+
+        self._next_pattern = self._hint_next(set_status=False)
+        self._hint_only_one_possibility = self._current_pattern is not None and self._next_pattern is None
+
+        return self._current_pattern
 
     def _hint_generator(self):
         """ Yields the first pattern that can be a solution based on all previous turns """

@@ -17,7 +17,7 @@ def main():
     print("##############################")
     print()
 
-    cb = CodeBreaker(colors=10, pegs=6, hint_mode=2)
+    cb = CodeBreaker(colors=8, pegs=7, hint_mode=3)
 
     print(
         "You are the CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors (letters)."
@@ -29,7 +29,7 @@ def main():
     print(
         "I am the CodeBreaker and I have {turns}"
         .format(
-            turns=cb.turns_limit
+            turns=cb.turns_limit,
         ),
         "turn" if cb.turns_limit == 1 else "turns",
         "to guess the solution pattern."
@@ -37,10 +37,12 @@ def main():
     print()
 
     while not cb.game_status:
-        if cb.input_for_codebreaker(input(cb.prompt)):
-            print("Incorrect response. Enter again.")
-
+        try:
+            print(cb.input_for_codebreaker(input(cb.prompt)))
+        except ValueError as err:
+            print(err)
     print()
+
     if cb.game_status == 1:
         print(
             "The solution pattern is {pattern}."

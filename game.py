@@ -29,7 +29,7 @@ def main():
     print(
         "You are the CodeBreaker and you have {turns}"
         .format(
-            turns=cm.turns_limit
+            turns=cm.turns_limit,
         ),
         "turn" if cm.turns_limit == 1 else "turns",
         "to guess the solution pattern."
@@ -37,25 +37,17 @@ def main():
     print()
 
     while not cm.game_status:
-        response = cm.input_for_codemaker(input(cm.prompt))
-        if response is None:
-            print("Incorrect pattern. Enter again.")
-        else:
-            print(
-                "{turn}: {pattern} -> {response}"
-                .format(
-                    turn=cm.turns_counter,
-                    pattern=cm.last_pattern,
-                    response=response,
-                )
-            )
-
+        try:
+            print(cm.input_for_codemaker(input(cm.prompt)))
+        except ValueError as err:
+            print(err)
     print()
+
     if cm.game_status == 1:
         print(
             "You found the solution in {turns}"
             .format(
-                turns=cm.turns_counter
+                turns=cm.turns_counter,
             ),
             "turn." if cm.turns_counter == 1 else "turns."
         )
@@ -65,7 +57,7 @@ def main():
     print(
         "The solution pattern is {pattern}."
         .format(
-            pattern=cm.solution_pattern
+            pattern=cm.solution_pattern,
         )
     )
 
