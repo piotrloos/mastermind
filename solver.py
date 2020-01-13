@@ -1,8 +1,8 @@
 ########################################
 # My version of famous game Mastermind #
 # solver.py                            #
-# CodeBreaker file                     #
-#                  Piotr Loos (c) 2019 #
+# CodeBreaker I/O file                 #
+#             Piotr Loos (c) 2019-2020 #
 ########################################
 
 from mastermind import CodeBreaker
@@ -17,7 +17,7 @@ def main():
     print("##############################")
     print()
 
-    cb = CodeBreaker(colors=8, pegs=7, hint_mode=3)
+    cb = CodeBreaker(colors=8, pegs=5, hint_mode=0)
 
     print(
         "You are the CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors (letters)."
@@ -33,6 +33,12 @@ def main():
         ),
         "turn" if cb.turns_limit == 1 else "turns",
         "to guess the solution pattern."
+    )
+    print(
+        "Example pattern is {pattern}."
+        .format(
+            pattern=cb.example_pattern,
+        )
     )
     print()
 

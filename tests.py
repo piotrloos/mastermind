@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # tests.py                             #
 # Unittests for mastermind             #
-#                  Piotr Loos (c) 2019 #
+#             Piotr Loos (c) 2019-2020 #
 ########################################
 
 import unittest

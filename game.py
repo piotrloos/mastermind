@@ -1,8 +1,8 @@
 ########################################
 # My version of famous game Mastermind #
 # game.py                              #
-# CodeMaker file                       #
-#                  Piotr Loos (c) 2019 #
+# CodeMaker I/O file                   #
+#             Piotr Loos (c) 2019-2020 #
 ########################################
 
 from mastermind import CodeMaker
@@ -34,6 +34,12 @@ def main():
         "turn" if cm.turns_limit == 1 else "turns",
         "to guess the solution pattern."
     )
+    print(
+        "Example pattern is {pattern}."
+        .format(
+            pattern=cm.example_pattern,
+        )
+    )
     print()
 
     while not cm.game_status:
@@ -55,7 +61,7 @@ def main():
         print("You reached turns limit. Game over!")
 
     print(
-        "The solution pattern is {pattern}."
+        "The solution pattern was {pattern}."
         .format(
             pattern=cm.solution_pattern,
         )

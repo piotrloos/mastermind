@@ -1,13 +1,11 @@
 # do zrobienia w najbliższym czasie:
 
-# TODO: naprawić `turn_counter` dla CodeMakera
-
 # TODO: poprawienie split w `input_pattern` (wysypuje się ord() dla dwóch liter)
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb
 # TODO: wyświetlanie `_colors_set` przy uruchamianiu
-# TODO: osobna metoda random pattern
 
 # TODO: liczenie możliwych patternów hint_generatora - klasa na `hint_generator`?
+# TODO: inny sposób na hint patterny - filtrowanie listy po każdym ruchu
 
 # TODO: rozdzielenie klas `CodeMaker` i `CodeBreaker` na część ludzką dziedziczoną po części komputerowej
 
