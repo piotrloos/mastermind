@@ -20,10 +20,11 @@ def main():
     cb = CodeBreaker(colors=8, pegs=5, hint_mode=0)
 
     print(
-        "You are the CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors (letters)."
+        "You are the CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors: {set}."
         .format(
             pegs=cb.pegs_number,
             colors=cb.colors_number,
+            set=cb.colors_set,
         )
     )
     print(

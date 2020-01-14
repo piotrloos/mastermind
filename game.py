@@ -20,10 +20,11 @@ def main():
     cm = CodeMaker()
 
     print(
-        "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors (letters)."
+        "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {set}."
         .format(
             pegs=cm.pegs_number,
             colors=cm.colors_number,
+            set=cm.colors_set,
         )
     )
     print(

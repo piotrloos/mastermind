@@ -1,8 +1,6 @@
 # do zrobienia w najbliższym czasie:
 
-# TODO: poprawienie split w `input_pattern` (wysypuje się ord() dla dwóch liter)
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb
-# TODO: wyświetlanie `_colors_set` przy uruchamianiu
 
 # TODO: liczenie możliwych patternów hint_generatora - klasa na `hint_generator`?
 # TODO: inny sposób na hint patterny - filtrowanie listy po każdym ruchu

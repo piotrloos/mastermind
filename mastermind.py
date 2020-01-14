@@ -79,6 +79,27 @@ class Mastermind:
         else:
             return self._format_pattern(self._solution_pattern)
 
+    @property
+    def colors_set(self):
+        """ Returns formatted set of colors """
+
+        return "{" + ", ".join(self._format_peg(peg_int) for peg_int in self._colors_set) + "}"
+
+    @staticmethod
+    def _decode_peg(peg_char):
+        """ Returns formatted peg converted into integer """
+
+        if len(peg_char) == 1:
+            return ord(peg_char) - 97  # TODO: input digits, lowercase or uppercase letters
+        else:
+            return None
+
+    @staticmethod
+    def _format_peg(peg_int):
+        """ Returns integer converted into formatted peg """
+
+        return chr(peg_int + 97)  # TODO: implement different styles of formatting pattern
+
     def _calculate_response(self, pattern1, pattern2=None):
         """ Returns calculated response (black and white pegs) for given pattern """
 
@@ -118,12 +139,10 @@ class Mastermind:
 
         return False
 
-    @staticmethod
-    def _format_pattern(pattern):
+    def _format_pattern(self, pattern):
         """ Returns formatted pattern """
 
-        # convert each peg into letter  # TODO: implement different styles of formatting pattern
-        return "[ " + " ".join(chr(pattern_peg + 97) for pattern_peg in pattern) + " ]"
+        return "[ " + " ".join(self._format_peg(peg_int) for peg_int in pattern) + " ]"
 
     def _get_random_pattern(self):
         """ Returns random pattern for generating solution or giving a demo pattern """
@@ -174,8 +193,8 @@ class CodeMaker(Mastermind):
 
         try:  # try to convert `pattern_string` to tuple (pattern format)
             pattern = tuple(
-                ord(pattern_peg) - 97  # TODO: input digits, lowercase or uppercase letters - special method?
-                for pattern_peg in pattern_string.strip().split(' ', maxsplit=self._pegs_number - 1)  # divide into pegs
+                self._decode_peg(peg_char)
+                for peg_char in pattern_string.strip().split(' ', maxsplit=self._pegs_number - 1)  # divide into pegs
             )
         except (TypeError, ValueError):
             raise ValueError("Given pattern is incorrect! Enter again.")
