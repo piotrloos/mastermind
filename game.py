@@ -36,7 +36,13 @@ def main():
         "to guess the solution pattern."
     )
     print(
-        "Example pattern is {pattern}."
+        "There are {number} possible patterns in this game."
+        .format(
+            number=cm.patterns_number,
+        )
+    )
+    print(
+        "For example, one of the patterns is {pattern}."
         .format(
             pattern=cm.example_pattern,
         )
@@ -67,6 +73,7 @@ def main():
             pattern=cm.solution_pattern,
         )
     )
+    print("Thanks for playing!")
 
 
 if __name__ == "__main__":

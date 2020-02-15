@@ -5,33 +5,47 @@
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
+from abc import abstractmethod
 from random import randint, sample
-from settings import COLORS, PEGS, TURNS
+from settings import *
 
 
 class Mastermind:
     """ Contains whole game, base class for CodeMaker and CodeBreaker classes """
 
-    def __init__(self, colors=COLORS, pegs=PEGS, turns=TURNS):
+    @abstractmethod
+    def __init__(self, colors=COLORS, pegs=PEGS, turns_limit=TURNS_LIMIT, gen_mode=GEN_MODE, shuffle_mode=SHUFFLE_MODE):
         """ Initializes new game with given settings """
 
-        # check if given colors number is correct
+        # check if given `colors` number is correct
         if colors in range(2, 11):  # from 2 to 10
             self._colors_number = colors
         else:
             raise ValueError("Incorrect number of colors.")
 
-        # check if given pegs number is correct
+        # check if given `pegs` number is correct
         if pegs in range(2, 9):  # from 2 to 8
             self._pegs_number = pegs
         else:
             raise ValueError("Incorrect number of pegs.")
 
-        # check if given turns limit is correct
-        if turns in range(1, 21):  # from 1 to 20
-            self._turns_limit = turns
+        # check if given `turns_limit` number is correct
+        if turns_limit in range(1, 21):  # from 1 to 20
+            self._turns_limit = turns_limit
         else:
             raise ValueError("Incorrect number of turns limit.")
+
+        # check if given patterns `gen_mode` is correct
+        if gen_mode in {1, 2}:  # 1 or 2
+            self._gen_mode = gen_mode
+        else:
+            raise ValueError("Incorrect patterns generation mode.")
+
+        # check if given patterns `shuffle_mode` is correct
+        if shuffle_mode in {0, 1, 2, 3}:
+            self._shuffle_mode = shuffle_mode
+        else:
+            raise ValueError("Incorrect patterns shuffle mode.")
 
         self._turns_width = len(str(self._turns_limit))  # calculate width for `_turns_counter` formatting
         self._turns_counter = 1  # initialize turns counter
@@ -65,12 +79,6 @@ class Mastermind:
         return self._patterns_number
 
     @property
-    def example_pattern(self):
-        """ Returns formatted example pattern based on game settings """
-
-        return self._format_pattern(self._get_random_pattern())
-
-    @property
     def solution_pattern(self):
         """ Returns formatted solution pattern only when game is ended """
 
@@ -83,22 +91,75 @@ class Mastermind:
     def colors_set(self):
         """ Returns formatted set of colors """
 
-        return "{" + ", ".join(self._format_peg(peg_int) for peg_int in self._colors_set) + "}"
+        return "{" + ", ".join(self._encode_peg(peg_int) for peg_int in self._colors_set) + "}"
+
+    @property
+    def example_pattern(self):
+        """ Returns formatted example pattern based on game settings """
+
+        return self._format_pattern(self._get_random_pattern())
+
+    def _get_random_pattern(self):
+        """ Returns random pattern for generating solution or giving a demo pattern """
+
+        return tuple(randint(0, self._colors_number - 1) for _ in range(self._pegs_number))
+
+    def _format_pattern(self, pattern):
+        """ Returns formatted pattern """
+
+        return "[ " + " ".join(self._encode_peg(peg_int) for peg_int in pattern) + " ]"
+
+    @staticmethod
+    def _encode_peg(peg_int):
+        """ Returns formatted peg (char) converted from integer """
+
+        return chr(peg_int + 97)  # TODO: implement different styles of formatting pattern
 
     @staticmethod
     def _decode_peg(peg_char):
-        """ Returns formatted peg converted into integer """
+        """ Returns integer converted from formatted peg (char) """
 
         if len(peg_char) == 1:
             return ord(peg_char) - 97  # TODO: input digits, lowercase or uppercase letters
         else:
             return None
 
-    @staticmethod
-    def _format_peg(peg_int):
-        """ Returns integer converted into formatted peg """
+    def _get_patterns_list(self):
+        """ Returns list of all pattern combinations using game settings """
 
-        return chr(peg_int + 97)  # TODO: implement different styles of formatting pattern
+        # generates all possible patterns using my own function
+        # it's similar to Cartesian product (`import itertools.product`),
+        # but operates on tuples (not lists) and works direct on Mastermind class variables
+
+        all_patterns = (),  # initialize `all_patterns` with tuple containing empty tuple
+
+        # `_shuffle_mode`s are:
+        # 0 = don't shuffle `_colors_set` before build; don't shuffle `all_patterns` after build
+        # 1 =    do shuffle `_colors_set` before build; don't shuffle `all_patterns` after build
+        # 2 = don't shuffle `_colors_set` before build;    do shuffle `all_patterns` after build
+        # 3 =    do shuffle `_colors_set` before build;    do shuffle `all_patterns` after build
+
+        # build list (in fact generator for last peg) of all possible patterns
+        if self._shuffle_mode in {1, 3}:  # shuffle `_colors_set` to build patterns from (on every iteration)
+            for _ in range(self._pegs_number):
+                all_patterns = (
+                    (*pattern, pattern_peg)
+                    for pattern in all_patterns
+                    for pattern_peg in sample(self._colors_set, self._colors_number)  # `sample` returns a new list
+                )
+        else:  # {0, 2} - don't shuffle `_colors_set`, so `all_patterns` will contain patterns in ascending order
+            for _ in range(self._pegs_number):
+                all_patterns = (
+                    (*pattern, pattern_peg)
+                    for pattern in all_patterns
+                    for pattern_peg in self._colors_set
+                )
+
+        if self._shuffle_mode in {2, 3}:  # shuffle `all_patterns` (at once)
+            all_patterns = sample(set(all_patterns), self._patterns_number)  # `all_patterns` are now list, not gen.
+        # else {0, 1} - don't shuffle `all_patterns` -> nothing to do
+
+        return all_patterns
 
     def _calculate_response(self, pattern1, pattern2=None):
         """ Returns calculated response (black and white pegs) for given pattern """
@@ -129,25 +190,15 @@ class Mastermind:
     def _check_game_end(self, response):
         """ Checks if the game should end (after current turn) """
 
-        if response == (self._pegs_number, 0):  # check if the pattern is guessed correctly # TODO: response from class?
-            self._game_status = 1
+        if response == (self._pegs_number, 0):  # check if all response pegs are black  # TODO: response from class?
+            self._game_status = 1  # solution is found
             return True
 
-        if self._turns_counter >= self._turns_limit:  # check if the player reached turns limit
-            self._game_status = 2
+        if self._turns_counter >= self._turns_limit:
+            self._game_status = 2  # reached turns limit
             return True
 
         return False
-
-    def _format_pattern(self, pattern):
-        """ Returns formatted pattern """
-
-        return "[ " + " ".join(self._format_peg(peg_int) for peg_int in pattern) + " ]"
-
-    def _get_random_pattern(self):
-        """ Returns random pattern for generating solution or giving a demo pattern """
-
-        return tuple(randint(0, self._colors_number - 1) for _ in range(self._pegs_number))
 
 
 class CodeMaker(Mastermind):
@@ -219,30 +270,31 @@ class CodeMaker(Mastermind):
             raise PermissionError("Game is ended! You can't take turn.")
 
         response = self._calculate_response(pattern)
+
         if not self._check_game_end(response):
             self._turns_counter += 1  # prepare for next turn
+
         return response
 
 
 class CodeBreaker(Mastermind):
     """ Contains CodeBreaker mode, inherits from Mastermind class """
 
-    def __init__(self, hint_mode=1, **kwargs):  # TODO: add new param - next_hint mode or calc solutions_number mode
+    def __init__(self, **kwargs):  # TODO: add new param - next_hint mode or calc solutions_number mode
         """ Initializes CodeBreaker class object """
 
         super().__init__(**kwargs)  # initialize Mastermind class object
 
-        # check if given hint shuffle mode is correct
-        if hint_mode in {0, 1, 2, 3}:
-            self._hint_shuffle_mode = hint_mode
-        else:
-            raise ValueError("Incorrect hint shuffle mode.")
+        self._single_solution = False  # initialize the `_single_solution` flag
 
-        self._turns = dict()  # initialize dictionary of turns
-        self._hint = self._hint_generator()  # initialize hint pattern generator
-        self._current_pattern = self._hint_next()  # get first pattern
-        self._next_pattern = self._hint_next(set_status=False)  # get second pattern
-        self._hint_only_one_possibility = False  # initialize the only one possibility flag
+        if self._gen_mode == 1:  # checking patterns generator mode
+            self._1turns = dict()  # initialize dictionary of turns
+            self._1hint = self._1hint_generator()  # initialize hint pattern generator
+            self._current_pattern = self._1hint_next()  # get first pattern
+            self._1second_pattern = self._1hint_next(set_status=False)  # get second pattern
+        elif self._gen_mode == 2:  # patterns list filtering mode
+            self._2patterns = list(self._get_patterns_list())  # prepare list of all possible patterns to filter
+            self._current_pattern = self._2patterns[0]  # take first pattern from the list
 
     @property
     def current_pattern(self):
@@ -254,24 +306,24 @@ class CodeBreaker(Mastermind):
     def hint_percent(self):
         """ Returns current hint percentage value """
 
-        return self._hint_counter / self._patterns_number * 100
+        return 100 * self._1hint_counter / self._patterns_number
 
     @property
-    def hint_only_one_possibility(self):
-        """ Returns formatted `hint_only_one_possibility` flag """
+    def single_solution(self):
+        """ Returns formatted `_single_solution` string (asterisk) """
 
-        return " (*)" if self._hint_only_one_possibility else ""
+        return " (*)" if self._single_solution else ""
 
     @property
     def prompt(self):
         """ Returns prompt string for input function """
 
         return (
-            "Turn number {turn}. Enter response for pattern {pattern}{possibility}: "
+            "Turn number {turn}. Enter response for pattern {pattern}{single}: "
             .format(
                 turn=self._turns_counter,
                 pattern=self.current_pattern,  # formatted
-                possibility=self.hint_only_one_possibility,  # formatted
+                single=self.single_solution,  # formatted
             )
         )
 
@@ -287,18 +339,6 @@ class CodeBreaker(Mastermind):
                 # both black and white pegs number (and sum of them also) should be between 0 and pegs number
             )
         )
-
-    def _check_game_end(self, response):
-        """ Checks if the game should end (after current turn) """
-
-        if super()._check_game_end(response):
-            return True
-
-        if self._next_pattern is None:
-            self._game_status = 3
-            return True
-
-        return False
 
     def input_for_codebreaker(self, response_string):
         """ Takes `response_string` from CodeMaker (human), verifies it, takes turn and returns formatted pattern """
@@ -316,13 +356,13 @@ class CodeBreaker(Mastermind):
         pattern = self.take_turn_as_codebreaker(response)
 
         if pattern is None:
-            return ""
+            return "No further pattern to guess."
         else:
             return (
-                "My next pattern is {pattern}{possibility}"
+                "My next pattern is {pattern}{single}."
                 .format(
                     pattern=self._format_pattern(pattern),  # formatted
-                    possibility=self.hint_only_one_possibility,  # formatted
+                    single=self.single_solution,  # formatted
                 )
             )
 
@@ -332,69 +372,70 @@ class CodeBreaker(Mastermind):
         if self._game_status != 0:
             raise PermissionError("Game is ended! You can't take turn.")
 
-        self._turns[self._current_pattern] = response  # add this turn to the turns dictionary
-
         if self._check_game_end(response):
             return None
 
         self._turns_counter += 1  # prepare for next turn
 
-        if self._hint_check(self._next_pattern):
-            self._current_pattern = self._next_pattern
-        else:
-            self._current_pattern = self._hint_next()
+        if self._gen_mode == 1:  # checking patterns generator mode
 
-        self._next_pattern = self._hint_next(set_status=False)
-        self._hint_only_one_possibility = self._current_pattern is not None and self._next_pattern is None
+            self._1turns[self._current_pattern] = response  # add this turn to the turns dictionary
+
+            # check if previously generated pattern (`_1second_pattern`) still can be a solution
+            if self._1hint_check(self._1second_pattern):
+                self._current_pattern = self._1second_pattern  # yes -> save `_1second_pattern` as current
+            else:
+                self._current_pattern = self._1hint_next()  # no -> get another pattern
+
+            self._1second_pattern = self._1hint_next(set_status=False)  # get second possible solution (if exists)
+            self._single_solution = self._current_pattern is not None and self._1second_pattern is None  # set flag
+
+        elif self._gen_mode == 2:  # patterns list filtering mode
+
+            print("(2) before filter: {}".format(len(self._2patterns)))  # TODO: for tests
+
+            self._2patterns = [  # filter the list
+                pattern
+                for pattern in self._2patterns
+                if self._calculate_response(self._current_pattern, pattern) == response
+            ]
+            self._current_pattern = self._2patterns[0]  # take first pattern from the list
+            self._single_solution = (len(self._2patterns) == 1)  # set flag
+
+            print("(2) after filter: {}".format(len(self._2patterns)))  # TODO: for tests
 
         return self._current_pattern
 
-    def _hint_generator(self):
+    def _check_game_end(self, response):
+        """ Checks if the game should end (after current turn) """
+
+        if super()._check_game_end(response):
+            return True
+
+        if (
+            self._gen_mode == 1 and self._1second_pattern is None  # check if exists another solution in `_gen_mode` = 1
+        ) or (
+            self._gen_mode == 2 and len(self._2patterns) <= 1  # check if exists another solution in `_gen_mode` = 2
+        ):
+            self._game_status = 3  # no possible solution
+            return True
+
+        return False
+
+    def _1hint_generator(self):
         """ Yields the first pattern that can be a solution based on all previous turns """
 
-        # generates all possible patterns using my own function
-        # it's similar to Cartesian product (`import itertools.product`),
-        # but operates on tuples (not lists) and works direct on Mastermind class variables
-
-        self._hint_counter = 0  # initialize hint counter
-        all_patterns = (),  # initialize `all_patterns` with tuple containing empty tuple
-
-        # `hint_shuffle_mode`s are:
-        # 0 = don't shuffle `_colors_set` before build; don't shuffle `all_patterns` after build
-        # 1 =    do shuffle `_colors_set` before build; don't shuffle `all_patterns` after build
-        # 2 = don't shuffle `_colors_set` before build;    do shuffle `all_patterns` after build
-        # 3 =    do shuffle `_colors_set` before build;    do shuffle `all_patterns` after build
-
-        # build list (in fact generator for last peg) of all possible patterns
-        if self._hint_shuffle_mode in {1, 3}:  # shuffle `_colors_set` to build patterns from (on every iteration)
-            for _ in range(self._pegs_number):
-                all_patterns = (
-                    (*pattern, pattern_peg)
-                    for pattern in all_patterns
-                    for pattern_peg in sample(self._colors_set, self._colors_number)  # `sample` returns a new list
-                )
-        else:  # {0, 2} - don't shuffle `_colors_set`, so `all_patterns` will contain patterns in ascending order
-            for _ in range(self._pegs_number):
-                all_patterns = (
-                    (*pattern, pattern_peg)
-                    for pattern in all_patterns
-                    for pattern_peg in self._colors_set
-                )
-
-        if self._hint_shuffle_mode in {2, 3}:  # shuffle `all_patterns` (at once)
-            all_patterns = sample(set(all_patterns), self._patterns_number)  # `all_patterns` are now list, not gen.
-        # else {0, 1} - don't shuffle `all_patterns`
-
+        self._1hint_counter = 0  # initialize hint counter
         width = len(str(self._patterns_number))  # tests  # TODO: move out from there
 
-        for hint_pattern in all_patterns:
-            self._hint_counter += 1
+        for hint_pattern in self._get_patterns_list():
+            self._1hint_counter += 1
 
-            if self._hint_check(hint_pattern):
+            if self._1hint_check(hint_pattern):
                 print(  # tests  # TODO: move out from there
-                    "{hint:>{width}d} / {all:>{width}d} ({percent:6.2f}%)"
+                    "(1) {hint:>{width}d} / {all:>{width}d} ({percent:6.2f}%)"
                     .format(
-                        hint=self._hint_counter,
+                        hint=self._1hint_counter,
                         all=self.patterns_number,
                         percent=self.hint_percent,
                         width=width,
@@ -404,28 +445,28 @@ class CodeBreaker(Mastermind):
 
         # after yield the last pattern
         print(  # tests  # TODO: move out from there
-            "{hint:>{width}d} / {all:>{width}d} ({percent:6.2f}%)"  # should be always 100.00%
+            "(1) {hint:>{width}d} / {all:>{width}d} ({percent:6.2f}%)"  # should be always 100.00%
             .format(
-                hint=self._hint_counter,
+                hint=self._1hint_counter,
                 all=self.patterns_number,
                 percent=self.hint_percent,
                 width=width,
             )
         )
 
-    def _hint_check(self, hint_pattern):
+    def _1hint_check(self, hint_pattern):
         """ Checks if given `hint_pattern` can be a solution based on all previous turns """
 
         return all(
-            self._turns[turn_pattern] == self._calculate_response(turn_pattern, hint_pattern)
-            for turn_pattern in self._turns.keys()
+            self._1turns[turn_pattern] == self._calculate_response(turn_pattern, hint_pattern)
+            for turn_pattern in self._1turns.keys()
         )
 
-    def _hint_next(self, set_status=True):
+    def _1hint_next(self, set_status=True):
         """ Gets the next hint pattern and handles the `StopIteration` exception """
 
         try:
-            return next(self._hint)
+            return next(self._1hint)
         except StopIteration:
             if set_status:
                 self._game_status = 3

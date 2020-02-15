@@ -17,7 +17,7 @@ def main():
     print("##############################")
     print()
 
-    cb = CodeBreaker(colors=8, pegs=5, hint_mode=0)
+    cb = CodeBreaker(colors=7, pegs=8, turns_limit=15, gen_mode=2, shuffle_mode=0)
 
     print(
         "You are the CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors: {set}."
@@ -36,7 +36,13 @@ def main():
         "to guess the solution pattern."
     )
     print(
-        "Example pattern is {pattern}."
+        "There are {number} possible patterns in this game."
+        .format(
+            number=cb.patterns_number,
+        )
+    )
+    print(
+        "For example, one of the patterns is {pattern}."
         .format(
             pattern=cb.example_pattern,
         )
@@ -68,6 +74,7 @@ def main():
         print("I reached turns limit. Game over!")
     elif cb.game_status == 3:
         print("Sorry. No possible solution found!")
+    print("Thanks for playing!")
 
 
 if __name__ == "__main__":

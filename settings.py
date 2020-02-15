@@ -5,6 +5,8 @@
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-COLORS = 6  # defining how many colors will be in the game
-PEGS = 4    # defining how many pegs will be in the game
-TURNS = 10  # defining how many turns the player will have in the game
+COLORS = 6          # defining default colors number
+PEGS = 4            # defining default pegs number
+TURNS_LIMIT = 12    # defining default turns limit number
+GEN_MODE = 1        # defining default patterns generation mode
+SHUFFLE_MODE = 0    # defining default patterns shuffle mode
