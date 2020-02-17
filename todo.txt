@@ -1,16 +1,20 @@
 # do zrobienia w najbliższym czasie:
 
-# TODO: formatowanie patternów za pomocą małych/dużych liter, liczb
+# TODO: zmiana nazw klas
+# TODO: uporządkowanie dwóch metod znajdujących możliwe patterny
+# TODO: mode 1 - wyłączenie szukania drugiego patterna (parametr)
+# TODO: przeniesienie parametrów związanych z rozwiązywaniem do CodeBreakera
+# TODO: getter dla `_possible_solutions_number`
 
 # TODO: liczenie możliwych patternów hint_generatora - klasa na `hint_generator`?
-# TODO: inny sposób na hint patterny - filtrowanie listy po każdym ruchu
-
 # TODO: rozdzielenie klas `CodeMaker` i `CodeBreaker` na część ludzką dziedziczoną po części komputerowej
-
 # TODO: uporządkować kod w wielu miejscach
+
+# TODO: stworzenie helpera
 
 # później, pomysły itp.:
 
+# TODO: formatowanie patternów za pomocą małych/dużych liter, liczb
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: formatowanie patternów (Colorama)
 # TODO: klasy na Pattern i Response - nie spowolni to gry?

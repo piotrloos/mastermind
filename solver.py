@@ -17,7 +17,7 @@ def main():
     print("##############################")
     print()
 
-    cb = CodeBreaker(colors=7, pegs=8, turns_limit=15, gen_mode=2, shuffle_mode=0)
+    cb = CodeBreaker(colors=7, pegs=8, turns_limit=15, gen_mode=2, shuffle_mode=2)
 
     print(
         "You are the CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors: {set}."
