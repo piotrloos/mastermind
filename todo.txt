@@ -7,10 +7,11 @@
 # TODO: MODE1 - liczenie możliwych patternów `hint_generatora` - klasa na `hint_generator`?
 # TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
 # TODO: uporządkować kod w wielu miejscach
-# TODO: zmiana nazwy `hint` na coś innego, `possible solutions` także
+# TODO: zmiana nazwy `possible solutions`
 
 # TODO: stworzenie `Helper`a
 # TODO: stworzenie pliku `readme.md`
+# TODO: progress przy dłuższych operacjach
 
 # później, pomysły itp.:
 
