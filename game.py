@@ -1,78 +1,75 @@
 ########################################
 # My version of famous game Mastermind #
 # game.py                              #
-# CodeMaker I/O file                   #
+# Mastermind Game I/O file             #
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-from mastermind import CodeMaker
+from mastermind import MastermindGame
 
 
 def main():
-    """ Main I/O file for Mastermind CodeMaker """
+    """ Main I/O file for Mastermind Game """
 
     print()
-    print("##############################")
-    print("#   Welcome to Mastermind!   #")
-    print("##############################")
+    print("###################################")
+    print("#   Welcome to Mastermind Game!   #")
+    print("###################################")
     print()
 
-    cm = CodeMaker()
+    mg = MastermindGame()
 
+    print()
     print(
         "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {set}."
         .format(
-            pegs=cm.pegs_number,
-            colors=cm.colors_number,
-            set=cm.colors_set,
+            pegs=mg.pegs_number,
+            colors=mg.colors_number,
+            set=mg.colors_set,
         )
     )
     print(
         "You are the CodeBreaker and you have {turns}"
         .format(
-            turns=cm.turns_limit,
+            turns=mg.turns_limit,
         ),
-        "turn" if cm.turns_limit == 1 else "turns",
+        "turn" if mg.turns_limit == 1 else "turns",
         "to guess the solution pattern."
     )
     print(
-        "There are {number} possible patterns in this game."
+        "There are {number} possible patterns in this game. Example pattern is {pattern}."
         .format(
-            number=cm.patterns_number,
-        )
-    )
-    print(
-        "For example, one of the patterns is {pattern}."
-        .format(
-            pattern=cm.example_pattern,
+            number=mg.patterns_number,
+            pattern=mg.example_pattern,
         )
     )
     print()
 
-    while not cm.game_status:
+    while not mg.game_status:
         try:
-            print(cm.input_for_codemaker(input(cm.prompt)))
+            print(mg.input(input(mg.prompt)))
         except ValueError as err:
             print(err)
     print()
 
-    if cm.game_status == 1:
+    if mg.game_status == 1:
         print(
             "You found the solution in {turns}"
             .format(
-                turns=cm.turns_counter,
+                turns=mg.turns_counter,
             ),
-            "turn." if cm.turns_counter == 1 else "turns."
+            "turn." if mg.turns_counter == 1 else "turns."
         )
-    elif cm.game_status == 2:
+    elif mg.game_status == 2:
         print("You reached turns limit. Game over!")
 
     print(
-        "The solution pattern was {pattern}."
+        "The solution was {pattern}."
         .format(
-            pattern=cm.solution_pattern,
+            pattern=mg.solution,
         )
     )
+
     print("Thanks for playing!")
 
 
