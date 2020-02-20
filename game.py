@@ -17,9 +17,8 @@ def main():
     print("###################################")
     print()
 
-    mg = MastermindGame()
+    mg = MastermindGame(pegs=6, colors=8, turns_limit=20)
 
-    print()
     print(
         "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {set}."
         .format(
