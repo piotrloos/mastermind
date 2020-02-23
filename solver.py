@@ -17,7 +17,7 @@ def main():
     print("#####################################")
     print()
 
-    ms = MastermindSolver(colors=7, pegs=7, turns_limit=15, solve_mode=1, shuffle_mode=2)
+    ms = MastermindSolver(colors=8, pegs=7, turns_limit=15, shuffle_mode=0, solve_mode=2)
 
     print()
     print(
@@ -56,7 +56,7 @@ def main():
         print(
             "The solution is {pattern}."
             .format(
-                pattern=ms.current_poss_sol,
+                pattern=ms.format_current_poss_sol,
             )
         )
         print(

@@ -37,6 +37,11 @@ class Progress:
 
         print()
 
+    # def __del__(self):
+    #     """ Deletes Progress class object """
+    #
+    #     return super().__del__()
+
 
 def shuffle(lst, p_obj=None):
     """ Shuffles iterable `lst` in place, executes Progress object's method `item()` if given """
