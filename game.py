@@ -20,11 +20,11 @@ def main():
     mg = MastermindGame(pegs=6, colors=8, turns_limit=20)
 
     print(
-        "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {set}."
+        "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {list}."
         .format(
             pegs=mg.pegs_number,
             colors=mg.colors_number,
-            set=mg.colors_set,
+            list=mg.colors_list_formatted,
         )
     )
     print(

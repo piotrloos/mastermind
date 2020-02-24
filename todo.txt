@@ -1,24 +1,23 @@
 # do zrobienia w najbliższym czasie:
 
-# TODO: uporządkowanie obu MODE1 i MODE2
-# TODO: MODE1 - wyłączenie szukania drugiego patterna (parametr)
+# TODO: MODE1 - wyłączenie szukania drugiego patterna - parametr
 # TODO: MODE2 - możlwość brania dowolnego patternu z listy (nie tylko 0) - parametr
 
 # TODO: MODE1 - liczenie możliwych patternów `hint_generatora` - klasa na `hint_generator`?
 # TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
 # TODO: uporządkować kod w wielu miejscach
-# TODO: zmiana nazwy `possible solutions`
 
 # TODO: stworzenie `Helper`a
 # TODO: stworzenie pliku `readme.md`
-# TODO: progress przy dłuższych operacjach
+
+# TODO: uporządkować drukowane komunikaty
+# TODO: klasy na Pattern i Response - nie spowolni to gry?
 
 # później, pomysły itp.:
 
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: formatowanie patternów (Colorama)
-# TODO: klasy na Pattern i Response - nie spowolni to gry?
 # TODO: przyspieszenie `hint_generator`:
 # TODO:     ocena ważności wyniku i sprawdzanie all() po ważności
 # TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)

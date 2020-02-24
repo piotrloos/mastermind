@@ -15,17 +15,17 @@ class Mastermind:
     """ Contains whole game, base class for MastermindGame and MastermindSolver classes """
 
     @abstractmethod
-    def __init__(self, colors=COLORS, pegs=PEGS, turns_limit=TURNS_LIMIT):  # TODO: kwargs to be ignored
+    def __init__(self, *args, colors=COLORS, pegs=PEGS, turns_limit=TURNS_LIMIT, **kwargs):
         """ Initializes new game with given settings """
 
         # check if given `colors` number is correct
-        if colors in range(2, 11):  # from 2 to 10
+        if colors in range(2, 13):  # from 2 to 12
             self._colors_number = colors
         else:
             raise ValueError("Incorrect number of colors.")
 
         # check if given `pegs` number is correct
-        if pegs in range(2, 9):  # from 2 to 8
+        if pegs in range(2, 11):  # from 2 to 10
             self._pegs_number = pegs
         else:
             raise ValueError("Incorrect number of pegs.")
@@ -36,42 +36,67 @@ class Mastermind:
         else:
             raise ValueError("Incorrect number of turns limit.")
 
+        for attribute in args:
+            print(
+                "Attribute '{attribute}' hasn't been recognized! Ignoring."
+                .format(
+                    attribute=attribute,
+                )
+            )
+
+        for key, value in kwargs.items():
+            print(
+                "Keyword '{key}' and it's value '{value}' hasn't been recognized! Ignoring."
+                .format(
+                    key=key,
+                    value=value,
+                )
+            )
+
         self._turns_width = len(str(self._turns_limit))  # calculate width for `_turns_counter` formatting
         self._turns_counter = 1  # initialize turns counter
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
         self._patterns_number = self._colors_number ** self._pegs_number  # calculate number of all possible patterns
-        self._colors_list = list(range(self._colors_number))  # initialize list of colors (for performance)
+        self._colors_list = list(range(self._colors_number))  # initialize list of colors
 
     @property
     def colors_number(self):
+        """ Returns colors number """
+
         return self._colors_number
 
     @property
     def pegs_number(self):
+        """ Returns pegs number """
+
         return self._pegs_number
 
     @property
     def turns_limit(self):
+        """ Returns turns limit """
+
         return self._turns_limit
 
     @property
     def turns_counter(self):
+        """ Returns turn counter """
+
         return self._turns_counter
 
     @property
     def game_status(self):
+        """ Returns game status """
+
         return self._game_status
 
     @property
     def patterns_number(self):
+        """ Returns all possible patterns number """
+
         return self._patterns_number
 
     @property
-    def colors_list(self):
-        return self._colors_list
-
-    @property
-    def colors_set(self):
+    def colors_list_formatted(self):
         """ Returns formatted set of colors """
 
         return "{" + ", ".join(self._encode_peg(peg_int) for peg_int in self._colors_list) + "}"
@@ -146,10 +171,10 @@ class Mastermind:
 class MastermindGame(Mastermind):
     """ Contains Mastermind Game mode, inherits from Mastermind class """
 
-    def __init__(self, solution=None, **kwargs):
+    def __init__(self, *args, solution=None, **kwargs):
         """ Initializes Mastermind Game class object """
 
-        super().__init__(**kwargs)  # initialize Mastermind class object
+        super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
         if solution is None:  # check if `solution` is given, if not -> randomize new pattern
             self._solution = self._get_random_pattern()
@@ -160,7 +185,7 @@ class MastermindGame(Mastermind):
                 raise ValueError("Incorrect solution pattern.")
 
     @property
-    def solution(self):
+    def solution(self):  # TODO: move this method to Mastermind class
         """ Returns formatted solution pattern only when game is ended """
 
         if self._game_status == 0:
@@ -240,18 +265,16 @@ class MastermindGame(Mastermind):
 class MastermindSolver(Mastermind):
     """ Contains Mastermind Solver mode, inherits from Mastermind class """
 
-    def __init__(self, shuffle_mode=SHUFFLE_MODE, solve_mode=SOLVE_MODE, **kwargs):
+    def __init__(self, *args, shuffle_mode=SHUFFLE_MODE, solve_mode=SOLVE_MODE, **kwargs):
         """ Initializes Mastermind Solver class object """
 
-        super().__init__(**kwargs)  # initialize Mastermind class object
+        super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
         # check if given `shuffle_mode` is correct
         if shuffle_mode in {0, 1, 2, 3}:
             self._shuffle_mode = shuffle_mode
         else:
             raise ValueError("Incorrect patterns shuffling mode.")
-
-        self._single_poss_sol = False  # initialize the single possible solution flag
 
         # TODO: new flag needed: `self._first_turn`
 
@@ -265,32 +288,27 @@ class MastermindSolver(Mastermind):
 
     @property
     def shuffle_mode(self):
+        """ Returns shuffle mode """
+
         return self._shuffle_mode
 
     @property
-    def current_poss_sol(self):
-        """ ... """
+    def poss_number(self):
+        """ Returns possible solutions number """
 
-        return self._solver.mode_current_poss_sol
+        return self._solver.poss_number
 
     @property
-    def format_current_poss_sol(self):
+    def current_poss_formatted(self):
         """ Returns formatted current possible solution string """
 
-        return self._format_pattern(self.current_poss_sol)
+        return self._format_pattern(self._solver.current_poss)
 
     @property
-    def poss_sol_number(self):
-        """ Returns possible solutions number in solving mode 2, raises exception in solving mode 1 """
-
-        return self._solver.mode_poss_sol_number
-
-    @property
-    def format_single_poss_sol(self):
+    def single_poss_formatted(self):
         """ Returns formatted single possible solution flag as a string """
 
-        return " This must be the solution, there is no other option!" if self._single_poss_sol else ""
-        # TODO: get variable from modes
+        return " This must be the solution, there is no other option!" if self._solver.single_poss else ""
 
     @property
     def prompt(self):
@@ -300,7 +318,7 @@ class MastermindSolver(Mastermind):
             "Turn number {turn}. Enter response for pattern {pattern}: "
             .format(
                 turn=self._turns_counter,
-                pattern=self.format_current_poss_sol,
+                pattern=self.current_poss_formatted,
             )
         )
 
@@ -331,24 +349,22 @@ class MastermindSolver(Mastermind):
         # 3 =    do shuffle `_colors_list` during building;    do shuffle `all_patterns` after build
 
         all_patterns = [()]  # initialize with list containing empty tuple
-        colors_list = self.colors_list
+        colors_list = self._colors_list  # get local `colors_list` to be shuffled (if needed)
 
-        # TODO: progress tests
         p = Progress("Building patterns list...", sum(self._colors_number**i for i in range(1, self._pegs_number + 1)))
-        for _ in range(self._pegs_number):  # build list of all possible patterns
+        for _ in range(self._pegs_number):  # iterate for every peg
 
             if self._shuffle_mode in {1, 3}:  # shuffle `colors_list` to build patterns from (on every iteration)
                 shuffle(colors_list)
             # else {0, 2}: don't shuffle `colors_list`, patterns will be in ascending order
 
             all_patterns = [
-                p.item((*pattern, pattern_peg))  # new tuple one peg bigger (all "old" pegs + "new" one)
+                p.item((*pattern, pattern_peg))  # (wrapped) new tuple one peg bigger (all "old" pegs + "new" one)
                 for pattern in all_patterns  # all "old" pegs
                 for pattern_peg in colors_list  # one "new" peg
             ]
         p.delete()
 
-        # TODO: progress tests
         if self._shuffle_mode in {2, 3}:  # shuffle `all_patterns` (at once)
             p = Progress("Shuffling patterns list...", len(all_patterns) - 1)
             shuffle(all_patterns, p_obj=p)
@@ -379,8 +395,8 @@ class MastermindSolver(Mastermind):
             return (
                 "My next possible solution is {pattern}.{single}"
                 .format(
-                    pattern=self._format_pattern(current_pattern),
-                    single=self.format_single_poss_sol,
+                    pattern=self._format_pattern(current_pattern),  # TODO: current from Solver Mode
+                    single=self.single_poss_formatted,
                 )
             )
 
@@ -395,7 +411,7 @@ class MastermindSolver(Mastermind):
 
         self._turns_counter += 1  # prepare for next turn
 
-        return self._solver.mode_take_turn(response)
+        return self._solver.take_turn(response)
 
     def _check_game_end(self, response):
         """ Checks if the game should end (after current turn) """
@@ -403,7 +419,7 @@ class MastermindSolver(Mastermind):
         if super()._check_game_end(response):
             return True
 
-        if self._solver.mode_check_game_end():  # check if exists another possible solution
+        if self._solver.check_game_end():  # check if exists another possible solution
             self._game_status = 3  # no possible solution
             return True
 
@@ -411,163 +427,168 @@ class MastermindSolver(Mastermind):
 
 
 class MastermindSolverMode1:
-    """ ... """
+    """ Contains Mastermind Solver MODE 1 (patterns checking generator mode) """
 
     def __init__(self, upper):
-        """ ... """
+        """ (MODE 1) Initializes Mastermind Solver MODE 1 class object """
 
         self.super = upper  # TODO: is it OK?
 
         self._turns = dict()  # initialize dictionary of turns
-        self._gen_state = self._poss_sol_generator()  # initialize possible solutions generator
-        self._second_poss_sol = None  # TODO: temporary
-        self._current_poss_sol = self.mode_next_poss_sol()  # get first possible solution
+        self._poss_state = self._poss_generator()  # initialize possible solutions generator
+        self._single_poss = False  # initialize the single possible solution flag
+        self._second_poss = None  # TODO: temporary
+        self._current_poss = self._next_poss()  # get first possible solution
 
     @property
-    def mode_current_poss_sol(self):
-        """ ... """
+    def current_poss(self):
+        """ (MODE 1) Returns current possible solution (in this turn) """
 
-        return self._current_poss_sol
-
-    @property
-    def mode_poss_sol_number(self):
-        """ ... """
-
-        raise NotImplementedError("It is impossible to calculate possible solutions number in this mode!")
+        return self._current_poss
 
     @property
-    def _poss_sol_percent(self):
-        """ Returns current possible solution index percentage value """
+    def single_poss(self):
+        """ (MODE 1) Returns single possible solution flag """
 
-        return 100 * self._poss_sol_counter / self.super.patterns_number
+        return self._single_poss
 
-    def mode_take_turn(self, response):
-        """ ... """  # TODO: desc
+    @property
+    def poss_number(self):
+        """ (MODE 1) Returns possible solutions number """
 
-        self._turns[self._current_poss_sol] = response  # add this turn to the turns dictionary
+        raise NotImplementedError("It is impossible to calculate possible solutions number in (MODE 1)!")
 
-        self._current_poss_sol = self.mode_next_poss_sol()  # get next possible solution
-        return self._current_poss_sol
+    def take_turn(self, response):
+        """ (MODE 1) Takes turn as CodeBreaker with response and returns next possible solution """
 
-    def mode_check_game_end(self):
-        """ ... """
+        self._turns[self._current_poss] = response  # add this turn to the turns dictionary
 
-        return self._second_poss_sol is None
+        self._current_poss = self._next_poss()  # get next possible solution
+        return self._current_poss
 
-    def _poss_sol_generator(self):
-        """ Yields the first pattern that can be a solution based on all previous turns """
+    def _poss_generator(self):
+        """ (MODE 1) Yields the first possible solution based on all previous turns """
 
-        self._poss_sol_counter = 0  # initialize possible solutions counter
+        poss_counter = 0  # initialize possible solutions counter
+        poss_list = self.super.get_patterns_list()  # get list of all possible solutions to be checked
+        poss_number = self.super.patterns_number  # get number of all patterns
 
-        poss_sols = self.super.get_patterns_list()  # TODO: progress tests
-
-        p = Progress("Thinking...", self.super.patterns_number)
-        for poss_sol in poss_sols:  # TODO: progress
-            self._poss_sol_counter += 1
+        p = Progress("Thinking...", poss_number)
+        for poss in poss_list:  # TODO: progress
+            poss_counter += 1
             p.item()  # TODO: repair it
 
-            if self._mode_check_poss_sol(poss_sol):
+            if self._check_poss(poss):
                 print(
                     "(MODE 1) Found possible solution.",
                     "It's index is {index} of {all} overall ({percent:.2f}%)."
                     .format(
-                        index=self._poss_sol_counter,
-                        all=self.super.patterns_number,
-                        percent=self._poss_sol_percent,
+                        index=poss_counter,
+                        all=poss_number,
+                        percent=100 * poss_counter / poss_number,
                     )
                 )
-                yield poss_sol  # yields pattern if it can be a solution
+                yield poss  # yields pattern if it can be a solution
 
         # after yield the last pattern
-        p.delete()
+        p.delete()  # TODO: repair it
         print(
-            "(MODE 1) Finished searching for possible solutions. Nothing was found.",
-            "Reached index {index} of {all} overall ({percent:.2f}%)."
-            # should be always 100.00%
+            "(MODE 1) Finished searching for possible solutions.",
+            "Reached index {index} of {all} overall ({percent:.2f}%)."  # should be always 100.00%
             .format(
-                index=self._poss_sol_counter,
-                all=self.super.patterns_number,
-                percent=self._poss_sol_percent,
+                index=poss_counter,
+                all=poss_number,
+                percent=100 * poss_counter / poss_number,
             )
         )
 
-    def _mode_check_poss_sol(self, poss_sol):
-        """ Checks if given possible solution still can be a solution based on all previous turns """
+    def _check_poss(self, poss):
+        """ (MODE 1) Checks if given possible solution still can be a solution based on all previous turns """
 
         return all(
-            self.super.calculate_response(turn_pattern, poss_sol) == turn_response
+            self.super.calculate_response(turn_pattern, poss) == turn_response
             for turn_pattern, turn_response in self._turns.items()
         )
 
-    def mode_next_poss_sol(self):
-        """ Returns next possible solution (in MODE 1) """
+    def _next_poss(self):
+        """ (MODE 1) Returns next possible solution """
 
-        self.super._single_poss_sol = False  # reset the flag
+        self._single_poss = False  # reset the flag
 
         # check if previously found possible solution still can be a solution
-        if self._second_poss_sol is not None and self._mode_check_poss_sol(self._second_poss_sol):
-            # TODO: change `if` criteria (especially when `_second_poss_sol` will be disabled)
+        if self._second_poss is not None and self._check_poss(self._second_poss):
+            # TODO: change `if` criteria (especially when `_second_poss` will be disabled)
             print("(MODE 1) Previously found second possible solution still can be a solution.")
-            current = self._second_poss_sol  # yes -> save it as current
+            current_poss = self._second_poss  # yes -> save it as current possible solution
         else:
-            print("(MODE 1) Searching for possible solution...")
+            print("(MODE 1) Searching for possible solution...")  # TODO: progress?
             try:
-                current = next(self._gen_state)  # no -> get another possible solution
-            except StopIteration:  # there is no solution
-                self.super._game_status = 3
-                self._second_poss_sol = None
+                current_poss = next(self._poss_state)  # no -> get another possible solution
+            except StopIteration:
+                self.super._game_status = 3  # no solution found  # TODO: setter?
+                self._second_poss = None  # there is also no second possible solution
                 return None
 
-        print("(MODE 1) Searching for second possible solution...")
+        print("(MODE 1) Searching for second possible solution...")  # TODO: progress?
         try:
-            self._second_poss_sol = next(self._gen_state)  # get second possible solution
+            self._second_poss = next(self._poss_state)  # get second possible solution
         except StopIteration:  # there is no second solution -> only one solution!
-            self.super._single_poss_sol = True  # change the flag
-            self._second_poss_sol = None
+            self._single_poss = True  # set the flag
+            self._second_poss = None
 
-        return current
+        return current_poss
+
+    def check_game_end(self):
+        """ (MODE 1) Checks if the game should end (after current turn) """
+
+        return self._second_poss is None  # TODO: change it when `_second_poss` will be disabled
 
 
 class MastermindSolverMode2:
-    """ ... """
+    """ Contains Mastermind Solver MODE 2 (patterns list filtering mode) """
 
     def __init__(self, upper):
-        """ ... """
+        """ (MODE 2) Initializes Mastermind Solver MODE 2 class object """
 
         self.super = upper  # TODO: is it OK?
 
-        self._poss_sol_list = self.super.get_patterns_list()  # get list of all possible solutions to be filtered
-        self._current_poss_sol = self.mode_next_poss_sol()  # get first possible solution
+        self._poss_list = self.super.get_patterns_list()  # get list of all possible solutions to be filtered
+        self._single_poss = False  # initialize the single possible solution flag
+        self._current_poss = self._next_poss()  # get first possible solution
 
     @property
-    def mode_current_poss_sol(self):
-        """ ... """
+    def current_poss(self):
+        """ (MODE 2) Returns current possible solution (in this turn) """
 
-        return self._current_poss_sol
+        return self._current_poss
 
     @property
-    def mode_poss_sol_number(self):
-        """ ... """
+    def single_poss(self):
+        """ (MODE 2) Returns single possible solution flag """
 
-        return len(self._poss_sol_list)
+        return self._single_poss
 
-    def mode_take_turn(self, response):
-        """ ... """
+    @property
+    def poss_number(self):
+        """ (MODE 2) Returns possible solutions number """
 
-        # TODO: progress tests
-        old_number = self.mode_poss_sol_number
+        return len(self._poss_list)
+
+    def take_turn(self, response):
+        """ (MODE 2) Takes turn as CodeBreaker with response and returns next possible solution """
+
+        old_number = self.poss_number
 
         p = Progress("(MODE 2) Filtering patterns list...", old_number)
-
         # TODO: maybe remove items from list that doesn't meet condition?
-        self._poss_sol_list = [  # filter the existing list
+        self._poss_list = [  # filter the existing list
             pattern
-            for pattern in self._poss_sol_list
-            if p.item(self.super.calculate_response(self._current_poss_sol, pattern) == response)
+            for pattern in self._poss_list
+            if p.item(self.super.calculate_response(self._current_poss, pattern) == response)  # wrapped with p.item()
         ]
         p.delete()
 
-        new_number = self.super.poss_sol_number
+        new_number = self.poss_number
         print(
             "(MODE 2) Number of possible solutions is now {new} of {old} (rejected {percent:.2f}% of patterns)."
             .format(
@@ -577,23 +598,23 @@ class MastermindSolverMode2:
             )
         )
 
-        self._current_poss_sol = self.mode_next_poss_sol()  # get next possible solution
-        return self._current_poss_sol
+        self._current_poss = self._next_poss()  # get next possible solution
+        return self._current_poss
 
-    def mode_check_game_end(self):
-        """ ... """
+    def _next_poss(self):
+        """ (MODE 2) Returns next possible solution """
 
-        return self.mode_poss_sol_number <= 1
+        number = self.poss_number  # get the possible solutions number
+        self._single_poss = (number == 1)  # set the flag
 
-    def mode_next_poss_sol(self):
-        """ Returns next possible solution (in MODE 2) """
-
-        number = self.mode_poss_sol_number
-        self.super._single_poss_sol = (number == 1)  # set the flag
-
-        if number:
-            return self._poss_sol_list[0]  # take first possible solution from the list
+        if number:  # is there at least one possible solution?
+            return self._poss_list[0]  # take first possible solution from the list
             # TODO: maybe random value? Not always 0? - parameter
         else:
-            self.super._game_status = 3
+            self.super._game_status = 3  # no solution found  # TODO: setter?
             return None
+
+    def check_game_end(self):
+        """ (MODE 2) Checks if the game should end (after current turn) """
+
+        return self.poss_number <= 1  # there were only one possible solution or less
