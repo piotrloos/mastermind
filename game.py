@@ -17,14 +17,14 @@ def main():
     print("###################################")
     print()
 
-    mg = MastermindGame(pegs=6, colors=8, turns_limit=20)
+    mg = MastermindGame(pegs=4, colors=6, turns_limit=20)
 
     print(
         "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {list}."
         .format(
             pegs=mg.pegs_number,
             colors=mg.colors_number,
-            list=mg.colors_list_formatted,
+            list=mg.colors_list,
         )
     )
     print(
@@ -46,7 +46,7 @@ def main():
 
     while not mg.game_status:
         try:
-            print(mg.input(input(mg.prompt)))
+            print(mg.take_turn_human(input(mg.prompt)))
         except ValueError as err:
             print(err)
     print()

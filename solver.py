@@ -17,7 +17,7 @@ def main():
     print("#####################################")
     print()
 
-    ms = MastermindSolver(colors=7, pegs=9, turns_limit=15, shuffle_mode=0, solve_mode=2)
+    ms = MastermindSolver(colors=6, pegs=5, turns_limit=15, shuffle_mode=0, solve_mode=2)
 
     print()
     print(
@@ -25,7 +25,7 @@ def main():
         .format(
             pegs=ms.pegs_number,
             colors=ms.colors_number,
-            list=ms.colors_list_formatted,
+            list=ms.colors_list,
         )
     )
     print(
@@ -47,7 +47,7 @@ def main():
 
     while not ms.game_status:
         try:
-            print(ms.input(input(ms.prompt)))
+            print(ms.take_turn_human(input(ms.prompt)))
         except ValueError as err:
             print(err)
     print()
@@ -56,7 +56,7 @@ def main():
         print(
             "The solution is {pattern}."
             .format(
-                pattern=ms.current_poss_formatted,
+                pattern=ms.solution,
             )
         )
         print(

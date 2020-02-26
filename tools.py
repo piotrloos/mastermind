@@ -26,7 +26,7 @@ class Progress:
 
         self._index += 1
         if self._index >= self._threshold_int:
-            print("\b\b\b\b{:3}%".format(round(self._index * self._inv)), end='', flush=True)
+            print("\b\b\b\b{:3d}%".format(round(self._index * self._inv)), end='', flush=True)
             self._threshold += self._portion
             self._threshold_int = int(round(self._threshold))
         return value
@@ -35,7 +35,7 @@ class Progress:
     def delete():  # TODO: create a destructor
         """ Ends printing progress """
 
-        print()
+        print("\b\b\b\bDone!")
 
     # def __del__(self):
     #     """ Deletes Progress class object """

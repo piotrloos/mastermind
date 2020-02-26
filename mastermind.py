@@ -55,6 +55,7 @@ class Mastermind:
 
         self._turns_width = len(str(self._turns_limit))  # calculate width for `_turns_counter` formatting
         self._turns_counter = 1  # initialize turns counter
+        self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
         self._patterns_number = self._colors_number ** self._pegs_number  # calculate number of all possible patterns
         self._colors_list = list(range(self._colors_number))  # initialize list of colors
@@ -84,6 +85,18 @@ class Mastermind:
         return self._turns_counter
 
     @property
+    def solution(self):
+        """ Returns formatted solution pattern only when game is ended """
+
+        if self._game_status == 0:
+            raise PermissionError("No access to the solution when game is active!")
+        else:
+            if self._solution is None:
+                raise ValueError("No saved solution in this game!")
+            else:
+                return self._format_pattern(self._solution)
+
+    @property
     def game_status(self):
         """ Returns game status """
 
@@ -96,10 +109,10 @@ class Mastermind:
         return self._patterns_number
 
     @property
-    def colors_list_formatted(self):
+    def colors_list(self):
         """ Returns formatted set of colors """
 
-        return "{" + ", ".join(self._encode_peg(peg_int) for peg_int in self._colors_list) + "}"
+        return "{" + ", ".join(self._format_peg(peg) for peg in self._colors_list) + "}"
 
     @property
     def example_pattern(self):
@@ -115,25 +128,97 @@ class Mastermind:
             for _ in range(self._pegs_number)
         )
 
-    def _format_pattern(self, pattern):
-        """ Returns formatted pattern """
-
-        return "[ " + " ".join(self._encode_peg(peg_int) for peg_int in pattern) + " ]"
-
     @staticmethod
-    def _encode_peg(peg_int):
-        """ Returns formatted peg (char) converted from integer """
+    def _format_peg(peg):
+        """ Returns formatted peg (char) """
 
-        return chr(peg_int + 97)  # TODO: implement different styles of formatting pattern
+        return chr(peg + 97)  # TODO: implement different styles of formatting pattern
+
+    def _format_pattern(self, pattern):
+        """ Returns formatted pattern (string) """
+
+        return "[ " + " ".join(self._format_peg(peg) for peg in pattern) + " ]"
+
+    def _format_response(self, response):
+        """ Returns formatted response (string) """
+
+        blacks = response[0]
+        whites = response[1]
+        return (
+            "●" * blacks
+            + "○" * whites
+            + "∙" * (self._pegs_number - blacks - whites)
+            + " ({blacks}, {whites})".format(
+                blacks=blacks,
+                whites=whites,
+            )
+        )
 
     @staticmethod
     def _decode_peg(peg_char):
-        """ Returns integer converted from formatted peg (char) """
+        """ Returns `peg` converted from formatted `peg_char` """
 
         if len(peg_char) == 1:
             return ord(peg_char) - 97  # TODO: input digits, lowercase or uppercase letters
         else:
             return None
+
+    def _decode_pattern(self, pattern_string):
+        """ Returns `pattern` converted from formatted `pattern_string` """
+
+        try:
+            pattern = tuple(
+                self._decode_peg(peg_char)
+                for peg_char in pattern_string.strip().split(' ', maxsplit=self._pegs_number - 1)  # divide into pegs
+            )
+        except (TypeError, ValueError):
+            return None
+
+        if self._validate_pattern(pattern):
+            return pattern
+        else:
+            return None
+
+    def _decode_response(self, response_string):
+        """ Returns `response` converted from formatted `response_string` """
+
+        try:
+            response = tuple(
+                int(response_peg)
+                for response_peg in response_string.strip().split(' ', maxsplit=1)  # only one divide
+            )
+        except (TypeError, ValueError):
+            return None
+
+        if self._validate_response(response):
+            return response
+        else:
+            return None
+
+    def _validate_pattern(self, pattern):
+        """ Checks if given `pattern` is formally correct """
+
+        return (
+            isinstance(pattern, tuple)
+            and len(pattern) == self._pegs_number
+            and all(
+                pattern_peg in self._colors_list
+                for pattern_peg in pattern
+            )
+        )
+
+    def _validate_response(self, response):
+        """ Checks if given `response` (a tuple built from black pegs and white pegs) is formally correct """
+
+        return (
+            isinstance(response, tuple)
+            and len(response) == 2
+            and all(
+                response_peg in range(0, self._pegs_number + 1)
+                for response_peg in {response[0], response[1], response[0] + response[1]}
+                # both black and white pegs number (and sum of them also) should be between 0 and pegs number
+            )
+        )
 
     def calculate_response(self, pattern1, pattern2):
         """ Returns calculated response (black and white pegs) for given pattern, related to other pattern """
@@ -176,26 +261,17 @@ class MastermindGame(Mastermind):
 
         super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
-        if solution is None:  # check if `solution` is given, if not -> randomize new pattern
+        if solution is None:  # check if `solution` is given
             self._solution = self._get_random_pattern()
         else:
-            if self._validate_pattern(solution):  # check if given `solution` is correct
+            if self._validate_pattern(solution):
                 self._solution = solution
             else:
                 raise ValueError("Incorrect solution pattern.")
 
     @property
-    def solution(self):  # TODO: move this method to Mastermind class
-        """ Returns formatted solution pattern only when game is ended """
-
-        if self._game_status == 0:
-            raise PermissionError("No access to the solution when game is active!")
-        else:
-            return self._format_pattern(self._solution)
-
-    @property
     def prompt(self):
-        """ Returns prompt string for input function """
+        """ Returns prompt string for `input` function """
 
         return (
             "Enter pattern number {turn}: "
@@ -204,47 +280,23 @@ class MastermindGame(Mastermind):
             )
         )
 
-    def _validate_pattern(self, pattern):
-        """ Checks if given `pattern` is formally correct """
-
-        return (
-            isinstance(pattern, tuple)
-            and len(pattern) == self._pegs_number
-            and all(
-                pattern_peg in self._colors_list
-                for pattern_peg in pattern
-            )
-        )
-
-    def _calculate_response(self, pattern):
-        """ Returns calculated response (black and white pegs) for given pattern, related to the solution """
-
-        return super().calculate_response(pattern, self._solution)
-
-    def input(self, pattern_string):
+    def take_turn_human(self, pattern_string):
         """ Gets `pattern_string` from human (CodeBreaker), verifies it, takes turn and returns formatted response """
 
-        try:  # try to convert `pattern_string` to tuple (pattern format)
-            pattern = tuple(
-                self._decode_peg(peg_char)
-                for peg_char in pattern_string.strip().split(' ', maxsplit=self._pegs_number - 1)  # divide into pegs
-            )
-        except (TypeError, ValueError):
-            raise ValueError("Given pattern is incorrect! Enter again.")
-
-        if not self._validate_pattern(pattern):  # check if `pattern` is correct
+        pattern = self._decode_pattern(pattern_string)
+        if pattern is None:
             raise ValueError("Given pattern is incorrect! Enter again.")
 
         turn = self._turns_counter  # save counter before taking turn
         response = self.take_turn(pattern)
 
-        return (
+        return (  # TODO: print it instead returning it
             "{turn:>{width}d}: {pattern} -> {response}"
             .format(
                 turn=turn,
                 width=self._turns_width,
                 pattern=self._format_pattern(pattern),
-                response=response,
+                response=self._format_response(response),
                 )
             )
 
@@ -254,7 +306,7 @@ class MastermindGame(Mastermind):
         if self._game_status != 0:
             raise PermissionError("Game is ended! You can't take turn.")
 
-        response = self._calculate_response(pattern)
+        response = self.calculate_response(pattern, self._solution)
 
         if not self._check_game_end(response):
             self._turns_counter += 1  # prepare for next turn
@@ -287,53 +339,16 @@ class MastermindSolver(Mastermind):
             raise ValueError("Incorrect solving mode.")
 
     @property
-    def shuffle_mode(self):
-        """ Returns shuffle mode """
-
-        return self._shuffle_mode
-
-    @property
     def poss_number(self):
         """ Returns possible solutions number """
 
         return self._solver.poss_number
 
     @property
-    def current_poss_formatted(self):
-        """ Returns formatted current possible solution string """
-
-        return self._format_pattern(self._solver.current_poss)
-
-    @property
-    def single_poss_formatted(self):
+    def single_poss(self):
         """ Returns formatted single possible solution flag as a string """
 
         return " This must be the solution, there is no other option!" if self._solver.single_poss else ""
-
-    @property
-    def prompt(self):
-        """ Returns prompt string for input function """
-
-        return (
-            "Turn number {turn}. Enter response for pattern {pattern}: "
-            .format(
-                turn=self._turns_counter,
-                pattern=self.current_poss_formatted,
-            )
-        )
-
-    def _validate_response(self, response):
-        """ Checks if given response (a tuple built from black pegs and white pegs) is formally correct """
-
-        return (
-            isinstance(response, tuple)
-            and len(response) == 2
-            and all(
-                response_peg in range(0, self._pegs_number + 1)
-                for response_peg in {response[0], response[1], response[0] + response[1]}
-                # both black and white pegs number (and sum of them also) should be between 0 and pegs number
-            )
-        )
 
     def get_patterns_list(self):
         """ Returns list of all pattern combinations using game settings """
@@ -373,30 +388,34 @@ class MastermindSolver(Mastermind):
 
         return all_patterns
 
-    def input(self, response_string):
+    @property
+    def prompt(self):
+        """ Returns prompt string for `input` function """
+
+        return (
+            "Turn number {turn}. Enter response for pattern {pattern}: "
+            .format(
+                turn=self._turns_counter,
+                pattern=self._format_pattern(self._solver.current_poss),
+            )
+        )
+
+    def take_turn_human(self, response_string):
         """ Gets `response_string` from human (CodeMaker), verifies it, takes turn and returns formatted pattern """
 
-        try:  # try to convert `response_string` to tuple (response format)
-            response = tuple(
-                int(response_peg)
-                for response_peg in response_string.strip().split(' ', maxsplit=1)  # only one divide
-            )
-        except (TypeError, ValueError):
+        response = self._decode_response(response_string)
+        if response is None:
             raise ValueError("Given response is incorrect! Enter again.")
 
-        if not self._validate_response(response):  # check if `response` is correct
-            raise ValueError("Given response is incorrect! Enter again.")
-
-        current_pattern = self.take_turn(response)
-
-        if current_pattern is None:  # TODO: delete this section? Return something else?
+        pattern = self.take_turn(response)
+        if pattern is None:  # TODO: delete this section? Return something else? Print it?
             return "No further possible solutions."
         else:
             return (
                 "My next possible solution is {pattern}.{single}"
                 .format(
-                    pattern=self._format_pattern(current_pattern),  # TODO: current from Solver Mode
-                    single=self.single_poss_formatted,
+                    pattern=self._format_pattern(pattern),  # TODO: current from Solver Mode
+                    single=self.single_poss,
                 )
             )
 
@@ -407,18 +426,21 @@ class MastermindSolver(Mastermind):
             raise PermissionError("Game is ended! You can't take turn.")
 
         if self._check_game_end(response):
+            if self._game_status == 1:  # if the solution is found
+                self._solution = self._solver.current_poss  # save current possible solution as proper solution
             return None
 
-        self._turns_counter += 1  # prepare for next turn
+        self._turns_counter += 1  # prepare for next turn # TODO: make it similar as in MastermindGame
 
         return self._solver.take_turn(response)
 
     def _check_game_end(self, response):
         """ Checks if the game should end (after current turn) """
 
-        if super()._check_game_end(response):
+        if super()._check_game_end(response):  # check if solution is found or reached turns limit
             return True
 
+        # TODO: active or passive checking?
         if self._solver.check_game_end():  # check if exists another possible solution
             self._game_status = 3  # no possible solution
             return True
@@ -438,7 +460,7 @@ class MastermindSolverMode1:
         self._poss_state = self._poss_generator()  # initialize possible solutions generator
         self._single_poss = False  # initialize the single possible solution flag
         self._second_poss = None  # TODO: temporary
-        self._current_poss = self._next_poss()  # get first possible solution
+        self._current_poss = self._get_next_poss()  # get first possible solution
 
     @property
     def current_poss(self):
@@ -463,7 +485,7 @@ class MastermindSolverMode1:
 
         self._turns[self._current_poss] = response  # add this turn to the turns dictionary
 
-        self._current_poss = self._next_poss()  # get next possible solution
+        self._current_poss = self._get_next_poss()  # get next possible solution
         return self._current_poss
 
     def _poss_generator(self):
@@ -510,8 +532,8 @@ class MastermindSolverMode1:
             for turn_pattern, turn_response in self._turns.items()
         )
 
-    def _next_poss(self):
-        """ (MODE 1) Returns next possible solution """
+    def _get_next_poss(self):
+        """ (MODE 1) Returns next possible solution (if exists) """
 
         self._single_poss = False  # reset the flag
 
@@ -541,7 +563,11 @@ class MastermindSolverMode1:
     def check_game_end(self):
         """ (MODE 1) Checks if the game should end (after current turn) """
 
-        return self._second_poss is None  # TODO: change it when `_second_poss` will be disabled
+        if self._second_poss is None:  # TODO: for tests - delete this method?
+            print("(MODE 1) END!")
+
+        return self._second_poss is None  # `True` if there were only one possible solution
+        # TODO: change it when `_second_poss` will be disabled - always return False?
 
 
 class MastermindSolverMode2:
@@ -554,7 +580,7 @@ class MastermindSolverMode2:
 
         self._poss_list = self.super.get_patterns_list()  # get list of all possible solutions to be filtered
         self._single_poss = False  # initialize the single possible solution flag
-        self._current_poss = self._next_poss()  # get first possible solution
+        self._current_poss = self._get_next_poss()  # get first possible solution
 
     @property
     def current_poss(self):
@@ -598,16 +624,16 @@ class MastermindSolverMode2:
             )
         )
 
-        self._current_poss = self._next_poss()  # get next possible solution
+        self._current_poss = self._get_next_poss()  # get next possible solution
         return self._current_poss
 
-    def _next_poss(self):
-        """ (MODE 2) Returns next possible solution """
+    def _get_next_poss(self):
+        """ (MODE 2) Returns next possible solution (if exists) """
 
         number = self.poss_number  # get the possible solutions number
-        self._single_poss = (number == 1)  # set the flag
+        self._single_poss = (number == 1)  # set the flag if there is only one possible solution
 
-        if number:  # is there at least one possible solution?
+        if number:  # check if there is at least one possible solution
             return self._poss_list[0]  # take first possible solution from the list
             # TODO: maybe random value? Not always 0? - parameter
         else:
@@ -617,4 +643,7 @@ class MastermindSolverMode2:
     def check_game_end(self):
         """ (MODE 2) Checks if the game should end (after current turn) """
 
-        return self.poss_number <= 1  # there were only one possible solution or less
+        if self.poss_number <= 1:  # TODO: for tests - delete this method?
+            print("(MODE 2) END!")
+
+        return self.poss_number <= 1  # `True` if there were only one possible solution (or less)
