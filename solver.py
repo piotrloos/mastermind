@@ -17,7 +17,7 @@ def main():
     print("#####################################")
     print()
 
-    ms = MastermindSolver(colors=6, pegs=5, turns_limit=15, shuffle_mode=0, solve_mode=2)
+    ms = MastermindSolver(colors=3, pegs=5, turns_limit=15, shuffle_mode=0, solve_mode=1)
 
     print()
     print(
