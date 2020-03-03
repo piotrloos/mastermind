@@ -168,15 +168,16 @@ class Mastermind:
     def _format_response(self, response):
         """ Returns formatted `response` """
 
-        blacks = response[0]
-        whites = response[1]
+        black_number = response[0]
+        white_number = response[1]
         return (
-            "●" * blacks
-            + "○" * whites
-            + "∙" * (self._pegs_number - blacks - whites)
-            + " ({blacks}, {whites})".format(
-                blacks=blacks,
-                whites=whites,
+            "[{blacks}{whites}{dots}] ({black_number}, {white_number})"
+            .format(
+                blacks="●" * black_number,
+                whites="○" * white_number,
+                dots="∙" * (self._pegs_number - black_number - white_number),
+                black_number=black_number,
+                white_number=white_number,
             )
         )
 
@@ -288,6 +289,7 @@ class Mastermind:
             self._game_status = 2  # reached turns limit
             return True
 
+        self._turns_counter += 1  # prepare for next turn
         return False
 
 
@@ -319,7 +321,7 @@ class MastermindGame(Mastermind):
         )
 
     def take_turn_human(self, pattern_string):
-        """ Gets `pattern_string` from human (CodeBreaker), verifies it, takes turn and returns formatted response """
+        """ Gets `pattern_string` from human (CodeBreaker), verifies it and takes turn """
 
         pattern = self._decode_pattern(pattern_string)
         if pattern is None:
@@ -329,26 +331,15 @@ class MastermindGame(Mastermind):
         response = self.take_turn(pattern)
         print(self._format_turn(turn, pattern, response))  # TODO: print all turns
 
-        return (  # TODO: print it instead returning it
-            "{turn:>{width}d}: {pattern} -> {response}"
-            .format(
-                turn=turn,
-                width=self._turns_width,
-                pattern=self._format_pattern(pattern),
-                response=self._format_response(response),
-                )
-            )
-
     def take_turn(self, pattern):
-        """ Takes turn as CodeMaker (with pattern from CodeBreaker) - without pattern validation, returns response """
+        """ Takes turn as CodeMaker (with `pattern` from CodeBreaker) and returns `response` """
 
         if self._game_status != 0:
             raise PermissionError("Game is ended! You can't take turn.")
 
-        response = self.calculate_response(pattern, self._solution)
+        response = self.calculate_response(pattern, self._solution)  # TODO: save response to class object
 
-        if not self._check_game_end(response):
-            self._turns_counter += 1  # prepare for next turn
+        self._check_game_end(response)
 
         return response
 
@@ -449,20 +440,18 @@ class MastermindSolver(Mastermind):
         print(self._format_turn(self._turns_counter, self._solver.current_poss, response))  # TODO: print all turns
 
         pattern = self.take_turn(response)
-        if pattern is None:  # TODO: delete this section? Return something else? Print it?
-            return "No further possible solutions."
-        else:
-            return (
+        if pattern is not None:
+            print(
                 "My next possible solution is {pattern}.{single}"
                 .format(
-                    pattern=self._format_pattern(pattern),  # TODO: current from Solver Mode
+                    pattern=self._format_pattern(pattern),
                     single=self.single_poss,
                 )
             )
             print()
 
     def take_turn(self, response):
-        """ Takes turn as CodeBreaker (with response from CodeMaker) - without response validation, returns pattern """
+        """ Takes turn as CodeBreaker (with `response` from CodeMaker) and returns `pattern` """
 
         if self._game_status != 0:
             raise PermissionError("Game is ended! You can't take turn.")
@@ -472,24 +461,11 @@ class MastermindSolver(Mastermind):
                 self._solution = self._solver.current_poss  # save current possible solution as proper solution
             return None
 
-        self._turns_counter += 1  # prepare for next turn # TODO: make it similar as in MastermindGame
+        pattern = self._solver.take_turn(response)
+        if pattern is None:
+            self._game_status = 3  # no possible solution found
 
-        return self._solver.take_turn(response)
-
-    # def _check_game_end(self, response):
-    #     """ Checks if the game should end (after current turn) """
-    #
-    #     if super()._check_game_end(response):  # check if solution is found or reached turns limit
-    #         return True
-    #
-    #     # TODO: active or passive checking?
-    #     if self._solver.check_game_end():  # check if exists another possible solution
-    #         print(self._game_status)
-    #         self._game_status = 3  # no possible solution
-    #         print(self._game_status)
-    #         return True
-    #
-    #     return False
+        return pattern
 
 
 class MastermindSolverMode1:
@@ -502,9 +478,11 @@ class MastermindSolverMode1:
 
         self._turns = dict()  # initialize dictionary of turns
         self._poss_state = self._poss_generator()  # initialize possible solutions generator
+        self._current_poss = None  # initialize current possible solution
+        self._second_poss = None  # initialize second possible solution
         self._single_poss = False  # initialize the single possible solution flag
-        self._second_poss = None  # TODO: temporary
-        self._current_poss = self._get_next_poss()  # get first possible solution
+
+        self._get_next_poss()  # get first possible solution
 
     @property
     def current_poss(self):
@@ -525,11 +503,11 @@ class MastermindSolverMode1:
         raise NotImplementedError("It is impossible to calculate possible solutions number in (MODE 1)!")
 
     def take_turn(self, response):
-        """ (MODE 1) Takes turn as CodeBreaker with response and returns next possible solution """
+        """ (MODE 1) Prepares for getting the next possible solution """
 
-        self._turns[self._current_poss] = response  # add this turn to the turns dictionary
+        self._turns[self._current_poss] = response  # add this turn to the turns dictionary  # TODO: make dict global
 
-        self._current_poss = self._get_next_poss()  # get next possible solution
+        self._get_next_poss()  # get next possible solution
         return self._current_poss
 
     def _poss_generator(self):
@@ -546,7 +524,7 @@ class MastermindSolverMode1:
 
             if self._check_poss(poss):
                 print(
-                    "(MODE 1) Found possible solution.",
+                    "(MODE 1) Found possible solution.",  # TODO: change output into one line
                     "It's index is {index} of {all} overall ({percent:.2f}%)."
                     .format(
                         index=poss_counter,
@@ -559,7 +537,7 @@ class MastermindSolverMode1:
         # after yield the last pattern
         p.delete()  # TODO: repair it
         print(
-            "(MODE 1) Finished searching for possible solutions.",
+            "(MODE 1) Finished searching for possible solutions.",  # TODO: change output into one line
             "Reached index {index} of {all} overall ({percent:.2f}%)."  # should be always 100.00%
             .format(
                 index=poss_counter,
@@ -577,41 +555,30 @@ class MastermindSolverMode1:
         )
 
     def _get_next_poss(self):
-        """ (MODE 1) Returns next possible solution (if exists) """
+        """ (MODE 1) Saves next possible solution (if exists) """
 
         self._single_poss = False  # reset the flag
 
         # check if previously found possible solution still can be a solution
         if self._second_poss is not None and self._check_poss(self._second_poss):
             # TODO: change `if` criteria (especially when `_second_poss` will be disabled)
-            print("(MODE 1) Previously found second possible solution still can be a solution.")
-            current_poss = self._second_poss  # yes -> save it as current possible solution
+            print("(MODE 1) Previously found second possible solution still can be a solution. Saved as current.")
+            self._current_poss = self._second_poss  # yes -> save it as current possible solution
         else:
             print("(MODE 1) Searching for possible solution...")  # TODO: progress?
             try:
-                current_poss = next(self._poss_state)  # no -> get another possible solution
+                self._current_poss = next(self._poss_state)  # no -> get another possible solution
             except StopIteration:
-                self.super._game_status = 3  # no solution found  # TODO: setter?
-                self._second_poss = None  # there is also no second possible solution
-                return None
+                self._current_poss = None  # no possible solution
+                self._second_poss = None  # no second possible solution also
+                return
 
         print("(MODE 1) Searching for second possible solution...")  # TODO: progress?
         try:
             self._second_poss = next(self._poss_state)  # get second possible solution
         except StopIteration:  # there is no second solution -> only one solution!
             self._single_poss = True  # set the flag
-            self._second_poss = None
-
-        return current_poss
-
-    # def check_game_end(self):
-    #     """ (MODE 1) Checks if the game should end (after current turn) """
-    #
-    #     if self._second_poss is None:  # TODO: for tests - delete this method?
-    #         print("(MODE 1) END!")
-    #
-    #     return self._second_poss is None  # `True` if there were only one possible solution
-    #     # TODO: change it when `_second_poss` will be disabled - always return False?
+            self._second_poss = None  # no second possible solution
 
 
 class MastermindSolverMode2:
@@ -623,8 +590,10 @@ class MastermindSolverMode2:
         self.super = upper  # TODO: is it OK?
 
         self._poss_list = self.super.get_patterns_list()  # get list of all possible solutions to be filtered
+        self._current_poss = None  # initialize current possible solution
         self._single_poss = False  # initialize the single possible solution flag
-        self._current_poss = self._get_next_poss()  # get first possible solution
+
+        self._get_next_poss()  # get first possible solution
 
     @property
     def current_poss(self):
@@ -645,7 +614,7 @@ class MastermindSolverMode2:
         return len(self._poss_list)
 
     def take_turn(self, response):
-        """ (MODE 2) Takes turn as CodeBreaker with response and returns next possible solution """
+        """ (MODE 2) Prepares for getting the next possible solution """
 
         old_number = self.poss_number
 
@@ -668,29 +637,17 @@ class MastermindSolverMode2:
             )
         )
 
-        self._current_poss = self._get_next_poss()  # get next possible solution
+        self._get_next_poss()  # get next possible solution
         return self._current_poss
 
     def _get_next_poss(self):
-        """ (MODE 2) Returns next possible solution (if exists) """
+        """ (MODE 2) Saves next possible solution (if exists) """
 
         number = self.poss_number  # get the possible solutions number
         self._single_poss = (number == 1)  # set the flag if there is only one possible solution
 
         if number:  # check if there is at least one possible solution
-            return self._poss_list[0]  # take first possible solution from the list
+            self._current_poss = self._poss_list[0]  # take first possible solution from the list
             # TODO: maybe random value? Not always 0? - parameter
         else:
-            self.super._game_status = 3  # no solution found  # TODO: setter?
-            return None
-
-    def check_game_end(self):
-        """ (MODE 2) Checks if the game should end (after current turn) """
-
-    # def check_game_end(self):
-    #     """ (MODE 2) Checks if the game should end (after current turn) """
-    #
-    #     if self.poss_number <= 1:  # TODO: for tests - delete this method?
-    #         print("(MODE 2) END!")
-    #
-    #     return self.poss_number <= 1  # `True` if there were only one possible solution (or less)
+            self._current_poss = None

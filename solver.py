@@ -17,7 +17,7 @@ def main():
     print("#####################################")
     print()
 
-    ms = MastermindSolver(colors=3, pegs=5, turns_limit=15, shuffle_mode=0, solve_mode=1)
+    ms = MastermindSolver(colors=7, pegs=8, shuffle_mode=2, solve_mode=2)
 
     print()
     print(
@@ -47,7 +47,7 @@ def main():
 
     while not ms.game_status:
         try:
-            print(ms.take_turn_human(input(ms.prompt)))
+            ms.take_turn_human(input(ms.prompt))
         except ValueError as err:
             print(err)
     print()
