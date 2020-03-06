@@ -17,7 +17,7 @@ def main():
     print("#####################################")
     print()
 
-    ms = MastermindSolver(colors=7, pegs=8, shuffle_mode=2, solve_mode=2)
+    ms = MastermindSolver(colors=7, pegs=8, shuffle_mode=1, solve_mode=1)
 
     print()
     print(
@@ -41,6 +41,13 @@ def main():
         .format(
             number=ms.patterns_number,
             pattern=ms.example_pattern,
+        )
+    )
+    print(
+        "Shuffle MODE is set to {shuffle} and Solver MODE is set to {solve}."
+        .format(
+            shuffle=ms.shuffle_mode,
+            solve=ms.solve_mode,
         )
     )
     print()
