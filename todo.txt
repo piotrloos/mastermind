@@ -5,17 +5,14 @@
 # TODO: MODE2 - możlwość brania dowolnego patternu z listy (nie tylko 0) - parametr
 
 # TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
-# TODO: uporządkować kod w wielu miejscach
-
-# TODO: nowa metoda `print_turn()` w obu klasach
 
 # TODO: poziom printowania komunikatów
-# TODO: uporządkować drukowane komunikaty
 # TODO: klasy na Pattern i Response - nie spowolni to gry?
 
 # TODO: stworzenie `Helper`a
 # TODO: stworzenie pliku `readme.md`
-# TODO: Progress refactor
+
+# TODO: uporządkować kod w wielu miejscach
 
 # później, pomysły itp.:
 

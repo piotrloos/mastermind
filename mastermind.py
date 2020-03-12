@@ -54,6 +54,7 @@ class Mastermind:
             )
 
         self._turns_width = len(str(self._turns_limit))  # calculate width for `_turns_counter` formatting
+        self._turns = []  # initialize list of turns
         self._turns_counter = 1  # initialize turns counter
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
@@ -77,6 +78,12 @@ class Mastermind:
         """ Returns turns limit """
 
         return self._turns_limit
+
+    @property
+    def turns(self):
+        """ Returns turns list """
+
+        return self._turns
 
     @property
     def turns_counter(self):
@@ -133,13 +140,13 @@ class Mastermind:
             for _ in range(self._pegs_number)
         )
 
-    def _format_turn_number(self, turn_number):
-        """ Returns formatted `turn_number` """
+    def _format_turn_count(self, turn_count):
+        """ Returns formatted `turn_count` """
 
         return (
-            "{turn:>{width}d}"
+            "{turn_count:>{width}d}"
             .format(
-                turn=turn_number,
+                turn_count=turn_count,
                 width=self._turns_width,
             )
         )
@@ -181,17 +188,24 @@ class Mastermind:
             )
         )
 
-    def _format_turn(self, turn_number, pattern, response):
-        """ Returns formatted whole turn (`turn_number`, `pattern` and `response`) """
+    def _format_turn(self, turn_count, pattern, response):
+        """ Returns formatted whole turn (`turn_count`, `pattern` and `response`) """
 
         return (
-            "{turn}: {pattern} => {response}"
+            "{turn_count}. {pattern} => {response}"
             .format(
-                turn=self._format_turn_number(turn_number),
+                turn_count=self._format_turn_count(turn_count),
                 pattern=self._format_pattern(pattern),
                 response=self._format_response(response),
             )
         )
+
+    def print_turns(self):
+        """ Prints all turns """
+
+        print()
+        for turn_number, (pattern, response) in enumerate(self._turns, 1):
+            print(self._format_turn(turn_number, pattern, response))
 
     @staticmethod
     def _decode_peg(peg_char):
@@ -314,9 +328,9 @@ class MastermindGame(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "Enter pattern number {turn}: "
+            "{turn_count}. Enter pattern: "
             .format(
-                turn=self._turns_counter,
+                turn_count=self._format_turn_count(self._turns_counter),
             )
         )
 
@@ -327,21 +341,21 @@ class MastermindGame(Mastermind):
         if pattern is None:
             raise ValueError("Given pattern is incorrect! Enter again.")
 
-        turn = self._turns_counter  # save counter before taking turn
-        response = self.take_turn(pattern)
-        print(self._format_turn(turn, pattern, response))  # TODO: print all turns
+        # response =
+        self.take_turn(pattern)
+        self.print_turns()
 
     def take_turn(self, pattern):
-        """ Takes turn as CodeMaker (with `pattern` from CodeBreaker) and returns `response` """
+        """ Takes turn as CodeMaker (with `pattern` from CodeBreaker) """
 
         if self._game_status != 0:
             raise PermissionError("Game is ended! You can't take turn.")
 
-        response = self.calculate_response(pattern, self._solution)  # TODO: save response to class object
-
+        response = self.calculate_response(pattern, self._solution)  # TODO: save response to class object?
+        self._turns.append((pattern, response))  # add turn (as a tuple) to the `turns` list
         self._check_game_end(response)
 
-        return response
+        # return response
 
 
 class MastermindSolver(Mastermind):
@@ -387,12 +401,6 @@ class MastermindSolver(Mastermind):
         """ Returns possible solutions number """
 
         return self._solver.poss_number
-
-    @property
-    def single_poss(self):
-        """ Returns formatted single possible solution flag """
-
-        return " This must be the solution, there is no other option!" if self._solver.single_poss else ""
 
     def get_patterns_list(self):
         """ Returns list of all pattern combinations using game settings """
@@ -440,9 +448,9 @@ class MastermindSolver(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "Turn number {turn}. Enter response for pattern {pattern}: "
+            "{turn_count}. Enter response for pattern {pattern}: "
             .format(
-                turn=self._turns_counter,
+                turn_count=self._format_turn_count(self._turns_counter),
                 pattern=self._format_pattern(self._solver.current_poss),
             )
         )
@@ -454,35 +462,33 @@ class MastermindSolver(Mastermind):
         if response is None:
             raise ValueError("Given response is incorrect! Enter again.")
 
-        print(self._format_turn(self._turns_counter, self._solver.current_poss, response))  # TODO: print all turns
+        # pattern =
+        self.take_turn(response)
 
-        pattern = self.take_turn(response)
-        if pattern is not None:
-            print(
-                "My next possible solution is {pattern}.{single}"  # TODO: delete this? print only single_poss?
-                .format(
-                    pattern=self._format_pattern(pattern),
-                    single=self.single_poss,
-                )
-            )
-            print()
+        if self._solver.single_poss and self.game_status == 0:
+            print("Now I know there is only one possible solution!")
 
     def take_turn(self, response):
-        """ Takes turn as CodeBreaker (with `response` from CodeMaker) and returns `pattern` """
+        """ Takes turn as CodeBreaker (with `response` from CodeMaker) """
 
         if self._game_status != 0:
             raise PermissionError("Game is ended! You can't take turn.")
 
+        current_poss = self._solver.current_poss
+        self._turns.append((current_poss, response))  # add turn (as a tuple) to the `turns` list
+
+        self.print_turns()  # TODO: this should be in `take_turn_human` method
+
         if self._check_game_end(response):
             if self._game_status == 1:  # if the solution is found
-                self._solution = self._solver.current_poss  # save current possible solution as proper solution
-            return None
+                self._solution = current_poss  # save current possible solution as proper solution
+            return  # None
 
-        pattern = self._solver.take_turn(response)
-        if pattern is None:
+        next_poss = self._solver.calculate_poss(response)
+        if next_poss is None:
             self._game_status = 3  # no possible solution found
 
-        return pattern
+        # return next_poss
 
 
 class MastermindSolverMode1:
@@ -493,7 +499,6 @@ class MastermindSolverMode1:
 
         self.super = upper  # TODO: is it OK?
 
-        self._turns = dict()  # initialize dictionary of turns
         self._generator = MastermindSolverMode1Generator(self)  # initialize possible solutions generator
         self._current_poss = None  # initialize current possible solution
         self._second_poss = None  # initialize second possible solution
@@ -519,10 +524,8 @@ class MastermindSolverMode1:
 
         raise NotImplementedError("It is impossible to calculate possible solutions number in MODE 1!")
 
-    def take_turn(self, response):
-        """ (MODE 1) Prepares for getting the next possible solution """
-
-        self._turns[self._current_poss] = response  # add this turn to the turns dictionary  # TODO: make dict global
+    def calculate_poss(self, response):
+        """ (MODE 1) Calculates the next possible solution """
 
         self._get_next_poss()  # get next possible solution
         return self._current_poss
@@ -532,7 +535,7 @@ class MastermindSolverMode1:
 
         return all(
             self.super.calculate_response(turn_pattern, poss) == turn_response
-            for turn_pattern, turn_response in self._turns.items()
+            for turn_pattern, turn_response in self.super.turns
         )
 
     def _get_next_poss(self):
@@ -639,8 +642,8 @@ class MastermindSolverMode2:
 
         return len(self._poss_list)
 
-    def take_turn(self, response):
-        """ (MODE 2) Prepares for getting the next possible solution """
+    def calculate_poss(self, response):
+        """ (MODE 2) Calculates the next possible solution """
 
         old_number = self.poss_number
 

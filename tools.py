@@ -14,67 +14,78 @@ class Progress:
     def __init__(self, text, items_number):
         """ Initializes Progress class object """
 
+        if items_number == 0:
+            raise ValueError("The Progress must last for one operation at least!")
+
         self._index = 0
         self._inv = 100 / items_number
         self._portion = items_number / 100
         self._threshold = self._portion
         self._threshold_int = int(round(self._threshold))
-        self._text = text
-
-    def start(self):
-        """ Starts printing progress """
-
-        print(
-            "\r{text} {value:3d}%"
-            .format(
-                text=self._text,
-                value=0,
-            ),
-            end='',
-            flush=True,
-        )
-
-    def item(self, value=None):
-        """ Wraps value - checks if next progress value should be printed and prints it if yes """
-
-        self._index += 1
-        if self._index >= self._threshold_int:
-            print(
-                "\b\b\b\b{value:3d}%"
-                .format(
-                    value=int(round(self._index * self._inv)),
-                ),
-                end='',
-                flush=True,
-            )
-            self._threshold += self._portion
-            self._threshold_int = int(round(self._threshold))
-        return value
-
-    def rename(self, text):
-        """ Changes the progress text and prints it """
-
-        self._text = text
-        print(
-            "\r{text} {value:3d}%"
-            .format(
-                text=self._text,
-                value=int(round(self._index * self._inv)),
-            ),
-            end='',
-            flush=True,
-        )
+        self._text = text or ""
 
     @staticmethod
-    def stop(text="Done!"):
-        """ Stops printing progress and prints `text` """
+    def _print(string):
+        """ Outputs `string` in the same line """
 
-        print(
-            "\b\b\b\b{text}"
+        print(string, end="", flush=True)
+
+    def _print_text_value(self, value):
+        """ Prints `text` and `value` """
+
+        self._print(
+            "\r{text} {value:3d}%"
+            .format(
+                text=self._text,
+                value=value,
+            )
+        )
+
+    def _print_value(self, value):
+        """ Prints `value` """
+
+        self._print(
+            "\b\b\b\b{value:3d}%"
+            .format(
+                value=value,
+            )
+        )
+
+    def _print_end_text(self, text):
+        """ Prints `text` in place of `value` """
+
+        self._print(
+            "\b\b\b\b{text}\n"
             .format(
                 text=text,
             )
         )
+
+    def start(self):
+        """ Starts printing Progress """
+
+        self._print_text_value(0)
+
+    def item(self, outer_value=None):
+        """ Wraps value - checks if next Progress value should be printed """
+
+        self._index += 1
+        if self._index >= self._threshold_int:
+            self._print_value(int(round(self._index * self._inv)))
+            self._threshold += self._portion
+            self._threshold_int = int(round(self._threshold))
+        return outer_value
+
+    def rename(self, text):
+        """ Changes Progress text """
+
+        self._text = text or ""
+        self._print_text_value(int(round(self._index * self._inv)))
+
+    def stop(self, text="Done!"):
+        """ Stops printing Progress """
+
+        self._print_end_text(text)
 
 
 def shuffle(lst, progress=None):
