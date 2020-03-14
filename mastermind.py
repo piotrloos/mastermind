@@ -324,7 +324,7 @@ class MastermindGame(Mastermind):
                 raise ValueError("Incorrect solution pattern.")
 
     @property
-    def prompt(self):
+    def game_prompt(self):
         """ Returns formatted prompt for `input` function """
 
         return (
@@ -334,28 +334,23 @@ class MastermindGame(Mastermind):
             )
         )
 
-    def take_turn_human(self, pattern_string):
-        """ Gets `pattern_string` from human (CodeBreaker), verifies it and takes turn """
-
-        pattern = self._decode_pattern(pattern_string)
-        if pattern is None:
-            raise ValueError("Given pattern is incorrect! Enter again.")
-
-        # response =
-        self.take_turn(pattern)
-        self.print_turns()
-
-    def take_turn(self, pattern):
-        """ Takes turn as CodeMaker (with `pattern` from CodeBreaker) """
+    def game_take_turn(self, pattern_string, pattern=None):
+        """ Takes turn as CodeMaker (with `pattern` or `pattern_string` from CodeBreaker) """
 
         if self._game_status != 0:
             raise PermissionError("Game is ended! You can't take turn.")
 
+        if pattern is None:
+            pattern = self._decode_pattern(pattern_string)
+            if pattern is None:
+                raise ValueError("Given pattern is incorrect! Enter again.")
+
         response = self.calculate_response(pattern, self._solution)  # TODO: save response to class object?
         self._turns.append((pattern, response))  # add turn (as a tuple) to the `turns` list
-        self._check_game_end(response)
 
-        # return response
+        self.print_turns()
+
+        self._check_game_end(response)
 
 
 class MastermindSolver(Mastermind):
@@ -444,7 +439,7 @@ class MastermindSolver(Mastermind):
         return all_patterns
 
     @property
-    def prompt(self):
+    def solver_prompt(self):
         """ Returns formatted prompt for `input` function """
 
         return (
@@ -455,40 +450,32 @@ class MastermindSolver(Mastermind):
             )
         )
 
-    def take_turn_human(self, response_string):
-        """ Gets `response_string` from human (CodeMaker), verifies it and takes turn """
-
-        response = self._decode_response(response_string)
-        if response is None:
-            raise ValueError("Given response is incorrect! Enter again.")
-
-        # pattern =
-        self.take_turn(response)
-
-        if self._solver.single_poss and self.game_status == 0:
-            print("Now I know there is only one possible solution!")
-
-    def take_turn(self, response):
-        """ Takes turn as CodeBreaker (with `response` from CodeMaker) """
+    def solver_take_turn(self, response_string, response=None):
+        """ Takes turn as CodeBreaker (with `response` or `response_string` from CodeMaker) """
 
         if self._game_status != 0:
             raise PermissionError("Game is ended! You can't take turn.")
 
+        if response is None:
+            response = self._decode_response(response_string)
+            if response is None:
+                raise ValueError("Given response is incorrect! Enter again.")
+
         current_poss = self._solver.current_poss
         self._turns.append((current_poss, response))  # add turn (as a tuple) to the `turns` list
 
-        self.print_turns()  # TODO: this should be in `take_turn_human` method
+        self.print_turns()
 
         if self._check_game_end(response):
             if self._game_status == 1:  # if the solution is found
                 self._solution = current_poss  # save current possible solution as proper solution
-            return  # None
+        else:
+            next_poss = self._solver.calculate_poss(current_poss, response)
+            if next_poss is None:
+                self._game_status = 3  # no possible solution found
 
-        next_poss = self._solver.calculate_poss(response)
-        if next_poss is None:
-            self._game_status = 3  # no possible solution found
-
-        # return next_poss
+            if self._solver.single_poss and self.game_status == 0:
+                print("Now I know there is only one possible solution!")
 
 
 class MastermindSolverMode1:
@@ -502,7 +489,7 @@ class MastermindSolverMode1:
         self._generator = MastermindSolverMode1Generator(self)  # initialize possible solutions generator
         self._current_poss = None  # initialize current possible solution
         self._second_poss = None  # initialize second possible solution
-        self._single_poss = False  # initialize the single possible solution flag
+        self._single_poss = False  # initialize single possible solution flag
 
         self._get_next_poss()  # get first possible solution
 
@@ -524,12 +511,6 @@ class MastermindSolverMode1:
 
         raise NotImplementedError("It is impossible to calculate possible solutions number in MODE 1!")
 
-    def calculate_poss(self, response):
-        """ (MODE 1) Calculates the next possible solution """
-
-        self._get_next_poss()  # get next possible solution
-        return self._current_poss
-
     def check_poss(self, poss):
         """ (MODE 1) Checks if given possible solution still can be a solution based on all previous turns """
 
@@ -538,29 +519,42 @@ class MastermindSolverMode1:
             for turn_pattern, turn_response in self.super.turns
         )
 
+    def calculate_poss(self, turn_pattern, turn_response):
+        """ (MODE 1) Calculates the next possible solution after current turn """
+
+        self._get_next_poss()  # get next possible solution
+        return self._current_poss
+
     def _get_next_poss(self):
         """ (MODE 1) Saves next possible solution (if exists) """
 
         self._single_poss = False  # reset the flag
 
-        # check if previously found possible solution still can be a solution
+        # TODO: change `if` criteria (especially when `_second_poss` will be disabled)
+
+        if self._current_poss is not None and self.check_poss(self._current_poss):
+            print("Previously found first possible solution still can be a first solution. Not changed.")
+        else:
+            if self._second_poss is not None and self.check_poss(self._second_poss):
+                print("Previously found second possible solution still can be a solution. Saved as first.")
+                self._current_poss = self._second_poss
+                self._second_poss = None
+            else:
+                try:
+                    self._current_poss = self._generator.next("Searching for first possible solution...")
+                except StopIteration:
+                    self._current_poss = None  # no possible solution
+                    self._second_poss = None  # no second possible solution also
+                    return
+
         if self._second_poss is not None and self.check_poss(self._second_poss):
-            # TODO: change `if` criteria (especially when `_second_poss` will be disabled)
-            print("Previously found second possible solution still can be a solution. Saved as first.")
-            self._current_poss = self._second_poss
+            print("Previously found second possible solution still can be a second solution. Not changed.")
         else:
             try:
-                self._current_poss = self._generator.next("Searching for first possible solution...")
-            except StopIteration:
-                self._current_poss = None  # no possible solution
-                self._second_poss = None  # no second possible solution also
-                return
-
-        try:
-            self._second_poss = self._generator.next("Searching for second possible solution...")
-        except StopIteration:  # there is no second solution -> only one solution!
-            self._single_poss = True  # set the flag
-            self._second_poss = None  # no second possible solution
+                self._second_poss = self._generator.next("Searching for second possible solution...")
+            except StopIteration:  # there is no second solution -> only one solution!
+                self._single_poss = True  # set the flag
+                self._second_poss = None  # no second possible solution
 
 
 class MastermindSolverMode1Generator:
@@ -620,7 +614,7 @@ class MastermindSolverMode2:
 
         self._poss_list = self.super.get_patterns_list()  # get list of all possible solutions to be filtered
         self._current_poss = None  # initialize current possible solution
-        self._single_poss = False  # initialize the single possible solution flag
+        self._single_poss = False  # initialize single possible solution flag
 
         self._get_next_poss()  # get first possible solution
 
@@ -642,8 +636,8 @@ class MastermindSolverMode2:
 
         return len(self._poss_list)
 
-    def calculate_poss(self, response):
-        """ (MODE 2) Calculates the next possible solution """
+    def calculate_poss(self, turn_pattern, turn_response):
+        """ (MODE 2) Calculates the next possible solution after current turn """
 
         old_number = self.poss_number
 
@@ -651,9 +645,9 @@ class MastermindSolverMode2:
         progress.start()
         # TODO: maybe remove items from list that don't meet condition?
         self._poss_list = [  # filter the existing list
-            pattern
-            for pattern in self._poss_list
-            if progress.item(self.super.calculate_response(self._current_poss, pattern) == response)  # wrapped
+            poss_pattern
+            for poss_pattern in self._poss_list
+            if progress.item(self.super.calculate_response(turn_pattern, poss_pattern) == turn_response)  # wrapped
         ]
         progress.stop()
 

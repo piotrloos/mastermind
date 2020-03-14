@@ -46,7 +46,7 @@ def main():
 
     while not mg.game_status:
         try:
-            mg.take_turn_human(input(mg.prompt))
+            mg.game_take_turn(input(mg.game_prompt))
         except ValueError as err:
             print(err)
     print()

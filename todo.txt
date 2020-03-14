@@ -16,7 +16,7 @@
 
 # później, pomysły itp.:
 
-# TODO: formatowanie patternów za pomocą małych/dużych liter, liczb
+# TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: formatowanie patternów (Colorama)
 # TODO: przyspieszenie generatora:
