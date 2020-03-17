@@ -192,7 +192,7 @@ class Mastermind:
         """ Returns formatted whole turn (`turn_count`, `pattern` and `response`) """
 
         return (
-            "{turn_count}. {pattern} => {response}"
+            "{turn_count}. {pattern} = {response}"
             .format(
                 turn_count=self._format_turn_count(turn_count),
                 pattern=self._format_pattern(pattern),
@@ -222,7 +222,7 @@ class Mastermind:
         try:
             pattern = tuple(
                 self._decode_peg(peg_char)
-                for peg_char in pattern_string.strip().split(' ', maxsplit=self._pegs_number - 1)  # divide into pegs
+                for peg_char in pattern_string.replace(" ", "").replace(",", "")  # clean string and divide into pegs
             )
         except (TypeError, ValueError):
             return None
@@ -247,6 +247,15 @@ class Mastermind:
             return response
         else:
             return None
+
+    def _decode_pattern_response(self, pattern_response_string):
+        """ Returns `pattern` and `response` tuple converted from formatted `pattern_response_string` """
+
+        try:
+            pattern, response = pattern_response_string.strip().split('=', maxsplit=1)  # only one divide at "=" sign
+        except (TypeError, ValueError):
+            return None, None
+        return self._decode_pattern(pattern), self._decode_response(response)
 
     def _validate_pattern(self, pattern):
         """ Checks if given `pattern` is formally correct """
@@ -473,6 +482,60 @@ class MastermindSolver(Mastermind):
             next_poss = self._solver.calculate_poss(current_poss, response)
             if next_poss is None:
                 self._game_status = 3  # no possible solution found
+
+            if self._solver.single_poss and self.game_status == 0:
+                print("Now I know there is only one possible solution!")
+
+
+class MastermindHelper(MastermindSolver):
+    """ Contains Mastermind Helper mode, inherits from MastermindSolver class """
+
+    def __init__(self, *args, **kwargs):
+        """ Initializes Mastermind Helper class object """
+
+        super().__init__(*args, **kwargs)  # initialize MastermindSolver class object
+
+    @property
+    def helper_prompt(self):
+        """ Returns formatted prompt for `input` function """
+
+        return (
+            "{turn_count}. Enter pattern and it's response: "
+            .format(
+                turn_count=self._format_turn_count(self._turns_counter),
+            )
+        )
+
+    def helper_take_turn(self, pattern_response_string, pattern=None, response=None):
+        """ Takes turn in Helper mode (with `pattern` and `response` from human) """
+
+        if self._game_status != 0:
+            raise PermissionError("Game is ended! You can't take turn.")
+
+        if pattern is None or response is None:
+            pattern, response = self._decode_pattern_response(pattern_response_string)
+            if pattern is None:
+                raise ValueError("Given pattern is incorrect! Enter again.")
+            if response is None:
+                raise ValueError("Given response is incorrect! Enter again.")
+
+        self.turns.append((pattern, response))  # add turn (as a tuple) to the `turns` list
+
+        self.print_turns()
+
+        if self._check_game_end(response):
+            if self._game_status == 1:  # if the solution is found
+                self._solution = pattern  # save current pattern as proper solution
+        else:
+            next_poss = self._solver.calculate_poss(pattern, response)
+            if next_poss is None:
+                self._game_status = 3  # no possible solution found
+            else:
+                print(
+                    "One of the possible solution is: {pattern}"
+                    .format(
+                        pattern=self._format_pattern(next_poss)),
+                    )
 
             if self._solver.single_poss and self.game_status == 0:
                 print("Now I know there is only one possible solution!")

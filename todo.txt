@@ -9,17 +9,19 @@
 # TODO: poziom printowania komunikatów
 # TODO: klasy na Pattern i Response - nie spowolni to gry?
 
-# TODO: stworzenie `Helper`a
+# TODO: rozbudowanie `Helper`a
 # TODO: stworzenie pliku `readme.md`
 
 # TODO: uporządkować kod w wielu miejscach
 
 # później, pomysły itp.:
 
+# TODO: inna propozycja rozwiązania w Helperze
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
 # TODO: parametry wejściowe przy uruchamianiu gry
+# TODO: opcje: allow_duplicates, allow_blanks
 # TODO: formatowanie patternów (Colorama)
-# TODO: przyspieszenie generatora:
+# TODO: MODE 1 - przyspieszenie generatora:
 # TODO:     ocena ważności wyniku i sprawdzanie all() po ważności
 # TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
 # TODO:     wielowątkowość
