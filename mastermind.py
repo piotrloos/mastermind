@@ -11,27 +11,103 @@ from settings import *
 from tools import Progress, shuffle
 
 
+class PatternPeg:
+    """ Class for one pattern peg """
+
+    def __init__(self, peg):
+        self._peg = peg
+
+    def __str__(self):
+        return (
+            "({peg})"
+            .format(
+                peg=chr(self._peg + 97),  # TODO: implement different styles of formatting pattern
+            )
+        )
+
+
+class Pattern:
+    """ Class for pattern """
+
+    def __init__(self, pegs):
+        self._pattern = list(pegs)
+
+    def __str__(self):
+        return (
+            "[{pattern}]"
+            .format(
+                pattern="".join(peg for peg in self._pattern),
+            )
+        )
+
+
+class Response:
+    """ Class for response """
+
+    def __init__(self, black_pegs, white_pegs):
+        self._black_pegs = black_pegs
+        self._white_pegs = white_pegs
+
+    def __str__(self):
+        return (
+            "[{blacks}{whites}{dots}] ({black_number}, {white_number})"
+            .format(
+                blacks="●" * self._black_pegs,
+                whites="○" * self._white_pegs,
+                dots="∙" * (10 - self._black_pegs - self._white_pegs),  # TODO: self._pegs_number
+                black_number=self._black_pegs,
+                white_number=self._white_pegs,
+            )
+        )
+
+
+class Turn:
+    """ Class for one game turn """
+
+    def __init__(self, turn_count, pattern, response):
+        self._turn_count = turn_count
+        self._pattern = pattern
+        self._response = response
+
+    def __str__(self):
+        return (
+            "{turn_count:>{width}d}. {pattern} = {response}"
+            .format(
+                turn_count=self._turn_count,
+                width=2,  # TODO: width
+                pattern=self._pattern,
+                response=self._response,
+            )
+        )
+
+
 class Mastermind:
     """ Contains whole game, base class for MastermindGame and MastermindSolver classes """
 
     @abstractmethod
-    def __init__(self, *args, colors=COLORS, pegs=PEGS, turns_limit=TURNS_LIMIT, **kwargs):
+    def __init__(self,
+                 *args,
+                 colors=COLORS,
+                 pegs=PEGS,
+                 turns_limit=TURNS_LIMIT,
+                 **kwargs,
+                 ):
         """ Initializes new game with given settings """
 
         # check if given `colors` number is correct
-        if colors in range(2, 13):  # from 2 to 12
+        if colors in range(2, MAX_COLORS + 1):
             self._colors_number = colors
         else:
             raise ValueError("Incorrect number of colors.")
 
         # check if given `pegs` number is correct
-        if pegs in range(2, 11):  # from 2 to 10
+        if pegs in range(2, MAX_PEGS + 1):
             self._pegs_number = pegs
         else:
             raise ValueError("Incorrect number of pegs.")
 
         # check if given `turns_limit` number is correct
-        if turns_limit in range(1, 21):  # from 1 to 20
+        if turns_limit in range(1, MAX_TURNS_LIMIT + 1):
             self._turns_limit = turns_limit
         else:
             raise ValueError("Incorrect number of turns limit.")
@@ -59,7 +135,7 @@ class Mastermind:
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
         self._patterns_number = self._colors_number ** self._pegs_number  # calculate number of all possible patterns
-        self._colors_list = list(range(self._colors_number))  # initialize list of colors
+        self._colors_list = list(PatternPeg(value) for value in range(self._colors_number))  # init pegs list
 
     @property
     def colors_number(self):
@@ -122,7 +198,7 @@ class Mastermind:
         return (
             "{{{set}}}"
             .format(
-                set=", ".join(self._format_peg(peg) for peg in self._colors_list),
+                set=", ".join(peg.__str__() for peg in self._colors_list),  # TODO: __str__
             )
         )
 
@@ -130,45 +206,46 @@ class Mastermind:
     def example_pattern(self):
         """ Returns formatted example pattern based on game settings """
 
-        return self._format_pattern(self._get_random_pattern())
+        return self._get_random_pattern()
 
     def _get_random_pattern(self):
         """ Returns random pattern for generating the solution or giving a demo pattern """
 
         return tuple(
-            randrange(0, self._colors_number)
+            self._colors_list[randrange(0, self._colors_number)].__str__()  # TODO: __str__
             for _ in range(self._pegs_number)
         )
 
-    def _format_turn_count(self, turn_count):
-        """ Returns formatted `turn_count` """
+    # def _format_turn_count(self, turn_count):
+    #     """ Returns formatted `turn_count` """
+    #
+    #     return (
+    #         "{turn_count:>{width}d}"
+    #         .format(
+    #             turn_count=turn_count,
+    #             width=self._turns_width,
+    #         )
+    #     )
 
-        return (
-            "{turn_count:>{width}d}"
-            .format(
-                turn_count=turn_count,
-                width=self._turns_width,
-            )
-        )
+    # @staticmethod
+    # def _format_peg(peg):
+    #     """ Returns formatted `peg` """
+    #
+    #     return (
+    #         "({peg})"
+    #         .format(
+    #             peg=chr(peg + 97),  # TODO: implement different styles of formatting pattern
+    #         )
+    #     )
 
     @staticmethod
-    def _format_peg(peg):
-        """ Returns formatted `peg` """
-
-        return (
-            "({peg})"
-            .format(
-                peg=chr(peg + 97),  # TODO: implement different styles of formatting pattern
-            )
-        )
-
-    def _format_pattern(self, pattern):
+    def _format_pattern(pattern):
         """ Returns formatted `pattern` """
 
         return (
             "[{pattern}]"
             .format(
-                pattern="".join(self._format_peg(peg) for peg in pattern),
+                pattern="".join(peg.__str__() for peg in pattern),  # TODO: __str__
             )
         )
 
@@ -192,9 +269,10 @@ class Mastermind:
         """ Returns formatted whole turn (`turn_count`, `pattern` and `response`) """
 
         return (
-            "{turn_count}. {pattern} = {response}"
+            "{turn_count:>{width}d}. {pattern} = {response}"
             .format(
-                turn_count=self._format_turn_count(turn_count),
+                turn_count=turn_count,
+                width=self._turns_width,
                 pattern=self._format_pattern(pattern),
                 response=self._format_response(response),
             )
@@ -207,12 +285,11 @@ class Mastermind:
         for turn_number, (pattern, response) in enumerate(self._turns, 1):
             print(self._format_turn(turn_number, pattern, response))
 
-    @staticmethod
-    def _decode_peg(peg_char):
+    def _decode_peg(self, peg_char):
         """ Returns `peg` converted from formatted `peg_char` """
 
         if len(peg_char) == 1:
-            return ord(peg_char) - 97  # TODO: input digits, lowercase or uppercase letters
+            return self._colors_list[ord(peg_char) - 97]  # TODO: input digits, lowercase or uppercase letters
         else:
             return None
 
@@ -227,10 +304,10 @@ class Mastermind:
         except (TypeError, ValueError):
             return None
 
-        if self._validate_pattern(pattern):
-            return pattern
-        else:
-            return None
+        # if self._validate_pattern(pattern):
+        return pattern
+        # else:
+        #     return None
 
     def _decode_response(self, response_string):
         """ Returns `response` converted from formatted `response_string` """
@@ -260,11 +337,12 @@ class Mastermind:
     def _validate_pattern(self, pattern):
         """ Checks if given `pattern` is formally correct """
 
+        print(pattern)
         return (
             isinstance(pattern, tuple)
             and len(pattern) == self._pegs_number
             and all(
-                pattern_peg in self._colors_list
+                self._decode_peg(pattern_peg) in self._colors_list
                 for pattern_peg in pattern
             )
         )
@@ -319,7 +397,11 @@ class Mastermind:
 class MastermindGame(Mastermind):
     """ Contains Mastermind Game mode, inherits from Mastermind class """
 
-    def __init__(self, *args, solution=None, **kwargs):
+    def __init__(self,
+                 *args,
+                 solution=None,
+                 **kwargs,
+                 ):
         """ Initializes Mastermind Game class object """
 
         super().__init__(*args, **kwargs)  # initialize Mastermind class object
@@ -337,9 +419,10 @@ class MastermindGame(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{turn_count}. Enter pattern: "
+            "{turn_count:>{width}d}. Enter pattern: "
             .format(
-                turn_count=self._format_turn_count(self._turns_counter),
+                turn_count=self._turns_counter,
+                width=self._turns_width,
             )
         )
 
@@ -365,16 +448,19 @@ class MastermindGame(Mastermind):
 class MastermindSolver(Mastermind):
     """ Contains Mastermind Solver mode, inherits from Mastermind class """
 
-    def __init__(self, *args, shuffle_mode=SHUFFLE_MODE, solve_mode=SOLVE_MODE, **kwargs):
+    def __init__(self,
+                 *args,
+                 shuffle_before=SHUFFLE_BEFORE,
+                 shuffle_after=SHUFFLE_AFTER,
+                 solve_mode=SOLVE_MODE,
+                 **kwargs,
+                 ):
         """ Initializes Mastermind Solver class object """
 
         super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
-        # check if given `shuffle_mode` is correct
-        if shuffle_mode in {0, 1, 2, 3}:
-            self._shuffle_mode = shuffle_mode
-        else:
-            raise ValueError("Incorrect patterns shuffling mode.")
+        self._shuffle_before = bool(shuffle_before)
+        self._shuffle_after = bool(shuffle_after)
 
         # TODO: new flag needed: `self._first_turn`
 
@@ -389,10 +475,16 @@ class MastermindSolver(Mastermind):
             raise ValueError("Incorrect solving mode.")
 
     @property
-    def shuffle_mode(self):
-        """ Returns shuffle mode number """
+    def shuffle_before(self):
+        """ Returns patterns shuffle before building list setting """
 
-        return self._shuffle_mode
+        return self._shuffle_before
+
+    @property
+    def shuffle_after(self):
+        """ Returns patterns shuffle after building list setting """
+
+        return self._shuffle_after
 
     @property
     def solve_mode(self):
@@ -411,25 +503,21 @@ class MastermindSolver(Mastermind):
 
         # generates all possible patterns using my own function
         # it's similar to Cartesian product (`import itertools.product`),
-        # but operates on tuples (not lists) and works direct on Mastermind class variables
-
-        # `_shuffle_mode`s are:
-        # 0 = don't shuffle `_colors_list` during building; don't shuffle `all_patterns` after build
-        # 1 =    do shuffle `_colors_list` during building; don't shuffle `all_patterns` after build
-        # 2 = don't shuffle `_colors_list` during building;    do shuffle `all_patterns` after build
-        # 3 =    do shuffle `_colors_list` during building;    do shuffle `all_patterns` after build
+        # but operates on tuples (not lists) and works directly on Mastermind class variables
 
         all_patterns = [()]  # initialize with list containing empty tuple
         colors_list = self._colors_list  # get local `colors_list` to be shuffled (if needed)
 
-        operations_number = sum(self._colors_number ** i for i in range(1, self._pegs_number + 1))
-        progress = Progress("Building patterns list...", operations_number)
+        progress = Progress(
+            "Building patterns list...",
+            sum(self._colors_number ** i for i in range(1, self._pegs_number + 1)),
+        )
+
         progress.start()
         for _ in range(self._pegs_number):  # iterate for every peg
 
-            if self._shuffle_mode in {1, 3}:  # shuffle `colors_list` to build patterns from (on every iteration)
+            if self._shuffle_before:  # shuffle `colors_list` to build patterns from (on every iteration)
                 shuffle(colors_list)
-            # else {0, 2}: don't shuffle `colors_list`, patterns will be in ascending order
 
             all_patterns = [
                 (*pattern, progress.item(pattern_peg))  # new tuple one peg bigger ("old" pegs + "new" (wrapped) one)
@@ -438,12 +526,8 @@ class MastermindSolver(Mastermind):
             ]
         progress.stop()
 
-        if self._shuffle_mode in {2, 3}:  # shuffle `all_patterns` (at once)
-            progress = Progress("Shuffling patterns list...", len(all_patterns) - 1)
-            progress.start()
-            shuffle(all_patterns, progress=progress)  # TODO: one line, without `progress` variable
-            progress.stop()
-        # else {0, 1}: don't shuffle `all_patterns`
+        if self._shuffle_after:  # shuffle `all_patterns` (whole list at once)
+            shuffle(all_patterns, progress=Progress("Shuffling patterns list...", len(all_patterns) - 1))
 
         return all_patterns
 
@@ -452,9 +536,10 @@ class MastermindSolver(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{turn_count}. Enter response for pattern {pattern}: "
+            "{turn_count:>{width}d}. Enter response for pattern {pattern}: "
             .format(
-                turn_count=self._format_turn_count(self._turns_counter),
+                turn_count=self._turns_counter,
+                width=self._turns_width,
                 pattern=self._format_pattern(self._solver.current_poss),
             )
         )
@@ -490,7 +575,10 @@ class MastermindSolver(Mastermind):
 class MastermindHelper(MastermindSolver):
     """ Contains Mastermind Helper mode, inherits from MastermindSolver class """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self,
+                 *args,
+                 **kwargs,
+                 ):
         """ Initializes Mastermind Helper class object """
 
         super().__init__(*args, **kwargs)  # initialize MastermindSolver class object
@@ -500,9 +588,10 @@ class MastermindHelper(MastermindSolver):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{turn_count}. Enter pattern and it's response: "
+            "{turn_count:>{width}d}. Enter pattern and it's response: "
             .format(
-                turn_count=self._format_turn_count(self._turns_counter),
+                turn_count=self._turns_counter,
+                width=self._turns_width,
             )
         )
 

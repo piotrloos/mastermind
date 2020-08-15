@@ -17,7 +17,7 @@ def main():
     print("#####################################")
     print()
 
-    mh = MastermindHelper(colors=10, pegs=6, shuffle_mode=2, solve_mode=2)
+    mh = MastermindHelper(colors=10, pegs=6, shuffle_before=False, shuffle_after=False, solve_mode=2)
 
     print()
     print(
@@ -44,10 +44,11 @@ def main():
         )
     )
     print(
-        "Shuffle MODE is set to {shuffle} and Solver MODE is set to {solve}."
+        "Settings: shuffle_before = {shuffle_before}, shuffle_after = {shuffle_after}, solve_mode = {solve_mode}."
         .format(
-            shuffle=mh.shuffle_mode,
-            solve=mh.solve_mode,
+            shuffle_before=mh.shuffle_before,
+            shuffle_after=mh.shuffle_after,
+            solve_mode=mh.solve_mode,
         )
     )
     print()
