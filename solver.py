@@ -17,7 +17,7 @@ def main():
     print("#####################################")
     print()
 
-    ms = MastermindSolver(colors=7, pegs=8, shuffle_before=True, shuffle_after=False, solve_mode=2)
+    ms = MastermindSolver(colors=8, pegs=6, shuffle_before=True, shuffle_after=True, solve_mode=2)
 
     print()
     print(
@@ -40,7 +40,7 @@ def main():
         "There are {number} possible patterns in this game. Example pattern is {pattern}."
         .format(
             number=ms.patterns_number,
-            pattern=ms.example_pattern,
+            pattern=ms.get_random_pattern(),
         )
     )
     print(

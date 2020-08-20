@@ -39,7 +39,7 @@ def main():
         "There are {number} possible patterns in this game. Example pattern is {pattern}."
         .format(
             number=mg.patterns_number,
-            pattern=mg.example_pattern,
+            pattern=mg.get_random_pattern(),
         )
     )
     print()

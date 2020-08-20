@@ -95,9 +95,11 @@ def shuffle(lst, progress=None):
         progress.start()
 
     length = len(lst)
+
     for i in range(length - 1):
         j = randrange(i, length)
         lst[i], lst[j] = lst[j], lst[i]
+
         if progress is not None:
             progress.item()
 

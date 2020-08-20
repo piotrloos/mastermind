@@ -1,19 +1,18 @@
 # do zrobienia w najbliższym czasie:
 
-# TODO: MODE1 - wyłączenie szukania drugiego patterna - parametr
-# TODO: MODE2 - możlwość brania dowolnego patternu z listy (nie tylko 0) - parametr
-
+# TODO: klasy na Pattern i Response, ogólnie prawie na wszystko
+# TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
-
-# TODO: poziom printowania komunikatów
-# TODO: klasy na Pattern i Response - nie spowolni to gry?
-
-# TODO: rozbudowanie `Helper`a
-# TODO: stworzenie pliku `readme.md`
+# TODO: uporządkować kod w wielu miejscach
+# TODO:     przenieść pętlę input do klasy
+# TODO:     warunek końca gry
+# TODO:     `next_poss` itp.
 
 # TODO: poprawka bugu w Helperze - można wpisać gotowe rozwiązanie, a gra nie sprawdza czy jest ono możliwe
 # TODO: sprawdzenie czy wpisany pattern w Helperze może być rozwiązaniem i wyświetlenie tego
 # TODO: możliwość wpisania tylko "=response" i wtedy patternem jest next_poss
+
+# polecenia "shella":
 
 # TODO: możliwość wpisywania poleceń:
 # TODO: !next: inna propozycja rozwiązania w Helperze
@@ -24,21 +23,24 @@
 # TODO: !pass: opcja poddania się (nowy `_game_status`)
 # TODO: !restart: restart gry z tym samym rozwiązaniem
 # TODO: !reset: restart gry z nowym rozwiązaniem przy tych samych ustawieniach
+# TODO: !shuffle: wymieszanie listy patternów
+# TODO: !sort: posortowanie listy patternów
 # TODO: !settings: wyświetlenie parametrów gry
-
-# TODO: uporządkować kod w wielu miejscach
 
 # później, pomysły itp.:
 
+# TODO: MODE2 - możlwość brania dowolnego patternu z listy (nie tylko 0) - parametr
+# TODO: stworzenie pliku `readme.md`
+# TODO: MODE1 - wyłączenie szukania drugiego patterna - parametr
 # TODO: MODE1 - liczenie możliwych patternów generatora
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
-# TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: opcje: allow_duplicates, allow_blanks
 # TODO: formatowanie patternów (Colorama)
 # TODO: MODE 1 - przyspieszenie generatora:
 # TODO:     ocena ważności wyniku i sprawdzanie all() po ważności
 # TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
 # TODO:     wielowątkowość
+# TODO: poziom printowania komunikatów
 # TODO: możliwość gry komputera samego ze sobą
 # TODO: testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
-# TODO: więcej testów dla `MastermindGame` i `MastermindSolver`
+# TODO: testy, testy, testy...
