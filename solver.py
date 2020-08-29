@@ -17,38 +17,38 @@ def main():
     print("#####################################")
     print()
 
-    ms = MastermindSolver(colors=8, pegs=6, shuffle_before=True, shuffle_after=True, solve_mode=2)
+    ms = MastermindSolver(colors=8, pegs=7, shuffle_before=False, shuffle_after=False, solver_mode=2)
 
     print()
     print(
         "You are the CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors: {list}."
         .format(
-            pegs=ms.pegs_number,
-            colors=ms.colors_number,
+            pegs=ms.settings.pegs,
+            colors=ms.settings.colors,
             list=ms.colors_list,
         )
     )
     print(
         "I am the CodeBreaker and I have {turns}"
         .format(
-            turns=ms.turns_limit,
+            turns=ms.settings.turns_limit,
         ),
-        "turn" if ms.turns_limit == 1 else "turns",
+        "turn" if ms.settings.turns_limit == 1 else "turns",
         "to guess the solution pattern."
     )
     print(
         "There are {number} possible patterns in this game. Example pattern is {pattern}."
         .format(
-            number=ms.patterns_number,
+            number=ms.settings.patterns,
             pattern=ms.get_random_pattern(),
         )
     )
     print(
-        "Settings: shuffle_before = {shuffle_before}, shuffle_after = {shuffle_after}, solve_mode = {solve_mode}."
+        "Settings: shuffle_before = {shuffle_before}, shuffle_after = {shuffle_after}, solver_mode = {solver_mode}."
         .format(
-            shuffle_before=ms.shuffle_before,
-            shuffle_after=ms.shuffle_after,
-            solve_mode=ms.solve_mode,
+            shuffle_before=ms.settings.shuffle_before,
+            shuffle_after=ms.settings.shuffle_after,
+            solver_mode=ms.settings.solver_mode,
         )
     )
     print()

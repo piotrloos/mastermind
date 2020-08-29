@@ -19,4 +19,4 @@ MAX_TURNS_LIMIT = 32    # max turns limit number
 SHUFFLE_BEFORE = False  # default patterns shuffle before building list setting
 SHUFFLE_AFTER = False   # default patterns shuffle after building list setting
 
-SOLVE_MODE = 1          # default solving mode (1 or 2)
+SOLVER_MODE = 1          # default solving mode (1 or 2)

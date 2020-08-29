@@ -22,23 +22,23 @@ def main():
     print(
         "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {list}."
         .format(
-            pegs=mg.pegs_number,
-            colors=mg.colors_number,
+            pegs=mg.settings.pegs,
+            colors=mg.settings.colors,
             list=mg.colors_list,
         )
     )
     print(
         "You are the CodeBreaker and you have {turns}"
         .format(
-            turns=mg.turns_limit,
+            turns=mg.settings.turns_limit,
         ),
-        "turn" if mg.turns_limit == 1 else "turns",
+        "turn" if mg.settings.turns_limit == 1 else "turns",
         "to guess the solution pattern."
     )
     print(
         "There are {number} possible patterns in this game. Example pattern is {pattern}."
         .format(
-            number=mg.patterns_number,
+            number=mg.settings.patterns,
             pattern=mg.get_random_pattern(),
         )
     )
