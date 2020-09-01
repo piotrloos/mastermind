@@ -1,20 +1,18 @@
 ########################################
 # My version of famous game Mastermind #
-# settings.py                          #
-# Settings for mastermind              #
+# consts.py                            #
+# CONSTs for mastermind                #
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-# CONSTs:
+COLORS_NUMBER = 6       # default colors number
+COLORS_NUMBER_MAX = 12  # max colors number
 
-COLORS = 6              # default colors number
-MAX_COLORS = 12         # max colors number
-
-PEGS = 4                # default pegs number
-MAX_PEGS = 10           # max pegs number
+PEGS_NUMBER = 4         # default pegs number
+PEGS_NUMBER_MAX = 10    # max pegs number
 
 TURNS_LIMIT = 12        # default turns limit number
-MAX_TURNS_LIMIT = 32    # max turns limit number
+TURNS_LIMIT_MAX = 32    # max turns limit number
 
 SHUFFLE_BEFORE = False  # default patterns shuffle before building list setting
 SHUFFLE_AFTER = False   # default patterns shuffle after building list setting

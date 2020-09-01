@@ -1,6 +1,5 @@
 # do zrobienia w najbliższym czasie:
 
-# TODO: klasy na Pattern i Response, ogólnie prawie na wszystko
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
 # TODO: uporządkować kod w wielu miejscach

@@ -17,14 +17,18 @@ def main():
     print("###################################")
     print()
 
-    mg = MastermindGame(pegs=4, colors=6, turns_limit=12)
+    mg = MastermindGame(
+        pegs_number=4,
+        colors_number=6,
+        turns_limit=12,
+    )
 
     print(
         "I am the CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {list}."
         .format(
-            pegs=mg.settings.pegs,
-            colors=mg.settings.colors,
-            list=mg.colors_list,
+            pegs=mg.settings.pegs_number,
+            colors=mg.settings.colors_number,
+            list=mg.settings.pegs_list,
         )
     )
     print(
@@ -38,7 +42,7 @@ def main():
     print(
         "There are {number} possible patterns in this game. Example pattern is {pattern}."
         .format(
-            number=mg.settings.patterns,
+            number=mg.settings.patterns_number,
             pattern=mg.get_random_pattern(),
         )
     )

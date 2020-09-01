@@ -17,15 +17,21 @@ def main():
     print("#####################################")
     print()
 
-    mh = MastermindHelper(colors=8, pegs=6, shuffle_before=False, shuffle_after=False, solver_mode=2)
+    mh = MastermindHelper(
+        colors_number=8,
+        pegs_number=6,
+        shuffle_before=False,
+        shuffle_after=False,
+        solver_mode=2,
+    )
 
     print()
     print(
         "You are the CodeBreaker and somebody has prepared {pegs}-peg pattern using {colors} different colors: {list}."
         .format(
-            pegs=mh.settings.pegs,
-            colors=mh.settings.colors,
-            list=mh.colors_list,
+            pegs=mh.settings.pegs_number,
+            colors=mh.settings.colors_number,
+            list=mh.settings.pegs_list,
         )
     )
     print(
@@ -39,7 +45,7 @@ def main():
     print(
         "There are {number} possible patterns in this game. Example pattern is {pattern}."
         .format(
-            number=mh.settings.patterns,
+            number=mh.settings.patterns_number,
             pattern=mh.get_random_pattern(),
         )
     )

@@ -7,11 +7,11 @@
 
 from abc import abstractmethod
 from random import randrange
-from settings import *
+from consts import *
 from tools import Progress, shuffle
 
 
-class PatternPeg:
+class Peg:
     """ Class for one pattern peg """
 
     def __init__(self, peg):
@@ -26,14 +26,41 @@ class PatternPeg:
         )
 
     def __repr__(self):
-        return "Peg" + self.__str__()
+        return "Peg " + self.__str__()
+
+
+class PegsContainer:
+    """ Class for list of pegs """
+
+    def __init__(self, colors_number):
+        self._pegs = list(Peg(peg_value) for peg_value in range(colors_number))
+
+    def __iter__(self):
+        return self._pegs.__iter__()
+
+    def __getitem__(self, index):
+        return self._pegs.__getitem__(index)
+
+    def __str__(self):
+        return (
+            "{{{pegs}}}"
+            .format(
+                pegs=", ".join(peg.__str__() for peg in self._pegs),
+            )
+        )
+
+    def __repr__(self):
+        return "PegsContainer " + self.__str__()
 
 
 class Pattern:
-    """ Class for pattern """
+    """ Class for one pattern """
 
     def __init__(self, pattern):
         self._pattern = tuple(pattern)
+
+    def __iter__(self):
+        return self._pattern.__iter__()
 
     def __str__(self):
         return (
@@ -44,21 +71,103 @@ class Pattern:
         )
 
     def __repr__(self):
-        return "Pattern" + self.__str__()
-
-    def __iter__(self):
-        return self._pattern.__iter__()
+        return "Pattern " + self.__str__()
 
     def count(self, peg):
         return self._pattern.count(peg)
 
 
-class Response:
-    """ Class for response """
+class PatternsContainer:
+    """ Class for list of all possible patterns """
 
-    def __init__(self, black_pegs, white_pegs):
+    def __init__(self, settings):
+        self._settings = settings
+        self._patterns = None
+        self.build()
+
+    def __iter__(self):
+        return self._patterns.__iter__()
+
+    def __getitem__(self, index):
+        return self._patterns.__getitem__(index)
+
+    def build(self):
+        # generates all possible Pattern objects using my own function
+        # it's similar to Cartesian product (`import itertools.product`),
+        # but operates on tuples (Patterns at the last iteration) and works directly on Mastermind game settings
+
+        self._patterns = [()]  # initialize with list containing empty tuple
+        pegs_list = self._settings.pegs_list[:]  # get local `pegs_list` to be shuffled
+
+        progress = Progress(
+            text="Building patterns list...",
+            items_number=sum(self._settings.colors_number ** i for i in range(1, self._settings.pegs_number + 1)),
+            # sum of powers
+        )
+
+        progress.start()
+
+        for _ in range(1, self._settings.pegs_number):  # iterate for pegs-1 times
+
+            if self._settings.shuffle_before:  # shuffle `pegs_list` to build patterns from (on every iteration)
+                shuffle(
+                    pegs_list,
+                    progress=None,
+                )
+
+            # make only temporary tuples instead of Pattern objects (for performance)
+            self._patterns = [
+                progress.item((*pattern, new_peg))
+                for pattern in self._patterns
+                for new_peg in pegs_list
+            ]
+            # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
+
+        if self._settings.shuffle_before:  # shuffle local `pegs_list` to build patterns from
+            shuffle(
+                pegs_list,
+                progress=None,
+            )
+
+        # make Pattern objects at last iteration
+        self._patterns = [
+            progress.item(Pattern((*pattern, new_peg)))
+            for pattern in self._patterns
+            for new_peg in pegs_list
+        ]
+
+        progress.stop()
+
+        if self._settings.shuffle_after:  # shuffle `self._patterns` (whole list at once)
+            shuffle(
+                self._patterns,
+                progress=Progress(
+                    text="Shuffling patterns list...",
+                    items_number=len(self._patterns) - 1,
+                )
+            )
+
+    @property
+    def all(self):
+        if self._patterns is None:
+            return 0
+        else:
+            return len(self._patterns)
+
+    def print(self):
+        pass
+
+    def filter(self):
+        pass
+
+
+class Response:
+    """ Class for one response """
+
+    def __init__(self, black_pegs, white_pegs, pegs_number):
         self._black_pegs = black_pegs
         self._white_pegs = white_pegs
+        self._pegs_number = pegs_number
 
     def __str__(self):
         return (
@@ -66,16 +175,17 @@ class Response:
             .format(
                 blacks="●" * self._black_pegs,
                 whites="○" * self._white_pegs,
-                dots="∙" * (10 - self._black_pegs - self._white_pegs),  # TODO: self._pegs_number
+                dots="∙" * (self._pegs_number - self._black_pegs - self._white_pegs),
                 black_number=self._black_pegs,
                 white_number=self._white_pegs,
             )
         )
 
+    def __repr__(self):
+        return "Response " + self.__str__()
+
     def __eq__(self, response):
-        return (
-            self._black_pegs == response.black_pegs and self._white_pegs == response.white_pegs
-        )
+        return self._black_pegs == response.black_pegs and self._white_pegs == response.white_pegs
 
     @property
     def black_pegs(self):
@@ -89,8 +199,9 @@ class Response:
 class Turn:
     """ Class for one game turn """
 
-    def __init__(self, index, pattern, response):
+    def __init__(self, index, width, pattern, response):
         self._index = index
+        self._width = width
         self._pattern = pattern
         self._response = response
 
@@ -99,11 +210,14 @@ class Turn:
             "{index:>{width}d}. {pattern} = {response}"
             .format(
                 index=self._index,
-                width=2,  # TODO: width  len(str(self._turns_limit))
+                width=self._width,
                 pattern=self._pattern,
                 response=self._response,
             )
         )
+
+    def __repr__(self):
+        return "Turn " + self.__str__()
 
     @property
     def index(self):
@@ -119,7 +233,8 @@ class Turn:
 
 
 class TurnsContainer:
-    def __init__(self):
+    def __init__(self, turns_width):
+        self._turns_width = turns_width
         self._index = 0
         self._turns = []
 
@@ -128,7 +243,7 @@ class TurnsContainer:
 
     def add_turn(self, pattern, response):
         self._index += 1
-        self._turns.append(Turn(self._index, pattern, response))
+        self._turns.append(Turn(self._index, self._turns_width, pattern, response))
 
     def print_turns(self):
         print()
@@ -140,28 +255,11 @@ class TurnsContainer:
         return self._index
 
 
-class PatternsContainer:
-    def __init__(self):
-        pass
-
-    def __iter__(self):
-        pass
-
-    def build(self):
-        pass
-
-    def print(self):
-        pass
-
-    def filter(self):
-        pass
-
-
 class SettingsContainer:
     def __init__(self,
                  *args,
-                 colors=COLORS,
-                 pegs=PEGS,
+                 colors_number=COLORS_NUMBER,
+                 pegs_number=PEGS_NUMBER,
                  turns_limit=TURNS_LIMIT,
                  shuffle_before=SHUFFLE_BEFORE,
                  shuffle_after=SHUFFLE_AFTER,
@@ -170,19 +268,19 @@ class SettingsContainer:
                  ):
 
         # check if given `colors` number is correct
-        if colors in range(2, MAX_COLORS + 1):
-            self._colors = colors
+        if colors_number in range(2, COLORS_NUMBER_MAX + 1):
+            self._colors_number = colors_number
         else:
             raise ValueError("Incorrect number of colors.")
 
         # check if given `pegs` number is correct
-        if pegs in range(2, MAX_PEGS + 1):
-            self._pegs = pegs
+        if pegs_number in range(2, PEGS_NUMBER_MAX + 1):
+            self._pegs_number = pegs_number
         else:
             raise ValueError("Incorrect number of pegs.")
 
         # check if given `turns_limit` number is correct
-        if turns_limit in range(1, MAX_TURNS_LIMIT + 1):
+        if turns_limit in range(1, TURNS_LIMIT_MAX + 1):
             self._turns_limit = turns_limit
         else:
             raise ValueError("Incorrect number of turns limit.")
@@ -195,6 +293,8 @@ class SettingsContainer:
 
         self._shuffle_before = bool(shuffle_before)
         self._shuffle_after = bool(shuffle_after)
+
+        self._pegs_list = PegsContainer(self._colors_number)
 
         for attribute in args:
             print(
@@ -214,22 +314,22 @@ class SettingsContainer:
             )
 
     @property
-    def colors(self):
+    def colors_number(self):
         """ Returns colors number """
 
-        return self._colors
+        return self._colors_number
 
     @property
-    def pegs(self):
+    def pegs_number(self):
         """ Returns pegs number """
 
-        return self._pegs
+        return self._pegs_number
 
     @property
-    def patterns(self):
+    def patterns_number(self):
         """ Returns all possible patterns number """
 
-        return self._colors ** self._pegs
+        return self._colors_number ** self._pegs_number
 
     @property
     def turns_limit(self):
@@ -261,6 +361,12 @@ class SettingsContainer:
 
         return self._solver_mode
 
+    @property
+    def pegs_list(self):
+        """ Returns list of colors """
+
+        return self._pegs_list
+
 
 class Mastermind:
     """ Contains whole game, base class for MastermindGame and MastermindSolver classes """
@@ -270,18 +376,19 @@ class Mastermind:
         """ Initializes new game with given settings """
 
         self._settings = SettingsContainer(*args, **kwargs)
-        self._turns = TurnsContainer()  # initialize list of turns
+        self._turns = TurnsContainer(self._settings.turns_width)  # initialize list of turns
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
-        self._colors_list = list(PatternPeg(value) for value in range(self._settings.colors))  # init pegs list
 
     @property
     def settings(self):
+        """ Returns `SettingsContainer` class object """
+
         return self._settings
 
     @property
     def turns(self):  # TODO: iteration through property?
-        """ Returns turns list """
+        """ Returns `TurnsContainer` class object """
 
         return self._turns
 
@@ -293,7 +400,7 @@ class Mastermind:
 
     @property
     def solution(self):
-        """ Returns formatted solution pattern only when game is ended """
+        """ Returns solution pattern (only when game is ended) """
 
         if self._game_status == 0:
             raise PermissionError("No access to the solution when game is active!")
@@ -309,30 +416,19 @@ class Mastermind:
 
         return self._game_status
 
-    @property
-    def colors_list(self):
-        """ Returns formatted set of colors """
-
-        return (
-            "{{{set}}}"
-            .format(
-                set=", ".join(peg.__str__() for peg in self._colors_list),  # TODO: __str__
-            )
-        )
-
     def get_random_pattern(self):
         """ Returns random pattern for generating the solution or giving a demo pattern """
 
         return Pattern(
-            self._colors_list[randrange(self._settings.colors)]
-            for _ in range(self._settings.pegs)
+            self._settings.pegs_list[randrange(self._settings.colors_number)]
+            for _ in range(self._settings.pegs_number)
         )
 
     def _decode_peg(self, peg_char):
         """ Returns PatternPeg object converted from formatted `peg_char` """
 
         if len(peg_char) == 1:
-            return self._colors_list[ord(peg_char) - 97]  # TODO: input digits, lowercase or uppercase letters
+            return self._settings.pegs_list[ord(peg_char) - 97]  # TODO: input digits, lowercase or uppercase letters
         else:
             return None
 
@@ -364,7 +460,7 @@ class Mastermind:
             return None
 
         if self._validate_response(response_tuple):
-            return Response(*response_tuple)
+            return Response(*response_tuple, self._settings.pegs_number)
         else:
             return None
 
@@ -383,9 +479,9 @@ class Mastermind:
 
         return (
             isinstance(pattern_tuple, tuple)
-            and len(pattern_tuple) == self._settings.pegs
+            and len(pattern_tuple) == self._settings.pegs_number
             and all(
-                pattern_peg in self._colors_list
+                pattern_peg in self._settings.pegs_list
                 for pattern_peg in pattern_tuple
             )
         )
@@ -398,7 +494,7 @@ class Mastermind:
             isinstance(response_tuple, tuple)
             and len(response_tuple) == 2
             and all(
-                response_peg in range(0, self._settings.pegs + 1)
+                response_peg in range(0, self._settings.pegs_number + 1)
                 for response_peg in {response_tuple[0], response_tuple[1], response_tuple[0] + response_tuple[1]}
                 # both black and white pegs number (and sum of them also) should be between 0 and pegs number
             )
@@ -416,18 +512,18 @@ class Mastermind:
         # `black_white_pegs` defines how many pegs are in proper color regardless to location
         black_white_pegs = sum(
             min(pattern1.count(pattern_peg), pattern2.count(pattern_peg))
-            for pattern_peg in self._colors_list
+            for pattern_peg in self._settings.pegs_list
         )
 
         # `white_pegs` defines how many pegs are in proper color and wrong location
         # to calculate `white_pegs` it's needed to subtract `black_pegs` from `black_white_pegs`
-        return Response(black_pegs, black_white_pegs - black_pegs)  # return response with black and white pegs
+        return Response(black_pegs, black_white_pegs - black_pegs, self._settings.pegs_number)
 
     def _check_game_end(self, response):
         """ Checks if the game should end (after current turn) """
 
         # check if all response pegs are black  # TODO: response from Mastermind object?
-        if response.black_pegs == self._settings.pegs and response.white_pegs == 0:
+        if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
             self._game_status = 1  # solution is found
             return True
 
@@ -499,10 +595,10 @@ class MastermindSolver(Mastermind):
         # TODO: new flag needed: `self._first_turn`
 
         # check if given `solver_mode` is correct
-        if self.settings.solver_mode == 1:  # patterns checking generator mode
-            self._solver = MastermindSolverMode1(self)  # TODO: giving (self) is OK?
-        elif self.settings.solver_mode == 2:  # patterns list filtering mode
-            self._solver = MastermindSolverMode2(self)  # TODO: giving (self) is OK?
+        if self._settings.solver_mode == 1:  # patterns checking generator mode
+            self._solver = MastermindSolverMode1(self._settings, self._turns, self.calculate_response)
+        elif self._settings.solver_mode == 2:  # patterns list filtering mode
+            self._solver = MastermindSolverMode2(self._settings, self._turns, self.calculate_response)
         else:
             self._solver = None
 
@@ -511,65 +607,6 @@ class MastermindSolver(Mastermind):
         """ Returns possible solutions number """
 
         return self._solver.poss_number
-
-    def get_patterns_list(self):
-        """ Returns list of all pattern combinations using game settings """
-
-        # generates all possible Pattern objects using my own function
-        # it's similar to Cartesian product (`import itertools.product`),
-        # but operates on tuples (Patterns at the last iteration) and works directly on Mastermind game settings
-
-        all_patterns = [()]  # initialize with list containing empty tuple
-        colors_list = self._colors_list[:]  # get local `colors_list` to be shuffled (if needed)
-
-        progress = Progress(
-            text="Building patterns list...",
-            items_number=sum(self._settings.colors ** i for i in range(1, self._settings.pegs + 1)),  # sum of powers
-        )
-
-        progress.start()
-
-        for _ in range(1, self._settings.pegs):  # iterate for pegs-1 times
-
-            if self.settings.shuffle_before:  # shuffle `colors_list` to build patterns from (on every iteration)
-                shuffle(
-                    colors_list,
-                    progress=None,
-                )
-
-            # make only temporary tuples instead of Pattern objects (for performance)
-            all_patterns = [
-                progress.item((*pattern, new_peg))
-                for pattern in all_patterns
-                for new_peg in colors_list
-            ]
-            # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
-
-        if self.settings.shuffle_before:  # shuffle `colors_list` to build patterns from
-            shuffle(
-                colors_list,
-                progress=None,
-            )
-
-        # make Pattern objects at last iteration
-        all_patterns = [
-            progress.item(Pattern((*pattern, new_peg)))
-            for pattern in all_patterns
-            for new_peg in colors_list
-        ]
-
-        progress.stop()
-
-        if self.settings.shuffle_after:  # shuffle `all_patterns` (whole list at once)
-            shuffle(
-                all_patterns,
-                progress=Progress(
-                    text="Shuffling patterns list...",
-                    items_number=len(all_patterns) - 1,
-                )
-            )
-
-        return all_patterns
 
     @property
     def solver_prompt(self):
@@ -670,12 +707,16 @@ class MastermindHelper(MastermindSolver):
 class MastermindSolverMode1:
     """ Contains Mastermind Solver MODE 1 (patterns checking generator mode) """
 
-    def __init__(self, upper):
+    def __init__(self, settings, turns, calculate_response):
         """ (MODE 1) Initializes Mastermind Solver MODE 1 class object """
 
-        self.super = upper  # TODO: is it OK?
+        # TODO: temporary given labels
+        self._settings = settings
+        self._turns = turns
+        self._calculate_response = calculate_response
 
-        self._generator = MastermindSolverMode1Generator(self)  # initialize possible solutions generator
+        # initialize possible solutions generator
+        self._generator = MastermindSolverMode1Generator(self._settings, self._check_poss)
         self._current_poss = None  # initialize current possible solution
         self._second_poss = None  # initialize second possible solution
         self._single_poss = False  # initialize single possible solution flag
@@ -700,12 +741,12 @@ class MastermindSolverMode1:
 
         raise NotImplementedError("It is impossible to calculate possible solutions number in MODE 1!")
 
-    def check_poss(self, poss):
+    def _check_poss(self, poss):
         """ (MODE 1) Checks if given possible solution still can be a solution based on all previous turns """
 
         return all(
-            self.super.calculate_response(turn.pattern, poss) == turn.response
-            for turn in self.super.turns
+            self._calculate_response(turn.pattern, poss) == turn.response
+            for turn in self._turns
         )
 
     def calculate_poss(self, turn_pattern, turn_response):
@@ -721,10 +762,10 @@ class MastermindSolverMode1:
 
         # TODO: change `if` criteria (especially when `_second_poss` will be disabled)
 
-        if self._current_poss is not None and self.check_poss(self._current_poss):
+        if self._current_poss is not None and self._check_poss(self._current_poss):
             print("Previously found first possible solution still can be a first solution. Not changed.")
         else:
-            if self._second_poss is not None and self.check_poss(self._second_poss):
+            if self._second_poss is not None and self._check_poss(self._second_poss):
                 print("Previously found second possible solution still can be a solution. Saved as first.")
                 self._current_poss = self._second_poss
                 self._second_poss = None
@@ -736,7 +777,7 @@ class MastermindSolverMode1:
                     self._second_poss = None  # no second possible solution also
                     return
 
-        if self._second_poss is not None and self.check_poss(self._second_poss):
+        if self._second_poss is not None and self._check_poss(self._second_poss):
             print("Previously found second possible solution still can be a second solution. Not changed.")
         else:
             try:
@@ -749,14 +790,16 @@ class MastermindSolverMode1:
 class MastermindSolverMode1Generator:
     """ (MODE 1) Contains possible solutions generator """
 
-    def __init__(self, upper):
+    def __init__(self, settings, check_poss):
         """ (MODE 1 Generator) Initializes Mastermind Solver MODE 1 Generator class object """
 
-        self.super = upper
+        # TODO: temporary given labels
+        self._settings = settings
+        self._check_poss = check_poss
 
-        self._list = self.super.super.get_patterns_list()  # get list of all possible solutions to be checked
+        self._list = PatternsContainer(self._settings)  # get list of all possible solutions to be checked
         self._index = 0  # initialize possible solutions index
-        self._all = len(self._list)
+        self._all = self._list.all
 
         self._progress = Progress(
             text="",
@@ -773,7 +816,7 @@ class MastermindSolverMode1Generator:
             poss = self._list[self._index]  # get pattern from list
             self._index += 1  # now index is between 1 and len()
 
-            if self._progress.item(self.super.check_poss(poss)):  # wrapped the long-taking operation
+            if self._progress.item(self._check_poss(poss)):  # wrapped the long-taking operation
                 self._progress.stop(
                     "Found! It's index is {index} of {all} overall ({percent:.2f}%)."
                     .format(
@@ -799,12 +842,16 @@ class MastermindSolverMode1Generator:
 class MastermindSolverMode2:
     """ Contains Mastermind Solver MODE 2 (patterns list filtering mode) """
 
-    def __init__(self, upper):
+    def __init__(self, settings, turns, calculate_response):
         """ (MODE 2) Initializes Mastermind Solver MODE 2 class object """
 
-        self.super = upper  # TODO: is it OK?
+        # TODO: temporary given labels
+        self._settings = settings
+        self._turns = turns
+        self._calculate_response = calculate_response
 
-        self._poss_list = self.super.get_patterns_list()  # get list of all possible solutions to be filtered
+        # TODO: filtering inside object (as method), not generated list from this object
+        self._poss_list = list(PatternsContainer(self._settings))  # get list of all possible solutions to be filtered
         self._current_poss = None  # initialize current possible solution
         self._single_poss = False  # initialize single possible solution flag
 
@@ -844,7 +891,7 @@ class MastermindSolverMode2:
         self._poss_list = [  # filter the existing list
             poss_pattern
             for poss_pattern in self._poss_list
-            if progress.item(self.super.calculate_response(turn_pattern, poss_pattern) == turn_response)  # wrapped
+            if progress.item(self._calculate_response(turn_pattern, poss_pattern) == turn_response)
         ]
 
         progress.stop()

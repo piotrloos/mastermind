@@ -17,15 +17,21 @@ def main():
     print("#####################################")
     print()
 
-    ms = MastermindSolver(colors=8, pegs=7, shuffle_before=False, shuffle_after=False, solver_mode=2)
+    ms = MastermindSolver(
+        colors_number=4,
+        pegs_number=3,
+        shuffle_before=False,
+        shuffle_after=False,
+        solver_mode=2,
+    )
 
     print()
     print(
         "You are the CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors: {list}."
         .format(
-            pegs=ms.settings.pegs,
-            colors=ms.settings.colors,
-            list=ms.colors_list,
+            pegs=ms.settings.pegs_number,
+            colors=ms.settings.colors_number,
+            list=ms.settings.pegs_list,
         )
     )
     print(
@@ -39,7 +45,7 @@ def main():
     print(
         "There are {number} possible patterns in this game. Example pattern is {pattern}."
         .format(
-            number=ms.settings.patterns,
+            number=ms.settings.patterns_number,
             pattern=ms.get_random_pattern(),
         )
     )
