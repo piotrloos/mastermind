@@ -18,11 +18,11 @@ def main():
     print()
 
     ms = MastermindSolver(
-        colors_number=4,
-        pegs_number=3,
+        colors_number=6,
+        pegs_number=8,
         shuffle_before=False,
         shuffle_after=False,
-        solver_mode=2,
+        solver_mode=1,
     )
 
     print()

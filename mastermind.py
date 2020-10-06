@@ -88,62 +88,67 @@ class PatternsContainer:
     def __iter__(self):
         return self._patterns.__iter__()
 
-    def __getitem__(self, index):
-        return self._patterns.__getitem__(index)
+    def __next__(self):
+        return Pattern(self._patterns.__next__())
 
     def build(self):
         # generates all possible Pattern objects using my own function
         # it's similar to Cartesian product (`import itertools.product`),
         # but operates on tuples (Patterns at the last iteration) and works directly on Mastermind game settings
 
-        self._patterns = [()]  # initialize with list containing empty tuple
+        patterns = [()]  # initialize with list containing empty tuple
         pegs_list = self._settings.pegs_list[:]  # get local `pegs_list` to be shuffled
 
         progress = Progress(
             text="Building patterns list...",
-            items_number=sum(self._settings.colors_number ** i for i in range(1, self._settings.pegs_number + 1)),
-            # sum of powers
+            items_number=sum(self._settings.colors_number ** i for i in range(1, self._settings.pegs_number)),
+            # items_number = sum of powers (from 1 to `pegs_number`-1)
+            # last iteration will build the generator which doesn't take much time
         )
 
         progress.start()
 
-        for _ in range(1, self._settings.pegs_number):  # iterate for pegs-1 times
+        # iterate for `pegs_number`-1 times
+        for _ in range(1, self._settings.pegs_number):
 
-            if self._settings.shuffle_before:  # shuffle `pegs_list` to build patterns from (on every iteration)
+            # shuffle `pegs_list` to build patterns from (on every iteration)
+            if self._settings.shuffle_before:
                 shuffle(
                     pegs_list,
                     progress=None,
                 )
 
-            # make only temporary tuples instead of Pattern objects (for performance)
-            self._patterns = [
+            # make temporary list of tuples (on every iteration)
+            patterns = [
                 progress.item((*pattern, new_peg))
-                for pattern in self._patterns
+                for pattern in patterns
                 for new_peg in pegs_list
             ]
             # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
 
-        if self._settings.shuffle_before:  # shuffle local `pegs_list` to build patterns from
+        progress.stop()
+
+        # shuffle `pegs_list` to build patterns from (last iteration)
+        if self._settings.shuffle_before:
             shuffle(
                 pegs_list,
                 progress=None,
             )
 
-        # make Pattern objects at last iteration
-        self._patterns = [
-            progress.item(Pattern((*pattern, new_peg)))
-            for pattern in self._patterns
+        # make generator expression for patterns (last iteration)
+        self._patterns = (
+            (*pattern, new_peg)
+            for pattern in patterns
             for new_peg in pegs_list
-        ]
+        )
 
-        progress.stop()
-
-        if self._settings.shuffle_after:  # shuffle `self._patterns` (whole list at once)
+        # shuffle `self._patterns` (whole list at once)
+        if self._settings.shuffle_after:
             shuffle(
-                self._patterns,
+                list(self._patterns),  # TODO: building list takes lot of time - progress?
                 progress=Progress(
                     text="Shuffling patterns list...",
-                    items_number=len(self._patterns) - 1,
+                    items_number=self.all - 1,
                 )
             )
 
@@ -152,7 +157,7 @@ class PatternsContainer:
         if self._patterns is None:
             return 0
         else:
-            return len(self._patterns)
+            return self._settings.patterns_number
 
     def print(self):
         pass
@@ -770,8 +775,9 @@ class MastermindSolverMode1:
                 self._current_poss = self._second_poss
                 self._second_poss = None
             else:
+                self._generator.rename("Searching for first possible solution...")
                 try:
-                    self._current_poss = self._generator.next("Searching for first possible solution...")
+                    self._current_poss = next(self._generator)
                 except StopIteration:
                     self._current_poss = None  # no possible solution
                     self._second_poss = None  # no second possible solution also
@@ -780,8 +786,9 @@ class MastermindSolverMode1:
         if self._second_poss is not None and self._check_poss(self._second_poss):
             print("Previously found second possible solution still can be a second solution. Not changed.")
         else:
+            self._generator.rename("Searching for second possible solution...")
             try:
-                self._second_poss = self._generator.next("Searching for second possible solution...")
+                self._second_poss = next(self._generator)
             except StopIteration:  # there is no second solution -> only one solution!
                 self._single_poss = True  # set the flag
                 self._second_poss = None  # no second possible solution
@@ -797,7 +804,7 @@ class MastermindSolverMode1Generator:
         self._settings = settings
         self._check_poss = check_poss
 
-        self._list = PatternsContainer(self._settings)  # get list of all possible solutions to be checked
+        self._list = PatternsContainer(self._settings)  # get generator of all possible solutions to be checked
         self._index = 0  # initialize possible solutions index
         self._all = self._list.all
 
@@ -806,15 +813,19 @@ class MastermindSolverMode1Generator:
             items_number=self._all,
         )
 
-    def next(self, text=None):
+    def rename(self, text):
+        """ (MODE 1 Generator) Changes Progress object display text """
+        self._progress.rename(text)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
         """ (MODE 1 Generator) Returns the first possible solution based on all previous turns """
 
-        if text is not None:
-            self._progress.rename(text)  # change the displayed text when needed
+        for poss in self._list:
 
-        while self._index < self._all:  # index between 0 and len()-1
-            poss = self._list[self._index]  # get pattern from list
-            self._index += 1  # now index is between 1 and len()
+            self._index += 1  # index is between 1 and length of `self._list`
 
             if self._progress.item(self._check_poss(poss)):  # wrapped the long-taking operation
                 self._progress.stop(
@@ -825,7 +836,7 @@ class MastermindSolverMode1Generator:
                         percent=100 * self._index / self._all,
                     )
                 )
-                return poss
+                return Pattern(poss)
 
         # after return the last pattern
         self._progress.stop(
@@ -851,11 +862,11 @@ class MastermindSolverMode2:
         self._calculate_response = calculate_response
 
         # TODO: filtering inside object (as method), not generated list from this object
-        self._poss_list = list(PatternsContainer(self._settings))  # get list of all possible solutions to be filtered
-        self._current_poss = None  # initialize current possible solution
-        self._single_poss = False  # initialize single possible solution flag
+        self._poss_list = PatternsContainer(self._settings)  # get generator of all possible solutions (to be filtered)
+        self._poss_number = self._poss_list.all
 
-        self._get_next_poss()  # get first possible solution
+        self._current_poss = next(self._poss_list)  # get first possible solution
+        self._single_poss = (self._poss_number == 1)  # set the flag if there is only one possible solution
 
     @property
     def current_poss(self):
@@ -873,12 +884,12 @@ class MastermindSolverMode2:
     def poss_number(self):
         """ (MODE 2) Returns possible solutions number """
 
-        return len(self._poss_list)
+        return self._poss_number
 
     def calculate_poss(self, turn_pattern, turn_response):
         """ (MODE 2) Calculates the next possible solution after current turn """
 
-        old_number = self.poss_number
+        old_number = self._poss_number
 
         progress = Progress(
             text="Filtering patterns list...",
@@ -887,16 +898,18 @@ class MastermindSolverMode2:
 
         progress.start()
 
+        # filter the existing list
         # TODO: maybe remove items from list that don't meet condition?
-        self._poss_list = [  # filter the existing list
+        self._poss_list = [
             poss_pattern
             for poss_pattern in self._poss_list
             if progress.item(self._calculate_response(turn_pattern, poss_pattern) == turn_response)
         ]
+        self._poss_number = len(self._poss_list)
 
         progress.stop()
 
-        new_number = self.poss_number
+        new_number = self._poss_number
         print(
             "Number of possible solutions is now {new} of {old} (rejected {percent:.2f}% of patterns)."
             .format(
@@ -906,17 +919,13 @@ class MastermindSolverMode2:
             )
         )
 
-        self._get_next_poss()  # get next possible solution
-        return self._current_poss
+        self._single_poss = (self._poss_number == 1)  # set the flag if there is only one possible solution
 
-    def _get_next_poss(self):
-        """ (MODE 2) Saves next possible solution (if exists) """
-
-        number = self.poss_number  # get the possible solutions number
-        self._single_poss = (number == 1)  # set the flag if there is only one possible solution
-
-        if number:  # check if there is at least one possible solution
-            self._current_poss = self._poss_list[0]  # take first possible solution from the list
+        if self._poss_number:  # check if there is at least one possible solution
+            self._current_poss = Pattern(self._poss_list[0])  # take first possible solution from the list
+            # self._current_poss = Pattern(next(self._poss_list))  # take first possible solution from the list
             # TODO: maybe random value? Not always 0? - parameter
         else:
             self._current_poss = None
+
+        return self._current_poss
