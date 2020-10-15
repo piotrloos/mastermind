@@ -6,12 +6,13 @@
 ########################################
 
 from random import randrange
+from time import time
 
 
 class Progress:
     """ Displays progress (percentage) during long-taking operations """
 
-    def __init__(self, text, items_number):
+    def __init__(self, text, items_number, timing=True):
         """ Initializes Progress class object """
 
         if items_number < 1:
@@ -23,6 +24,10 @@ class Progress:
         self._threshold = self._portion  # (float) current threshold (start with 1%)
         self._threshold_int = int(round(self._threshold))  # (int) round the threshold to be compared with index
         self._text = text or ""  # (str) progress text to be displayed (if given)
+
+        self._timing = timing  # (bool) flag whether Progress should be timed
+        self._time_start = None
+        self._time_stop = None
 
     @staticmethod
     def _print(string):
@@ -64,6 +69,9 @@ class Progress:
     def start(self):
         """ Starts printing Progress """
 
+        if self._timing:
+            self._time_start = time()
+
         self._print_text_value(0)  # start with 0%
 
     def item(self, outer_value=None):
@@ -84,6 +92,12 @@ class Progress:
 
     def stop(self, text="Done!"):
         """ Stops printing Progress """
+
+        if self._timing:
+            self._time_stop = time()
+            text += " (took {seconds:.2f}s)".format(
+                seconds=self._time_stop-self._time_start,
+            )
 
         self._print_end_text(text)
 

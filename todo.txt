@@ -1,8 +1,6 @@
 # optymalizacja
 
-# TODO: optymalizacja grupowego filtrowania patternów
-# TODO: optymalizacja generacji listy patternów (generator zamiast gotowej listy)
-# TODO: optymalizacja tworzenia obiektu Pattern dopiero gdy jest potrzebny (przechowywanie tupli na liście)
+# TODO: optymalizacja grupowego filtrowania patternów (MODE 1 i MODE 2)
 
 # do zrobienia w najbliższym czasie:
 
@@ -17,6 +15,7 @@
 # TODO: poprawka bugu w Helperze - można wpisać gotowe rozwiązanie, a gra nie sprawdza czy jest ono możliwe
 # TODO: sprawdzenie czy wpisany pattern w Helperze może być rozwiązaniem i wyświetlenie tego
 # TODO: możliwość wpisania tylko "=response" i wtedy patternem jest next_poss
+# TODO: timing dla generatora w MODE 1
 
 # polecenia "shella":
 
