@@ -1,20 +1,22 @@
 # optymalizacja
 
 # TODO: optymalizacja grupowego filtrowania patternów (MODE 1 i MODE 2)
+# TODO: optymalizacja `calculate_response` (rozbicie na 2 metody)
 
 # do zrobienia w najbliższym czasie:
 
-# TODO: bug: Mode1Gen odpala się za każdym razem od nowa
 # TODO: timing dla generatora w MODE 1
+# TODO: sumaryczny czas potrzebny na znalezienie rozwiązania
 # TODO: Response dict -> namedtuple
+# TODO: turns_limit == 0 -> endless game
+# TODO: MODE1 - wyłączenie szukania drugiego patterna - parametr
+# TODO: MODE2 - możlwość brania dowolnego patternu z listy (nie tylko 0) - parametr
+
+# TODO: parametry wejściowe przy uruchamianiu gry
+# TODO: przenieść pętlę input do klasy
+# TODO: stworzenie pliku `readme.md`
 
 # TODO: klasa Generator dla MODE 2?
-# TODO: parametry wejściowe przy uruchamianiu gry
-# TODO: uporządkować kod w wielu miejscach
-# TODO:     przenieść pętlę input do klasy
-# TODO:     warunek końca gry
-
-# TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
 
 # polecenia "shella":
 
@@ -33,9 +35,6 @@
 
 # później, pomysły itp.:
 
-# TODO: MODE2 - możlwość brania dowolnego patternu z listy (nie tylko 0) - parametr
-# TODO: stworzenie pliku `readme.md`
-# TODO: MODE1 - wyłączenie szukania drugiego patterna - parametr
 # TODO: MODE1 - liczenie liczby możliwych patternów generatora
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
 # TODO: opcje: allow_duplicates, allow_blanks
@@ -45,6 +44,7 @@
 # TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
 # TODO:     wielowątkowość
 # TODO: poziom printowania komunikatów
+# TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
 # TODO: możliwość gry komputera samego ze sobą
 # TODO: testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
 # TODO: testy, testy, testy...

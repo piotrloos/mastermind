@@ -744,7 +744,7 @@ class MastermindSolverMode1:
             else:
                 self._generator.rename("Searching for first possible solution...")
                 try:
-                    self._current_possible_solution = next(self._generator)
+                    self._current_possible_solution = self._generator.next()
                 except StopIteration:
                     self._current_possible_solution = None  # no possible solution
                     self._second_possible_solution = None  # no second possible solution also
@@ -755,7 +755,7 @@ class MastermindSolverMode1:
         else:
             self._generator.rename("Searching for second possible solution...")
             try:
-                self._second_possible_solution = next(self._generator)
+                self._second_possible_solution = self._generator.next()
             except StopIteration:  # there is no second solution -> only one solution!
                 self._single_solution_flag = True  # set the flag
                 self._second_possible_solution = None  # no second possible solution
@@ -774,7 +774,7 @@ class MastermindSolverMode1Generator:
         self._check_possible_solution = check_possible_solution
 
         self._patterns_list = PatternsContainer(self._settings)  # get list of all possible solutions to be checked
-        self._patterns_index = 0  # initialize possible solutions index  # TODO: there is some bug with indexing
+        self._patterns_index = 0  # initialize possible solutions index
         self._patterns_number = len(self._patterns_list)
 
         self._progress = Progress(
@@ -783,17 +783,13 @@ class MastermindSolverMode1Generator:
             timing=False,
         )
 
-    def __iter__(self):
-        """ (MODE 1 Generator) Returns the generator (itself) """
-
-        return self
-
-    def __next__(self):
+    def next(self):
         """ (MODE 1 Generator) Returns the first possible solution based on all previous turns """
 
-        for pattern in self._patterns_list:
+        while self._patterns_index < self._patterns_number:  # index is between 0 and `patterns_number`-1
 
-            self._patterns_index += 1  # index is between 1 and `self._patterns_number`
+            pattern = self._patterns_list[self._patterns_index]  # get pattern from list
+            self._patterns_index += 1  # index is now between 1 and `patterns_number`
 
             if self._progress.item(self._check_possible_solution(pattern)):  # wrapped the long-taking operation
                 self._progress.stop(

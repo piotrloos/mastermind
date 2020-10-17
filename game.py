@@ -18,8 +18,8 @@ def main():
     print()
 
     mg = MastermindGame(
-        pegs_number=4,
         colors_number=6,
+        pegs_number=4,
         turns_limit=12,
     )
 

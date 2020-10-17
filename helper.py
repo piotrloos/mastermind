@@ -22,7 +22,7 @@ def main():
         pegs_number=6,
         shuffle_before=False,
         shuffle_after=False,
-        solver_mode=2,
+        solver_mode=1,
     )
 
     print()
