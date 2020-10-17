@@ -18,7 +18,7 @@ class Peg(int):
         return (
             "({peg})"
             .format(
-                peg=chr(super().__int__() + 97),  # TODO: implement different styles of formatting peg object
+                peg=chr(self + 97),  # TODO: implement different styles of formatting peg object
             )
         )
 
@@ -121,10 +121,6 @@ class PatternsContainer(list):
 
     # TODO:
     def print(self):
-        pass
-
-    # TODO:
-    def filter(self):
         pass
 
 
@@ -319,7 +315,7 @@ class SettingsContainer:
 
     @property
     def pegs_list(self):
-        """ Returns list of colors """
+        """ Returns list of pegs """
 
         return self._pegs_list
 
@@ -396,7 +392,7 @@ class Mastermind:
                 self._decode_peg(peg_char)
                 for peg_char in pattern_string.replace(" ", "").replace(",", "")  # clean string and divide into pegs
             )
-        except (TypeError, ValueError):
+        except (TypeError, ValueError, IndexError):
             return None
 
         if self._validate_pattern(pattern_tuple):
@@ -634,7 +630,7 @@ class MastermindHelper(MastermindSolver):
         if pattern is None or response is None:
             pattern, response = self._decode_pattern_response(pattern_response_string)
             if pattern is None:
-                raise ValueError("Given pattern is incorrect! Enter again.")
+                pattern = self._solver.current_possible_solution  # get `pattern` if user enters "=response" only
             if response is None:
                 raise ValueError("Given response is incorrect! Enter again.")
 
@@ -677,7 +673,13 @@ class MastermindSolverMode1:
         self._second_possible_solution = None
         self._single_solution_flag = False
 
-        self._get_next_poss()  # get first possible solution
+        self.calculate_possible_solution()  # get first possible solution
+
+    @property
+    def possible_solutions_number(self):
+        """ (MODE 1) Returns number of possible solutions """
+
+        raise NotImplementedError("It is impossible to calculate number of possible solutions in MODE 1!")
 
     @property
     def current_possible_solution(self):
@@ -691,39 +693,28 @@ class MastermindSolverMode1:
 
         return self._single_solution_flag
 
-    @property
-    def possible_solutions_number(self):
-        """ (MODE 1) Returns number of possible solutions """
+    def check_possible_solution(self, possible_solution):
+        """ (MODE 1) Checks if given possible solution can be a solution based on all previous turns """
 
-        raise NotImplementedError("It is impossible to calculate number of possible solutions in MODE 1!")
-
-    def _check_possible_solution(self, possible_solution):
-        """ (MODE 1) Checks if given possible solution still can be a solution based on all previous turns """
+        if possible_solution is None:
+            return False
 
         return all(
             self._calculate_response(turn.pattern, possible_solution) == turn.response
             for turn in self._turns
         )
 
-    def calculate_possible_solution(self, turn_pattern, turn_response):
+    def calculate_possible_solution(self, *_):
         """ (MODE 1) Calculates the next possible solution after current turn """
-
-        self._get_next_poss()  # get next possible solution
-        return self._current_possible_solution
-
-    def _get_next_poss(self):
-        """ (MODE 1) Saves next possible solution (if exists) """
 
         self._single_solution_flag = False  # reset the flag
 
         # TODO: change `if` criteria (especially when `_second_poss` will be disabled)
 
-        if self._current_possible_solution is not None \
-                and self._check_possible_solution(self._current_possible_solution):
+        if self.check_possible_solution(self._current_possible_solution):
             print("Previously found first possible solution still can be a first solution. Not changed.")
         else:
-            if self._second_possible_solution is not None \
-                    and self._check_possible_solution(self._second_possible_solution):
+            if self.check_possible_solution(self._second_possible_solution):
                 print("Previously found second possible solution still can be a solution. Saved as first.")
                 self._current_possible_solution = self._second_possible_solution
                 self._second_possible_solution = None
@@ -734,9 +725,9 @@ class MastermindSolverMode1:
                 except StopIteration:
                     self._current_possible_solution = None  # no possible solution
                     self._second_possible_solution = None  # no second possible solution also
-                    return
+                    return None
 
-        if self._second_possible_solution is not None and self._check_possible_solution(self._second_possible_solution):
+        if self.check_possible_solution(self._second_possible_solution):
             print("Previously found second possible solution still can be a second solution. Not changed.")
         else:
             self._generator.rename("Searching for second possible solution...")
@@ -745,6 +736,8 @@ class MastermindSolverMode1:
             except StopIteration:  # there is no second solution -> only one solution!
                 self._single_solution_flag = True  # set the flag
                 self._second_possible_solution = None  # no second possible solution
+
+        return self._current_possible_solution
 
 
 class MastermindSolverMode1Generator:
@@ -759,19 +752,17 @@ class MastermindSolverMode1Generator:
 
         self._patterns_list = PatternsContainer(self._settings)  # get list of all possible solutions to be checked
         self._patterns_index = 0  # initialize possible solutions index  # TODO: there is some bug with indexing
-        self._patterns_number = self._patterns_list.patterns_number
+        self._patterns_number = len(self._patterns_list)
 
         self._progress = Progress(
             text="",
-            items_number=self._patterns_list.patterns_number,
+            items_number=self._patterns_number,
             timing=False,
         )
 
-    def rename(self, text):
-        """ (MODE 1 Generator) Changes Progress object display text """
-        self._progress.rename(text)
+    def __iter__(self):
+        """ (MODE 1 Generator) Returns the generator (itself) """
 
-    def __iter__(self):  # TODO: is it necessary?
         return self
 
     def __next__(self):
@@ -804,6 +795,11 @@ class MastermindSolverMode1Generator:
 
         raise StopIteration
 
+    def rename(self, text):
+        """ (MODE 1 Generator) Changes Progress object display text """
+
+        self._progress.rename(text)
+
 
 class MastermindSolverMode2:
     """ Contains Mastermind Solver MODE 2 (patterns list filtering mode) """
@@ -829,10 +825,10 @@ class MastermindSolverMode2:
             self._current_possible_solution = None
 
     @property
-    def patterns_number(self):
+    def possible_solutions_number(self):
         """ (MODE 2) Returns number of possible solutions """
 
-        return self._patterns_number
+        return self._possible_solutions_number
 
     @property
     def current_possible_solution(self):
@@ -859,12 +855,9 @@ class MastermindSolverMode2:
 
         progress.start()
 
-        # filter the existing list
-        # TODO: maybe remove items from list that don't meet condition?
-        self._patterns_list = [
+        self._possible_solutions_list = [
             possible_solution
-            for possible_solution in self._patterns_list
-            # TODO: ^ for first run it's PatternContainer object, then it's just list
+            for possible_solution in self._possible_solutions_list
             if progress.item(self._calculate_response(turn_pattern, possible_solution) == turn_response)
         ]
 

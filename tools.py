@@ -95,7 +95,7 @@ class Progress:
 
         if self._timing:
             self._time_stop = time()
-            text += " (took {seconds:.2f}s)".format(
+            text += " (took {seconds:.3f}s)".format(
                 seconds=self._time_stop-self._time_start,
             )
 

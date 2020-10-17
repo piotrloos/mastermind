@@ -19,9 +19,9 @@ def main():
 
     ms = MastermindSolver(
         colors_number=8,
-        pegs_number=7,
+        pegs_number=6,
         shuffle_before=False,
-        shuffle_after=True,
+        shuffle_after=False,
         solver_mode=2,
     )
 

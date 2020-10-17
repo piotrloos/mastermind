@@ -10,7 +10,6 @@
 # TODO: uporządkować kod w wielu miejscach
 # TODO:     przenieść pętlę input do klasy
 # TODO:     warunek końca gry
-# TODO:     `next_poss` itp.
 
 # TODO: poprawka bugu w Helperze - można wpisać gotowe rozwiązanie, a gra nie sprawdza czy jest ono możliwe
 # TODO: sprawdzenie czy wpisany pattern w Helperze może być rozwiązaniem i wyświetlenie tego
@@ -37,7 +36,7 @@
 # TODO: MODE2 - możlwość brania dowolnego patternu z listy (nie tylko 0) - parametr
 # TODO: stworzenie pliku `readme.md`
 # TODO: MODE1 - wyłączenie szukania drugiego patterna - parametr
-# TODO: MODE1 - liczenie możliwych patternów generatora
+# TODO: MODE1 - liczenie liczby możliwych patternów generatora
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
 # TODO: opcje: allow_duplicates, allow_blanks
 # TODO: formatowanie patternów (Colorama)
