@@ -115,10 +115,6 @@ class PatternsContainer(list):
                 )
             )
 
-    @property
-    def patterns_number(self):
-        return self.__len__()
-
     # TODO:
     def print(self):
         pass
@@ -471,20 +467,6 @@ class Mastermind:
         # to calculate `white_pegs` it's needed to subtract `black_pegs` from `black_white_pegs`
         return Response(black_pegs, black_white_pegs - black_pegs, self._settings.pegs_number)
 
-    def _check_game_end(self, response):
-        """ Checks if the game should end (after current turn) """
-
-        # check if all response pegs are black  # TODO: response from Mastermind object?
-        if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
-            self._game_status = 1  # solution is found
-            return True
-
-        if self._turns.turns_index >= self._settings.turns_limit:
-            self._game_status = 2  # reached turns limit
-            return True
-
-        return False
-
 
 class MastermindGame(Mastermind):
     """ Contains Mastermind Game mode, inherits from Mastermind class """
@@ -511,7 +493,7 @@ class MastermindGame(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{index:>{width}d}. Enter pattern: "
+            "{index:>{width}d}. Enter `pattern`: "
             .format(
                 index=self._turns.turns_index + 1,
                 width=self._settings.turns_width,
@@ -527,13 +509,26 @@ class MastermindGame(Mastermind):
         if pattern is None:
             pattern = self._decode_pattern(pattern_string)
             if pattern is None:
-                raise ValueError("Given pattern is incorrect! Enter again.")
+                raise ValueError("Given `pattern` is incorrect! Enter again.")
 
         response = self.calculate_response(pattern, self._solution)  # TODO: save response to class object?
 
+        # TODO: use Solver (MODE1) `check_possible_solution` method here
+        #  to print info if given pattern could be the solution (like in Helper)
+
         self._turns.add_turn(pattern, response)
         self._turns.print_turns()
-        self._check_game_end(response)
+
+        # check game end
+
+        # check if all response pegs are black
+        if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
+            self._game_status = 1  # solution is found
+            return
+
+        if self._turns.turns_index >= self._settings.turns_limit:
+            self._game_status = 2  # reached turns limit
+            return
 
 
 class MastermindSolver(Mastermind):
@@ -565,7 +560,7 @@ class MastermindSolver(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{index:>{width}d}. Enter response for pattern {pattern}: "
+            "{index:>{width}d}. Enter `response` for pattern {pattern}: "
             .format(
                 index=self._turns.turns_index + 1,
                 width=self._settings.turns_width,
@@ -582,23 +577,33 @@ class MastermindSolver(Mastermind):
         if response is None:
             response = self._decode_response(response_string)
             if response is None:
-                raise ValueError("Given response is incorrect! Enter again.")
+                raise ValueError("Given `response` is incorrect! Enter again.")
 
-        current_poss = self._solver.current_possible_solution
+        pattern = self._solver.current_possible_solution
 
-        self._turns.add_turn(current_poss, response)
+        self._turns.add_turn(pattern, response)
         self._turns.print_turns()
 
-        if self._check_game_end(response):
-            if self._game_status == 1:  # if the solution is found
-                self._solution = current_poss  # save current possible solution as proper solution
-        else:
-            next_poss = self._solver.calculate_possible_solution(current_poss, response)
-            if next_poss is None:
-                self._game_status = 3  # no possible solution found
+        # check game end
 
-            if self._solver.single_solution_flag and self.game_status == 0:
-                print("Now I know there is only one possible solution!")
+        # check if all response pegs are black
+        if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
+            self._solution = pattern  # save current pattern as proper solution
+            self._game_status = 1  # solution is found
+            return
+
+        if self._turns.turns_index >= self._settings.turns_limit:
+            self._game_status = 2  # reached turns limit
+            return
+
+        if self._solver.calculate_possible_solution(pattern, response) is None:
+            self._game_status = 3  # no possible solution found
+            return
+
+        # game is still active
+
+        if self._solver.single_solution_flag:
+            print("Now I know there is only one possible solution!")
 
 
 class MastermindHelper(MastermindSolver):
@@ -614,7 +619,7 @@ class MastermindHelper(MastermindSolver):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{index:>{width}d}. Enter pattern and it's response: "
+            "{index:>{width}d}. Enter `pattern=response`: "
             .format(
                 index=self._turns.turns_index + 1,
                 width=self._settings.turns_width,
@@ -632,28 +637,47 @@ class MastermindHelper(MastermindSolver):
             if pattern is None:
                 pattern = self._solver.current_possible_solution  # get `pattern` if user enters "=response" only
             if response is None:
-                raise ValueError("Given response is incorrect! Enter again.")
+                raise ValueError("Given `pattern=response` is incorrect! Enter again.")
+
+        print()
+        if self._solver.check_possible_solution(pattern):
+            print("Nice try. Given pattern could be the solution!")  # TODO: ...and sometimes "was the solution!"
+        else:
+            print("Unfortunately given pattern couldn't be the solution!")
 
         self._turns.add_turn(pattern, response)
         self._turns.print_turns()
 
-        if self._check_game_end(response):
-            if self._game_status == 1:  # if the solution is found
-                self._solution = pattern  # save current pattern as proper solution
-        else:
-            next_poss = self._solver.calculate_possible_solution(pattern, response)
-            if next_poss is None:
-                self._game_status = 3  # no possible solution found
-            else:
-                print(
-                    "One of the possible solution is: {pattern}"
-                    .format(
-                        pattern=next_poss,
-                    )
-                )
+        # check game end
 
-            if self._solver.single_solution_flag and self.game_status == 0:
-                print("Now I know there is only one possible solution!")
+        # check if all response pegs are black
+        if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
+            if self._solver.check_possible_solution(pattern):
+                self._solution = pattern  # save current pattern as proper solution
+                self._game_status = 1  # solution is found
+            else:
+                self._game_status = 3  # no possible solution found
+            return
+
+        if self._turns.turns_index >= self._settings.turns_limit:
+            self._game_status = 2  # reached turns limit
+            return
+
+        if self._solver.calculate_possible_solution(pattern, response) is None:
+            self._game_status = 3  # no possible solution found
+            return
+
+        # game is still active
+
+        print(
+            "One of the possible solution is {pattern}."
+            .format(
+                pattern=self._solver.current_possible_solution,
+            )
+        )
+
+        if self._solver.single_solution_flag:
+            print("Now I know there is only one possible solution!")
 
 
 class MastermindSolverMode1:
@@ -667,8 +691,7 @@ class MastermindSolverMode1:
         self._turns = turns
         self._calculate_response = calculate_response
 
-        # initialize possible solutions generator
-        self._generator = MastermindSolverMode1Generator(self._settings, self._check_possible_solution)
+        self._generator = MastermindSolverMode1Generator(self._settings, self.check_possible_solution)
         self._current_possible_solution = None
         self._second_possible_solution = None
         self._single_solution_flag = False
@@ -812,16 +835,20 @@ class MastermindSolverMode2:
         self._turns = turns
         self._calculate_response = calculate_response
 
-        # TODO: filtering inside object (as method), not generated list from this object
-        self._patterns_list = PatternsContainer(self._settings)  # get list of all possible solutions (to be filtered)
-        # TODO: ^ for now it's PatternsContainer object, later it's just list
-        self._patterns_number = self._patterns_list.patterns_number
-        self._single_solution_flag = (self._patterns_number == 1)  # set the flag if there is only one possible solution
+        # TODO: for first time it's PatternsContainer object, later it's just list
+        self._possible_solutions_list = PatternsContainer(self._settings)  # get list of all possible solutions
+        self._analyze_the_list()
 
-        if self._patterns_number:
-            self._current_possible_solution = self._patterns_list[0]  # get first possible solution from the list
+    def _analyze_the_list(self):
+        """ (MODE 2) Gets the possible solution, gets the possible solutions number and sets the flag """
+
+        self._possible_solutions_number = len(self._possible_solutions_list)
+        self._single_solution_flag = (self._possible_solutions_number == 1)
+
+        try:
+            self._current_possible_solution = self._possible_solutions_list[0]
             # TODO: maybe random value? Not always 0? - parameter
-        else:
+        except IndexError:
             self._current_possible_solution = None
 
     @property
@@ -842,14 +869,19 @@ class MastermindSolverMode2:
 
         return self._single_solution_flag
 
-    def calculate_possible_solution(self, turn_pattern, turn_response):
+    def check_possible_solution(self, possible_solution):
+        """ (MODE 2) Checks if given possible solution can be a solution based on all previous turns """
+
+        return possible_solution in self._possible_solutions_list
+
+    def calculate_possible_solution(self, turn_pattern, turn_response, *_):
         """ (MODE 2) Calculates the next possible solution after current turn """
 
-        old_patterns_number = self._patterns_number
+        patterns_old_number = self._possible_solutions_number
 
         progress = Progress(
             text="Filtering patterns list...",
-            items_number=old_patterns_number,
+            items_number=patterns_old_number,
             timing=True,
         )
 
@@ -863,22 +895,15 @@ class MastermindSolverMode2:
 
         progress.stop()
 
-        self._patterns_number = len(self._patterns_list)
-        self._single_solution_flag = (self._patterns_number == 1)
+        self._analyze_the_list()
 
-        if self._patterns_number:  # check if there is at least one possible solution
-            self._current_possible_solution = self._patterns_list[0]  # get first possible solution from the list
-            # TODO: maybe random value? Not always 0? - parameter
-        else:
-            self._current_possible_solution = None
-
-        new_patterns_number = self._patterns_number
+        patterns_new_number = self._possible_solutions_number
         print(
             "Number of possible solutions is now {new} of {old} (rejected {percent:.2f}% of patterns)."
             .format(
-                new=new_patterns_number,
-                old=old_patterns_number,
-                percent=100 * (1 - new_patterns_number / old_patterns_number),
+                new=patterns_new_number,
+                old=patterns_old_number,
+                percent=100 * (1 - patterns_new_number / patterns_old_number),
             )
         )
 

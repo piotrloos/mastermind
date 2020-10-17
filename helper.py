@@ -74,14 +74,14 @@ def main():
             )
         )
         print(
-            "You found the solution in {turns}"
+            "We found the solution in {turns}"
             .format(
                 turns=mh.turns_counter,
             ),
             "turn." if mh.turns_counter == 1 else "turns."
         )
     elif mh.game_status == 2:
-        print("You reached turns limit. Game over!")
+        print("We reached turns limit. Game over!")
     elif mh.game_status == 3:
         print("Sorry. No possible solution found!")
 

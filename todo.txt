@@ -4,17 +4,17 @@
 
 # do zrobienia w najbliższym czasie:
 
+# TODO: bug: Mode1Gen odpala się za każdym razem od nowa
+# TODO: timing dla generatora w MODE 1
+# TODO: Response dict -> namedtuple
+
 # TODO: klasa Generator dla MODE 2?
 # TODO: parametry wejściowe przy uruchamianiu gry
-# TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
 # TODO: uporządkować kod w wielu miejscach
 # TODO:     przenieść pętlę input do klasy
 # TODO:     warunek końca gry
 
-# TODO: poprawka bugu w Helperze - można wpisać gotowe rozwiązanie, a gra nie sprawdza czy jest ono możliwe
-# TODO: sprawdzenie czy wpisany pattern w Helperze może być rozwiązaniem i wyświetlenie tego
-# TODO: możliwość wpisania tylko "=response" i wtedy patternem jest next_poss
-# TODO: timing dla generatora w MODE 1
+# TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
 
 # polecenia "shella":
 
