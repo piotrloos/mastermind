@@ -120,71 +120,56 @@ class PatternsContainer(list):
         pass
 
 
-class Response(dict):  # TODO: namedtuple
+class Response(tuple):
     """ Class for one response """
-
-    def __init__(self, black_pegs, white_pegs, pegs_number):
-        super().__init__()
-        self['black_pegs'] = black_pegs
-        self['white_pegs'] = white_pegs
-        self['pegs_number'] = pegs_number
 
     def __str__(self):
         return (
             "[{blacks}{whites}{dots}] ({black_number}, {white_number})"
             .format(
-                blacks="●" * self['black_pegs'],
-                whites="○" * self['white_pegs'],
-                dots="∙" * (self['pegs_number'] - self['black_pegs'] - self['white_pegs']),
-                black_number=self['black_pegs'],
-                white_number=self['white_pegs'],
+                blacks="●" * self[0],
+                whites="○" * self[1],
+                dots="∙" * (self[2] - self[0] - self[1]),
+                black_number=self[0],
+                white_number=self[1],
             )
         )
 
     @property
     def black_pegs(self):
-        return self['black_pegs']
+        return self[0]
 
     @property
     def white_pegs(self):
-        return self['white_pegs']
+        return self[1]
 
 
-class Turn(dict):  # TODO: namedtuple
+class Turn(tuple):
     """ Class for one game turn """
-
-    def __init__(self, index, turns_width, pattern, response):
-        super().__init__()
-        self['index'] = index
-        self['turns_width'] = turns_width
-        self['pattern'] = pattern
-        self['response'] = response
 
     def __str__(self):
         return (
-            "{index:>{turns_width}d}. {pattern} = {response}"
+            "{turn_index:>{turn_width}d}. {pattern} = {response}"
             .format(
-                index=self['index'],
-                turns_width=self['turns_width'],
-                pattern=self['pattern'],
-                response=self['response'],
+                turn_index=self[0],
+                turn_width=self[1],
+                pattern=self[2],
+                response=self[3],
             )
         )
 
     @property
-    def index(self):
-        return self['index']
-
-    @property
     def pattern(self):
-        return self['pattern']
+        return self[2]
 
     @property
     def response(self):
-        return self['response']
+        return self[3]
 
 
 class TurnsContainer(list):
+    """ CLass for list of all turns in the game """
+
     def __init__(self, turns_width):
         super().__init__()
         self._turns_width = turns_width
@@ -192,7 +177,7 @@ class TurnsContainer(list):
 
     def add_turn(self, pattern, response):
         self._turns_index += 1
-        self.append(Turn(self._turns_index, self._turns_width, pattern, response))
+        self.append(Turn((self._turns_index, self._turns_width, pattern, response)))
 
     def print_turns(self):
         for turn in self:
@@ -204,6 +189,8 @@ class TurnsContainer(list):
 
 
 class SettingsContainer:
+    """ Class for all the game settings """
+
     def __init__(self,
                  *args,
                  colors_number=COLORS_NUMBER,
@@ -408,7 +395,7 @@ class Mastermind:
             return None
 
         if self._validate_response(response_tuple):
-            return Response(*response_tuple, self._settings.pegs_number)
+            return Response((*response_tuple, self._settings.pegs_number))  # black_pegs, white_pegs, pegs_number
         else:
             return None
 
@@ -448,24 +435,32 @@ class Mastermind:
             )
         )
 
-    def calculate_response(self, pattern1, pattern2):
-        """ Returns calculated Response object for given pattern related to other pattern """
+    @staticmethod
+    def _calculate_black_pegs(pattern1, pattern2):
+        """ Returns `black_pegs` number (how many pegs are in proper color and in proper location) """
 
-        # `black_pegs` defines how many pegs are in proper color and in proper location
-        black_pegs = sum(
+        return sum(
             int(pattern1_peg == pattern2_peg)
             for pattern1_peg, pattern2_peg in zip(pattern1, pattern2)
         )
 
-        # `black_white_pegs` defines how many pegs are in proper color regardless to location
-        black_white_pegs = sum(
+    def _calculate_black_white_pegs(self, pattern1, pattern2):
+        """ Returns `black_white_pegs` number (how many pegs are in proper color regardless to location) """
+
+        return sum(
             min(pattern1.count(pattern_peg), pattern2.count(pattern_peg))
             for pattern_peg in self._settings.pegs_list
         )
 
+    def _calculate_response(self, pattern1, pattern2):
+        """ Returns calculated Response object for given pattern related to other pattern """
+
+        black_pegs = self._calculate_black_pegs(pattern1, pattern2)
+        black_white_pegs = self._calculate_black_white_pegs(pattern1, pattern2)
+
         # `white_pegs` defines how many pegs are in proper color and wrong location
         # to calculate `white_pegs` it's needed to subtract `black_pegs` from `black_white_pegs`
-        return Response(black_pegs, black_white_pegs - black_pegs, self._settings.pegs_number)
+        return Response((black_pegs, black_white_pegs - black_pegs, self._settings.pegs_number))
 
 
 class MastermindGame(Mastermind):
@@ -511,7 +506,7 @@ class MastermindGame(Mastermind):
             if pattern is None:
                 raise ValueError("Given `pattern` is incorrect! Enter again.")
 
-        response = self.calculate_response(pattern, self._solution)  # TODO: save response to class object?
+        response = self._calculate_response(pattern, self._solution)
 
         # TODO: use Solver (MODE1) `check_possible_solution` method here
         #  to print info if given pattern could be the solution (like in Helper)
@@ -543,9 +538,19 @@ class MastermindSolver(Mastermind):
 
         # check if given `solver_mode` is correct
         if self._settings.solver_mode == 1:  # patterns checking generator mode
-            self._solver = MastermindSolverMode1(self._settings, self._turns, self.calculate_response)
+            self._solver = MastermindSolverMode1(
+                self._settings,
+                self._turns,
+                self._calculate_black_pegs,
+                self._calculate_black_white_pegs,
+            )
         elif self._settings.solver_mode == 2:  # patterns list filtering mode
-            self._solver = MastermindSolverMode2(self._settings, self._turns, self.calculate_response)
+            self._solver = MastermindSolverMode2(
+                self._settings,
+                self._turns,
+                self._calculate_black_pegs,
+                self._calculate_black_white_pegs,
+            )
         else:
             self._solver = None
 
@@ -683,13 +688,14 @@ class MastermindHelper(MastermindSolver):
 class MastermindSolverMode1:
     """ Contains Mastermind Solver MODE 1 (patterns checking generator mode) """
 
-    def __init__(self, settings, turns, calculate_response):
+    def __init__(self, settings, turns, calculate_black_pegs, calculate_black_white_pegs):
         """ (MODE 1) Initializes Mastermind Solver MODE 1 class object """
 
         # TODO: temporary given labels
         self._settings = settings
         self._turns = turns
-        self._calculate_response = calculate_response
+        self._calculate_black_pegs = calculate_black_pegs
+        self._calculate_black_white_pegs = calculate_black_white_pegs
 
         self._generator = MastermindSolverMode1Generator(self._settings, self.check_possible_solution)
         self._current_possible_solution = None
@@ -722,8 +728,13 @@ class MastermindSolverMode1:
         if possible_solution is None:
             return False
 
+        # TODO: try to speed up these calculations
         return all(
-            self._calculate_response(turn.pattern, possible_solution) == turn.response
+            self._calculate_black_pegs(turn.pattern, possible_solution) ==
+            turn.response.black_pegs
+            and
+            self._calculate_black_white_pegs(turn.pattern, possible_solution) ==
+            turn.response.black_pegs + turn.response.white_pegs
             for turn in self._turns
         )
 
@@ -823,13 +834,14 @@ class MastermindSolverMode1Generator:
 class MastermindSolverMode2:
     """ Contains Mastermind Solver MODE 2 (patterns list filtering mode) """
 
-    def __init__(self, settings, turns, calculate_response):
+    def __init__(self, settings, turns, calculate_black_pegs, calculate_black_white_pegs):
         """ (MODE 2) Initializes Mastermind Solver MODE 2 class object """
 
         # TODO: temporary given labels
         self._settings = settings
         self._turns = turns
-        self._calculate_response = calculate_response
+        self._calculate_black_pegs = calculate_black_pegs
+        self._calculate_black_white_pegs = calculate_black_white_pegs
 
         # TODO: for first time it's PatternsContainer object, later it's just list
         self._possible_solutions_list = PatternsContainer(self._settings)  # get list of all possible solutions
@@ -883,10 +895,17 @@ class MastermindSolverMode2:
 
         progress.start()
 
+        # TODO: try to speed up these calculations
         self._possible_solutions_list = [
             possible_solution
             for possible_solution in self._possible_solutions_list
-            if progress.item(self._calculate_response(turn_pattern, possible_solution) == turn_response)
+            if progress.item(
+                self._calculate_black_pegs(turn_pattern, possible_solution) ==
+                turn_response.black_pegs
+                and
+                self._calculate_black_white_pegs(turn_pattern, possible_solution) ==
+                turn_response.black_pegs + turn_response.white_pegs
+            )
         ]
 
         progress.stop()

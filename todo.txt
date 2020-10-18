@@ -1,13 +1,11 @@
 # optymalizacja
 
 # TODO: optymalizacja grupowego filtrowania patternów (MODE 1 i MODE 2)
-# TODO: optymalizacja `calculate_response` (rozbicie na 2 metody)
 
 # do zrobienia w najbliższym czasie:
 
-# TODO: timing dla generatora w MODE 1
-# TODO: sumaryczny czas potrzebny na znalezienie rozwiązania
-# TODO: Response dict -> namedtuple
+# TODO: timing dla generatora w MODE 1 (progress.pause)
+# TODO: sumaryczny czas potrzebny na znalezienie rozwiązania (progress.elapsed_time)
 # TODO: turns_limit == 0 -> endless game
 # TODO: MODE1 - wyłączenie szukania drugiego patterna - parametr
 # TODO: MODE2 - możlwość brania dowolnego patternu z listy (nie tylko 0) - parametr
