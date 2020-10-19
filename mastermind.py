@@ -199,6 +199,7 @@ class SettingsContainer:
                  shuffle_before=SHUFFLE_BEFORE,
                  shuffle_after=SHUFFLE_AFTER,
                  solver_mode=SOLVER_MODE,
+                 mode2_random_pattern=False,
                  **kwargs,
                  ):
 
@@ -228,6 +229,7 @@ class SettingsContainer:
 
         self._shuffle_before = bool(shuffle_before)
         self._shuffle_after = bool(shuffle_after)
+        self._mode2_random_pattern = bool(mode2_random_pattern)
 
         self._pegs_list = PegsContainer(self._colors_number)
 
@@ -295,6 +297,12 @@ class SettingsContainer:
         """ Returns solver mode number """
 
         return self._solver_mode
+
+    @property
+    def mode2_random_pattern(self):
+        """ Returns `random_pattern` setting for Solver MODE 2 """
+
+        return self._mode2_random_pattern
 
     @property
     def pegs_list(self):
@@ -573,6 +581,7 @@ class MastermindSolver(Mastermind):
             )
         )
 
+    # TODO: refactor with `helper_take_turn`
     def solver_take_turn(self, response_string, response=None):
         """ Takes turn as CodeBreaker (with `response` or `response_string` from CodeMaker) """
 
@@ -584,6 +593,7 @@ class MastermindSolver(Mastermind):
             if response is None:
                 raise ValueError("Given `response` is incorrect! Enter again.")
 
+        print()
         pattern = self._solver.current_possible_solution
 
         self._turns.add_turn(pattern, response)
@@ -631,6 +641,7 @@ class MastermindHelper(MastermindSolver):
             )
         )
 
+    # TODO: refactor with `solver_take_turn`
     def helper_take_turn(self, pattern_response_string, pattern=None, response=None):
         """ Takes turn in Helper mode (with `pattern` and `response` from human) """
 
@@ -853,9 +864,13 @@ class MastermindSolverMode2:
         self._possible_solutions_number = len(self._possible_solutions_list)
         self._single_solution_flag = (self._possible_solutions_number == 1)
 
+        if self._settings.mode2_random_pattern:
+            index = randrange(self._possible_solutions_number)
+        else:
+            index = 0
+
         try:
-            self._current_possible_solution = self._possible_solutions_list[0]
-            # TODO: maybe random value? Not always 0? - parameter
+            self._current_possible_solution = self._possible_solutions_list[index]
         except IndexError:
             self._current_possible_solution = None
 
