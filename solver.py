@@ -23,7 +23,8 @@ def main():
         shuffle_before=False,
         shuffle_after=False,
         solver_mode=1,
-        mode1_second_solution=False,
+        progress_timing=True,
+        mode1_second_solution=True,
         mode2_random_pattern=False,
     )
 

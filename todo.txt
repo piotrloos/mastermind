@@ -1,19 +1,20 @@
-# optymalizacja
-
-# TODO: optymalizacja grupowego filtrowania patternów (MODE 1 i MODE 2)
-
 # do zrobienia w najbliższym czasie:
 
 # TODO: propozycja patterna w helperze przez pierwszym ruchem
-# TODO: timing dla generatora w MODE 1 (progress.pause)
-# TODO: sumaryczny czas potrzebny na znalezienie rozwiązania (progress.elapsed_time)
+# TODO: sumaryczny czas potrzebny na znalezienie rozwiązania (solver.elapsed_time)
 # TODO: turns_limit == 0 -> endless game
 
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: przenieść pętlę input do klasy
+# TODO: uruchamianie gry z podanym obiektem Settings
+# TODO: porozdzielanie klas do różnych plików
 # TODO: stworzenie pliku `readme.md`
 
 # TODO: klasa Generator dla MODE 2?
+
+# optymalizacja
+
+# TODO: optymalizacja grupowego filtrowania patternów (MODE 1 i MODE 2)
 
 # polecenia "shella":
 
@@ -32,7 +33,7 @@
 
 # później, pomysły itp.:
 
-# TODO: MODE1 - liczenie liczby możliwych patternów generatora
+# TODO: MODE1 - liczenie liczby możliwych patternów generatora (kopiowanie generatora wraz ze stanem)
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
 # TODO: opcje: allow_duplicates, allow_blanks
 # TODO: formatowanie patternów (Colorama)
