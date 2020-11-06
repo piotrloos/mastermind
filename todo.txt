@@ -4,10 +4,10 @@
 
 # do zrobienia w najbliższym czasie:
 
+# TODO: propozycja patterna w helperze przez pierwszym ruchem
 # TODO: timing dla generatora w MODE 1 (progress.pause)
 # TODO: sumaryczny czas potrzebny na znalezienie rozwiązania (progress.elapsed_time)
 # TODO: turns_limit == 0 -> endless game
-# TODO: MODE1 - wyłączenie szukania drugiego patterna - parametr
 
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: przenieść pętlę input do klasy

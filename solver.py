@@ -18,12 +18,13 @@ def main():
     print()
 
     ms = MastermindSolver(
-        colors_number=7,
-        pegs_number=8,
+        colors_number=8,
+        pegs_number=6,
         shuffle_before=False,
         shuffle_after=False,
-        solver_mode=2,
-        mode2_random_pattern=True,
+        solver_mode=1,
+        mode1_second_solution=False,
+        mode2_random_pattern=False,
     )
 
     print()

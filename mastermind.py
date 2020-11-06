@@ -199,6 +199,7 @@ class SettingsContainer:
                  shuffle_before=SHUFFLE_BEFORE,
                  shuffle_after=SHUFFLE_AFTER,
                  solver_mode=SOLVER_MODE,
+                 mode1_second_solution=True,
                  mode2_random_pattern=False,
                  **kwargs,
                  ):
@@ -229,6 +230,7 @@ class SettingsContainer:
 
         self._shuffle_before = bool(shuffle_before)
         self._shuffle_after = bool(shuffle_after)
+        self._mode1_second_solution = bool(mode1_second_solution)
         self._mode2_random_pattern = bool(mode2_random_pattern)
 
         self._pegs_list = PegsContainer(self._colors_number)
@@ -297,6 +299,12 @@ class SettingsContainer:
         """ Returns solver mode number """
 
         return self._solver_mode
+
+    @property
+    def mode1_second_solution(self):
+        """ Returns `second_solution` setting for Solver MODE 1 """
+
+        return self._mode1_second_solution
 
     @property
     def mode2_random_pattern(self):
@@ -544,23 +552,17 @@ class MastermindSolver(Mastermind):
 
         # TODO: new flag needed: `self._first_turn`
 
-        # check if given `solver_mode` is correct
-        if self._settings.solver_mode == 1:  # patterns checking generator mode
-            self._solver = MastermindSolverMode1(
-                self._settings,
-                self._turns,
-                self._calculate_black_pegs,
-                self._calculate_black_white_pegs,
-            )
-        elif self._settings.solver_mode == 2:  # patterns list filtering mode
-            self._solver = MastermindSolverMode2(
-                self._settings,
-                self._turns,
-                self._calculate_black_pegs,
-                self._calculate_black_white_pegs,
-            )
-        else:
-            self._solver = None
+        solvers = {
+            1: MastermindSolverMode1,  # patterns checking generator mode
+            2: MastermindSolverMode2,  # patterns list filtering mode
+        }
+
+        self._solver = solvers[self._settings.solver_mode](
+            self._settings,
+            self._turns,
+            self._calculate_black_pegs,
+            self._calculate_black_white_pegs,
+        )
 
     @property
     def possible_solutions_number(self):
@@ -754,12 +756,10 @@ class MastermindSolverMode1:
 
         self._single_solution_flag = False  # reset the flag
 
-        # TODO: change `if` criteria (especially when `_second_poss` will be disabled)
-
         if self.check_possible_solution(self._current_possible_solution):
             print("Previously found first possible solution still can be a first solution. Not changed.")
         else:
-            if self.check_possible_solution(self._second_possible_solution):
+            if self._settings.mode1_second_solution and self.check_possible_solution(self._second_possible_solution):
                 print("Previously found second possible solution still can be a solution. Saved as first.")
                 self._current_possible_solution = self._second_possible_solution
                 self._second_possible_solution = None
@@ -772,15 +772,16 @@ class MastermindSolverMode1:
                     self._second_possible_solution = None  # no second possible solution also
                     return None
 
-        if self.check_possible_solution(self._second_possible_solution):
-            print("Previously found second possible solution still can be a second solution. Not changed.")
-        else:
-            self._generator.rename("Searching for second possible solution...")
-            try:
-                self._second_possible_solution = self._generator.next()
-            except StopIteration:  # there is no second solution -> only one solution!
-                self._single_solution_flag = True  # set the flag
-                self._second_possible_solution = None  # no second possible solution
+        if self._settings.mode1_second_solution:
+            if self.check_possible_solution(self._second_possible_solution):
+                print("Previously found second possible solution still can be a second solution. Not changed.")
+            else:
+                self._generator.rename("Searching for second possible solution...")
+                try:
+                    self._second_possible_solution = self._generator.next()
+                except StopIteration:  # there is no second solution -> only one solution!
+                    self._second_possible_solution = None  # no second possible solution
+                    self._single_solution_flag = True  # set the flag
 
         return self._current_possible_solution
 
