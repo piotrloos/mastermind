@@ -34,7 +34,7 @@ def main():
     print(
         "You are the CodeBreaker and you have {turns}"
         .format(
-            turns=mg.settings.turns_limit,
+            turns=mg.settings.turns_limit if mg.settings.turns_limit else "unlimited",
         ),
         "turn" if mg.settings.turns_limit == 1 else "turns",
         "to guess the solution pattern."

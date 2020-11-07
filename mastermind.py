@@ -149,35 +149,33 @@ class Turn(tuple):
 
     def __str__(self):
         return (
-            "{turn_index:>{turn_width}d}. {pattern} = {response}"
+            "{turn_index:>3d}. {pattern} => {response}"
             .format(
                 turn_index=self[0],
-                turn_width=self[1],
-                pattern=self[2],
-                response=self[3],
+                pattern=self[1],
+                response=self[2],
             )
         )
 
     @property
     def pattern(self):
-        return self[2]
+        return self[1]
 
     @property
     def response(self):
-        return self[3]
+        return self[2]
 
 
 class TurnsContainer(list):
     """ CLass for list of all turns in the game """
 
-    def __init__(self, turns_width):
+    def __init__(self):
         super().__init__()
-        self._turns_width = turns_width
         self._turns_index = 0
 
     def add_turn(self, pattern, response):
         self._turns_index += 1
-        self.append(Turn((self._turns_index, self._turns_width, pattern, response)))
+        self.append(Turn((self._turns_index, pattern, response)))
 
     def print_turns(self):
         for turn in self:
@@ -199,9 +197,9 @@ class SettingsContainer:
                  shuffle_before=SHUFFLE_BEFORE,
                  shuffle_after=SHUFFLE_AFTER,
                  solver_mode=SOLVER_MODE,
-                 progress_timing=True,
-                 mode1_second_solution=True,
-                 mode2_random_pattern=False,
+                 progress_timing=PROGRESS_TIMING,
+                 mode1_second_solution=MODE1_SECOND_SOLUTION,
+                 mode2_random_pattern=MODE2_RANDOM_PATTERN,
                  **kwargs,
                  ):
 
@@ -218,7 +216,7 @@ class SettingsContainer:
             raise ValueError("Incorrect number of pegs.")
 
         # check if given `turns_limit` number is correct
-        if turns_limit in range(1, TURNS_LIMIT_MAX + 1):
+        if turns_limit in range(0, TURNS_LIMIT_MAX + 1):  # turns_limit = 0 means unlimited turns
             self._turns_limit = turns_limit
         else:
             raise ValueError("Incorrect turns limit number.")
@@ -279,12 +277,6 @@ class SettingsContainer:
         return self._turns_limit
 
     @property
-    def turns_width(self):
-        """ Returns max width of turns integer """
-
-        return len(str(self._turns_limit))
-
-    @property
     def shuffle_before(self):
         """ Returns 'patterns shuffle before building list' setting """
 
@@ -335,7 +327,7 @@ class Mastermind:
         """ Initializes new game with given settings """
 
         self._settings = SettingsContainer(*args, **kwargs)
-        self._turns = TurnsContainer(self._settings.turns_width)  # initialize list of turns
+        self._turns = TurnsContainer()  # initialize list of turns
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
 
@@ -512,10 +504,9 @@ class MastermindGame(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{index:>{width}d}. Enter `pattern`: "
+            "{index:>3d}. Enter `pattern`: "
             .format(
                 index=self._turns.turns_index + 1,
-                width=self._settings.turns_width,
             )
         )
 
@@ -545,7 +536,7 @@ class MastermindGame(Mastermind):
             self._game_status = 1  # solution is found
             return
 
-        if self._turns.turns_index >= self._settings.turns_limit:
+        if self._settings.turns_limit and self._turns.turns_index >= self._settings.turns_limit:
             self._game_status = 2  # reached turns limit
             return
 
@@ -583,10 +574,9 @@ class MastermindSolver(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{index:>{width}d}. Enter `response` for pattern {pattern}: "
+            "{index:>3d}. Enter `response` for pattern {pattern}: "
             .format(
                 index=self._turns.turns_index + 1,
-                width=self._settings.turns_width,
                 pattern=self._solver.current_possible_solution,
             )
         )
@@ -617,7 +607,7 @@ class MastermindSolver(Mastermind):
             self._game_status = 1  # solution is found
             return
 
-        if self._turns.turns_index >= self._settings.turns_limit:
+        if self._settings.turns_limit and self._turns.turns_index >= self._settings.turns_limit:
             self._game_status = 2  # reached turns limit
             return
 
@@ -644,10 +634,10 @@ class MastermindHelper(MastermindSolver):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{index:>{width}d}. Enter `pattern=response`: "
+            "{index:>3d}. Enter `pattern=response` (empty pattern means {pattern}): "
             .format(
                 index=self._turns.turns_index + 1,
-                width=self._settings.turns_width,
+                pattern=self._solver.current_possible_solution,
             )
         )
 
@@ -685,7 +675,7 @@ class MastermindHelper(MastermindSolver):
                 self._game_status = 3  # no possible solution found
             return
 
-        if self._turns.turns_index >= self._settings.turns_limit:
+        if self._settings.turns_limit and self._turns.turns_index >= self._settings.turns_limit:
             self._game_status = 2  # reached turns limit
             return
 

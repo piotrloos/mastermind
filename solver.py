@@ -20,6 +20,7 @@ def main():
     ms = MastermindSolver(
         colors_number=8,
         pegs_number=6,
+        turns_limit=0,
         shuffle_before=False,
         shuffle_after=False,
         solver_mode=1,
@@ -40,7 +41,7 @@ def main():
     print(
         "I am the CodeBreaker and I have {turns}"
         .format(
-            turns=ms.settings.turns_limit,
+            turns=ms.settings.turns_limit if ms.settings.turns_limit else "unlimited",
         ),
         "turn" if ms.settings.turns_limit == 1 else "turns",
         "to guess the solution pattern."

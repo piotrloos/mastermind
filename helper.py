@@ -18,14 +18,15 @@ def main():
     print()
 
     mh = MastermindHelper(
-        colors_number=8,
+        colors_number=9,
         pegs_number=7,
-        shuffle_before=False,
+        turns_limit=0,
+        shuffle_before=True,
         shuffle_after=False,
-        solver_mode=1,
+        solver_mode=2,
         progress_timing=True,
         mode1_second_solution=True,
-        mode2_random_pattern=False,
+        mode2_random_pattern=True,
     )
 
     print()
@@ -40,7 +41,7 @@ def main():
     print(
         "I am the Helper and I have {turns}"
         .format(
-            turns=mh.settings.turns_limit,
+            turns=mh.settings.turns_limit if mh.settings.turns_limit else "unlimited",
         ),
         "turn" if mh.settings.turns_limit == 1 else "turns",
         "to help you guess the solution pattern."

@@ -1,8 +1,6 @@
 # do zrobienia w najbliższym czasie:
 
-# TODO: propozycja patterna w helperze przez pierwszym ruchem
 # TODO: sumaryczny czas potrzebny na znalezienie rozwiązania (solver.elapsed_time)
-# TODO: turns_limit == 0 -> endless game
 
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: przenieść pętlę input do klasy
