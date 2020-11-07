@@ -22,7 +22,7 @@ def main():
         pegs_number=7,
         shuffle_before=False,
         shuffle_after=False,
-        solver_mode=2,
+        solver_mode=1,
         progress_timing=True,
         mode1_second_solution=True,
         mode2_random_pattern=False,

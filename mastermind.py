@@ -774,9 +774,9 @@ class MastermindSolverMode1:
                 self._current_possible_solution = self._second_possible_solution
                 self._second_possible_solution = None
             else:
-                self._generator.progress_rename("Searching for first possible solution...")  # TODO: not always `first`
                 try:
-                    self._current_possible_solution = self._generator.next()
+                    self._current_possible_solution = self._generator.next("Searching for first possible solution...")
+                    # TODO: ^^ not always `first`
                 except StopIteration:
                     self._current_possible_solution = None  # no possible solution
                     self._second_possible_solution = None  # no second possible solution also
@@ -786,9 +786,8 @@ class MastermindSolverMode1:
             if self.check_possible_solution(self._second_possible_solution):
                 print("Previously found second possible solution still can be a second solution. Not changed.")
             else:
-                self._generator.progress_rename("Searching for second possible solution...")
                 try:
-                    self._second_possible_solution = self._generator.next()
+                    self._second_possible_solution = self._generator.next("Searching for second possible solution...")
                 except StopIteration:  # there is no second solution -> only one solution!
                     self._second_possible_solution = None  # no second possible solution
                     self._single_solution_flag = True  # set the flag
@@ -816,10 +815,12 @@ class MastermindSolverMode1Generator:
             timing=self._settings.progress_timing,
         )
 
-    def next(self):
+    def next(self, progress_title):
         """ (MODE 1 Generator) Returns the first possible solution based on all previous turns """
 
-        self._progress.resume()
+        self._progress.start(
+            title=progress_title,
+        )
 
         while self._patterns_index < self._patterns_number:  # index is between 0 and `patterns_number`-1
 
@@ -827,32 +828,29 @@ class MastermindSolverMode1Generator:
             self._patterns_index += 1  # index is now between 1 and `patterns_number`
 
             if self._progress.item(self._check_possible_solution(pattern)):  # wrapped the long-taking operation
-                self._progress.pause(
-                    "Found! It's index is {index} of {all} overall ({percent:.2f}%)."
+                self._progress.stop(
+                    pause=True,
+                    summary="Found! It's index is {index} of {all} overall ({percent:.2f}%)."
                     .format(
                         index=self._patterns_index,
                         all=self._patterns_number,
                         percent=100 * self._patterns_index / self._patterns_number,
-                    )
+                    ),
                 )
                 return pattern
 
         # after return the last pattern
         self._progress.stop(
-            "Finished. Reached index {index} of {all} overall ({percent:.2f}%)."
+            pause=False,
+            summary="Finished. Reached index {index} of {all} overall ({percent:.2f}%)."
             .format(
                 index=self._patterns_index,
                 all=self._patterns_number,
                 percent=100 * self._patterns_index / self._patterns_number,  # should be always 100.00%
-            )
+            ),
         )
 
         raise StopIteration
-
-    def progress_rename(self, title):
-        """ (MODE 1 Generator) Changes Progress object display text """
-
-        self._progress.rename(title=title)
 
 
 class MastermindSolverMode2:

@@ -25,6 +25,7 @@ class Progress:
         self._threshold_int = int(round(self._threshold))  # (int) round the threshold to be compared with index
 
         self._title = str(title)  # (str) Progress process title to be displayed (if given)
+        self._summary = ""  # (str) Progress process summary to be displayed (after finishing)
 
         self._timing = bool(timing)  # (bool) flag whether Progress process should be timed
         self._total_time_elapsed = 0  # (float) total elapsed time in seconds
@@ -39,34 +40,34 @@ class Progress:
 
         print(string, end="", flush=True)
 
-    def _print_title_value(self, value):
+    def _print_title_value(self):
         """ Prints `title` and `value` """
 
         self._print(
             "\r{title} {value:3d}%"  # start from the beginning of line
             .format(
                 title=self._title,
-                value=value,
+                value=int(round(self._index * self._inv)),
             )
         )
 
-    def _print_value(self, value):
+    def _print_value(self):
         """ Prints `value` """
 
         self._print(
             "\b\b\b\b{value:3d}%"  # 4 backspaces and the new value (in the same place)
             .format(
-                value=value,
+                value=int(round(self._index * self._inv)),
             )
         )
 
-    def _print_end_text(self, text):
+    def _print_summary(self):
         """ Prints `text` in place of `value` """
 
         self._print(
-            "\b\b\b\b{text}\n"  # 4 backspaces and the text (in the same place), go to the new line
+            "\b\b\b\b{summary}\n"  # 4 backspaces and the text (in the same place), go to the new line
             .format(
-                text=text,
+                summary=self._summary,
             )
         )
 
@@ -85,16 +86,8 @@ class Progress:
         #     if self._running:
         #         raise RuntimeError("Progress process is already running!")
 
-    def rename(self, title):
-        """ Changes Progress process `title` """
-
-        self._check_state(should_be_running=False)
-
-        self._title = str(title)
-        self._print_title_value(int(round(self._index * self._inv)))
-
-    def resume(self):
-        """ Resumes printing Progress process """
+    def start(self, title=None):
+        """ Starts/resumes printing Progress process and changes `title` if given """
 
         self._check_state(should_be_running=False)
         self._running = True
@@ -102,41 +95,38 @@ class Progress:
         if self._timing:
             self._time_start = time()
 
-    def pause(self, text="", stop=False):
-        """ Pauses printing Progress process """
+        if title is not None:
+            self._title = str(title)
+
+        self._print_title_value()
+
+    def stop(self, pause=False, summary="Done!"):
+        """ Stops/pauses printing Progress process """
 
         self._check_state(should_be_running=True)
         self._running = False
 
+        if not pause:
+            self._finished = True
+
         if self._timing:
             time_elapsed = time() - self._time_start
             self._total_time_elapsed += time_elapsed
-            if stop:
-                text += " (total time elapsed: {seconds:.3f}s)".format(
-                    seconds=self._total_time_elapsed,
+
+            if pause:
+                self._summary = "{summary} (time elapsed: {time:.3f}s)".format(
+                    summary=summary,
+                    time=time_elapsed,
                 )
             else:
-                text += " (time elapsed: {seconds:.3f}s)".format(
-                    seconds=time_elapsed,
+                self._summary = "{summary} (total time elapsed: {time:.3f}s)".format(
+                    summary=summary,
+                    time=self._total_time_elapsed,
                 )
 
-        self._print_end_text(text)
+        self._print_summary()
 
-    def start(self):
-        """ Starts printing Progress process """
-
-        self.resume()
-
-        self._print_title_value(0)  # start with 0%
-
-    def stop(self, text="Done!"):
-        """ Stops printing Progress process """
-
-        self.pause(text, stop=True)
-
-        self._finished = True
-
-    def item(self, outer_value=None):
+    def item(self, wrapped_value=None):
         """ Wraps value - checks if next Progress process value should be printed """
 
         self._index += 1
@@ -145,11 +135,11 @@ class Progress:
 
             self._check_state(should_be_running=True)
 
-            self._print_value(int(round(self._index * self._inv)))  # calc the new Progress process value and print it
+            self._print_value()  # calc the new Progress process value and print it
             self._threshold += self._portion  # (float) set the new threshold
             self._threshold_int = int(round(self._threshold))  # (int) round the threshold to be compared with index
 
-        return outer_value
+        return wrapped_value
 
 
 def shuffle(lst, progress=None):
