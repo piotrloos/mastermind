@@ -753,6 +753,7 @@ class MastermindSolverMode1:
         """ (MODE 1) Calculates the next possible solution after current turn """
 
         # TODO: refactor this method to avoid bug in Progress state (when generator is exhausted)
+        # TODO: generator exhausted bug
 
         self._single_solution_flag = False  # reset the flag
 
@@ -764,22 +765,18 @@ class MastermindSolverMode1:
                 self._current_possible_solution = self._second_possible_solution
                 self._second_possible_solution = None
             else:
-                try:
-                    self._current_possible_solution = self._generator.next("Searching for first possible solution...")
-                    # TODO: ^^ not always `first`
-                except StopIteration:
-                    self._current_possible_solution = None  # no possible solution
+                self._current_possible_solution = self._generator.get_next("Searching for first possible solution...")
+                # TODO: ^^ not always `first` (especially when second_solution is off)
+                if self._current_possible_solution is None:  # no possible solution
                     self._second_possible_solution = None  # no second possible solution also
-                    return None
+                    return self._current_possible_solution  # (=None)
 
         if self._settings.mode1_second_solution:
             if self.check_possible_solution(self._second_possible_solution):
                 print("Previously found second possible solution still can be a second solution. Not changed.")
             else:
-                try:
-                    self._second_possible_solution = self._generator.next("Searching for second possible solution...")
-                except StopIteration:  # there is no second solution -> only one solution!
-                    self._second_possible_solution = None  # no second possible solution
+                self._second_possible_solution = self._generator.get_next("Searching for second possible solution...")
+                if self._second_possible_solution is None:  # no second possible solution -> only one solution!
                     self._single_solution_flag = True  # set the flag
 
         return self._current_possible_solution
@@ -799,14 +796,20 @@ class MastermindSolverMode1Generator:
         self._patterns_index = 0  # initialize possible solutions index
         self._patterns_number = len(self._patterns_list)
 
+        self._exhausted = False
+
         self._progress = Progress(
             items_number=self._patterns_number,
             title="",
             timing=self._settings.progress_timing,
         )
 
-    def next(self, progress_title):
+    def get_next(self, progress_title):
         """ (MODE 1 Generator) Returns the first possible solution based on all previous turns """
+
+        # TODO: generator exhausted bug
+        # if self._exhausted:
+        #     raise RuntimeError("MODE 1 Generator is already exhausted!")
 
         self._progress.start(
             title=progress_title,
@@ -840,7 +843,9 @@ class MastermindSolverMode1Generator:
             ),
         )
 
-        raise StopIteration
+        # no possible solution
+        self._exhausted = True
+        return None
 
 
 class MastermindSolverMode2:
@@ -865,14 +870,13 @@ class MastermindSolverMode2:
         self._possible_solutions_number = len(self._possible_solutions_list)
         self._single_solution_flag = (self._possible_solutions_number == 1)
 
-        if self._settings.mode2_random_pattern:
-            index = randrange(self._possible_solutions_number)
-        else:
-            index = 0
-
-        try:
+        if self._possible_solutions_number:
+            if self._settings.mode2_random_pattern:
+                index = randrange(self._possible_solutions_number)
+            else:
+                index = 0
             self._current_possible_solution = self._possible_solutions_list[index]
-        except IndexError:
+        else:
             self._current_possible_solution = None
 
     @property

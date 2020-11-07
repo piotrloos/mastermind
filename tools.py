@@ -74,7 +74,7 @@ class Progress:
     def _check_state(self, should_be_running):
         """ Checks `finished` and `running` state and raises exception if needed """
 
-        # TODO: temporarily disabled
+        # TODO: generator exhausted bug
 
         # if self._finished:
         #     raise RuntimeError("Progress process is finished!")
