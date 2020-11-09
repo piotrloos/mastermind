@@ -1,6 +1,6 @@
 # do zrobienia w najbliższym czasie:
 
-# TODO: sumaryczny czas potrzebny na znalezienie rozwiązania (solver.elapsed_time)
+# TODO: exhausted generator bug
 
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: przenieść pętlę input do klasy

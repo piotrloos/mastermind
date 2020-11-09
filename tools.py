@@ -28,8 +28,8 @@ class Progress:
         self._summary = ""  # (str) Progress process summary to be displayed (after finishing)
 
         self._timing = bool(timing)  # (bool) flag whether Progress process should be timed
-        self._total_time_elapsed = 0  # (float) total elapsed time in seconds
-        self._time_start = None  # (float) last resume start timestamp
+        self._total_time = 0  # (float) total time in seconds
+        self._start_time = None  # (float) last resume start timestamp
 
         self._running = False  # (bool) flag whether Progress process is currently running
         self._finished = False  # (bool) flag whether Progress process is finished
@@ -62,10 +62,10 @@ class Progress:
         )
 
     def _print_summary(self):
-        """ Prints `text` in place of `value` """
+        """ Prints `summary` in place of `value` """
 
         self._print(
-            "\b\b\b\b{summary}\n"  # 4 backspaces and the text (in the same place), go to the new line
+            "\b\b\b\b{summary}\n"  # 4 backspaces and the summary (in the same place), go to the new line
             .format(
                 summary=self._summary,
             )
@@ -89,11 +89,11 @@ class Progress:
     def start(self, title=None):
         """ Starts/resumes printing Progress process and changes `title` if given """
 
+        if self._timing:
+            self._start_time = time()
+
         self._check_state(should_be_running=False)
         self._running = True
-
-        if self._timing:
-            self._time_start = time()
 
         if title is not None:
             self._title = str(title)
@@ -109,22 +109,23 @@ class Progress:
         if not pause:
             self._finished = True
 
-        if self._timing:
-            time_elapsed = time() - self._time_start
-            self._total_time_elapsed += time_elapsed
+        self._summary = summary
 
-            if pause:
-                self._summary = "{summary} (time elapsed: {time:.3f}s)".format(
-                    summary=summary,
-                    time=time_elapsed,
-                )
-            else:
-                self._summary = "{summary} (total time elapsed: {time:.3f}s)".format(
-                    summary=summary,
-                    time=self._total_time_elapsed,
+        if self._timing:
+            partial_time = time() - self._start_time
+            self._total_time += partial_time
+
+            # TODO: 3 different states, clean it up
+            self._summary += \
+                (" (partial time: {partial_time:.3f}s" + ("" if pause else ", total time: {total_time:.3f}s") + ")")\
+                .format(
+                    partial_time=partial_time,
+                    total_time=self._total_time,
                 )
 
         self._print_summary()
+
+        return self._total_time
 
     def item(self, wrapped_value=None):
         """ Wraps value - checks if next Progress process value should be printed """

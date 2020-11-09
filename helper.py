@@ -18,15 +18,15 @@ def main():
     print()
 
     mh = MastermindHelper(
-        colors_number=9,
-        pegs_number=7,
+        colors_number=8,
+        pegs_number=8,
         turns_limit=0,
-        shuffle_before=True,
+        shuffle_before=False,
         shuffle_after=False,
-        solver_mode=2,
+        solver_mode=1,
         progress_timing=True,
         mode1_second_solution=True,
-        mode2_random_pattern=True,
+        mode2_random_pattern=False,
     )
 
     print()
@@ -88,6 +88,14 @@ def main():
         print("We reached turns limit. Game over!")
     elif mh.game_status == 3:
         print("Sorry. No possible solution found!")
+
+    if mh.settings.progress_timing:
+        print(
+            "Total solving time: {time:.3f}s."
+            .format(
+                time=mh.solving_time,
+            ),
+        )
 
     print("Thanks for playing!")
 

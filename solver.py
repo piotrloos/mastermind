@@ -19,7 +19,7 @@ def main():
 
     ms = MastermindSolver(
         colors_number=8,
-        pegs_number=6,
+        pegs_number=7,
         turns_limit=0,
         shuffle_before=False,
         shuffle_after=False,
@@ -88,6 +88,14 @@ def main():
         print("I reached turns limit. Game over!")
     elif ms.game_status == 3:
         print("Sorry. No possible solution found!")
+
+    if ms.settings.progress_timing:
+        print(
+            "Total solving time: {time:.3f}s."
+            .format(
+                time=ms.solving_time,
+            ),
+        )
 
     print("Thanks for playing!")
 

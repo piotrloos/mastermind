@@ -570,6 +570,12 @@ class MastermindSolver(Mastermind):
         return self._solver.possible_solutions_number
 
     @property
+    def solving_time(self):
+        """ Returns total solving time """
+
+        return self._solver.solving_time
+
+    @property
     def solver_prompt(self):
         """ Returns formatted prompt for `input` function """
 
@@ -713,6 +719,8 @@ class MastermindSolverMode1:
         self._second_possible_solution = None
         self._single_solution_flag = False
 
+        self._time_elapsed = 0
+
         self.calculate_possible_solution()  # get first possible solution
 
     @property
@@ -732,6 +740,12 @@ class MastermindSolverMode1:
         """ (MODE 1) Returns single possible solution flag """
 
         return self._single_solution_flag
+
+    @property
+    def solving_time(self):
+        """ (MODE 1) Returns total solving time """
+
+        return self._generator.solving_time
 
     def check_possible_solution(self, possible_solution):
         """ (MODE 1) Checks if given possible solution can be a solution based on all previous turns """
@@ -797,6 +811,7 @@ class MastermindSolverMode1Generator:
         self._patterns_number = len(self._patterns_list)
 
         self._exhausted = False
+        self._solving_time = 0
 
         self._progress = Progress(
             items_number=self._patterns_number,
@@ -821,7 +836,7 @@ class MastermindSolverMode1Generator:
             self._patterns_index += 1  # index is now between 1 and `patterns_number`
 
             if self._progress.item(self._check_possible_solution(pattern)):  # wrapped the long-taking operation
-                self._progress.stop(
+                self._solving_time = self._progress.stop(
                     pause=True,
                     summary="Found! It's index is {index} of {all} overall ({percent:.2f}%)."
                     .format(
@@ -833,7 +848,7 @@ class MastermindSolverMode1Generator:
                 return pattern
 
         # after return the last pattern
-        self._progress.stop(
+        self._solving_time = self._progress.stop(
             pause=False,
             summary="Finished. Reached index {index} of {all} overall ({percent:.2f}%)."
             .format(
@@ -847,6 +862,12 @@ class MastermindSolverMode1Generator:
         self._exhausted = True
         return None
 
+    @property
+    def solving_time(self):
+        """ (MODE 1 Generator) Returns total solving time """
+
+        return self._solving_time
+
 
 class MastermindSolverMode2:
     """ Contains Mastermind Solver MODE 2 (patterns list filtering mode) """
@@ -859,6 +880,8 @@ class MastermindSolverMode2:
         self._turns = turns
         self._calculate_black_pegs = calculate_black_pegs
         self._calculate_black_white_pegs = calculate_black_white_pegs
+
+        self._solving_time = 0
 
         # TODO: for first time it's PatternsContainer object, later it's just list
         self._possible_solutions_list = PatternsContainer(self._settings)  # get list of all possible solutions
@@ -897,6 +920,12 @@ class MastermindSolverMode2:
 
         return self._single_solution_flag
 
+    @property
+    def solving_time(self):
+        """ (MODE 2) Returns total solving time """
+
+        return self._solving_time
+
     def check_possible_solution(self, possible_solution):
         """ (MODE 2) Checks if given possible solution can be a solution based on all previous turns """
 
@@ -928,7 +957,7 @@ class MastermindSolverMode2:
             )
         ]
 
-        progress.stop()
+        self._solving_time += progress.stop()
 
         self._analyze_the_list()
 
