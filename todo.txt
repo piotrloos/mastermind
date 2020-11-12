@@ -9,6 +9,7 @@
 # TODO: stworzenie pliku `readme.md`
 
 # TODO: klasa Generator dla MODE 2?
+# TODO: możliwość wyłączenia Progressu
 
 # optymalizacja
 

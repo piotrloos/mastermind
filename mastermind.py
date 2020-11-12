@@ -15,6 +15,8 @@ class Peg(int):
     """ Class for one pattern peg """
 
     def __str__(self):
+        """ Formats `peg` to be printed """
+
         return (
             "({peg})"
             .format(
@@ -27,9 +29,13 @@ class PegsContainer(list):
     """ Class for list of pegs """
 
     def __init__(self, colors_number):
+        """ Initializes `PegsContainer` class object """
+
         super().__init__([Peg(peg_value) for peg_value in range(colors_number)])
 
     def __str__(self):
+        """ Formats `pegs` list to be printed """
+
         return (
             "{{{pegs}}}"
             .format(
@@ -39,9 +45,11 @@ class PegsContainer(list):
 
 
 class Pattern(tuple):
-    """ Class for one pattern """
+    """ Class for one `pattern` """
 
     def __str__(self):
+        """ Formats `pattern` to be printed """
+
         return (
             "[{pegs}]"
             .format(
@@ -95,11 +103,13 @@ class PatternsContainer(list):
             )
 
         # make final list of Pattern objects
-        super().__init__([
-            progress.item(Pattern((*pattern, new_peg)))
-            for pattern in patterns_list
-            for new_peg in pegs_list
-        ])
+        super().__init__(
+            [
+                progress.item(Pattern((*pattern, new_peg)))
+                for pattern in patterns_list
+                for new_peg in pegs_list
+            ]
+        )
         # new pattern is Pattern object a one peg bigger (unpacked "old" pegs + "new" one)
 
         progress.stop()
@@ -115,15 +125,19 @@ class PatternsContainer(list):
                 )
             )
 
-    # TODO:
-    def print(self):
-        pass
+    def print_patterns(self):
+        """ Prints all patterns """
+
+        for pattern in self:
+            print(pattern)
 
 
 class Response(tuple):
     """ Class for one response """
 
     def __str__(self):
+        """ Formats `response` to be printed """
+
         return (
             "[{blacks}{whites}{dots}] ({black_number}, {white_number})"
             .format(
@@ -137,10 +151,14 @@ class Response(tuple):
 
     @property
     def black_pegs(self):
+        """ Returns `black_pegs` from `response` """
+
         return self[0]
 
     @property
     def white_pegs(self):
+        """ Returns `white_pegs` from `response` """
+
         return self[1]
 
 
@@ -148,6 +166,8 @@ class Turn(tuple):
     """ Class for one game turn """
 
     def __str__(self):
+        """ Formats `turn` to be printed """
+
         return (
             "{turn_index:>3d}. {pattern} => {response}"
             .format(
@@ -159,10 +179,14 @@ class Turn(tuple):
 
     @property
     def pattern(self):
+        """ Returns `pattern` from turn """
+
         return self[1]
 
     @property
     def response(self):
+        """ Returns `response` from turn """
+
         return self[2]
 
 
@@ -170,62 +194,80 @@ class TurnsContainer(list):
     """ CLass for list of all turns in the game """
 
     def __init__(self):
+        """ Initializes `TurnsContainer` class object """
+
         super().__init__()
         self._turns_index = 0
 
     def add_turn(self, pattern, response):
+        """ Adds current turn to TurnsContainer """
+
         self._turns_index += 1
         self.append(Turn((self._turns_index, pattern, response)))
 
     def print_turns(self):
+        """ Prints all turns """
+
         for turn in self:
             print(turn)
 
     @property
     def turns_index(self):
+        """ Returns current turns index """
+
         return self._turns_index
 
 
 class SettingsContainer:
     """ Class for all the game settings """
 
-    def __init__(self,
-                 *args,
-                 colors_number=COLORS_NUMBER,
-                 pegs_number=PEGS_NUMBER,
-                 turns_limit=TURNS_LIMIT,
-                 shuffle_before=SHUFFLE_BEFORE,
-                 shuffle_after=SHUFFLE_AFTER,
-                 solver_mode=SOLVER_MODE,
-                 progress_timing=PROGRESS_TIMING,
-                 mode1_second_solution=MODE1_SECOND_SOLUTION,
-                 mode2_random_pattern=MODE2_RANDOM_PATTERN,
-                 **kwargs,
-                 ):
+    def __init__(
+            self,
+            *args,
+            colors_number=COLORS_NUMBER,
+            pegs_number=PEGS_NUMBER,
+            turns_limit=TURNS_LIMIT,
+            shuffle_before=SHUFFLE_BEFORE,
+            shuffle_after=SHUFFLE_AFTER,
+            solver_mode=SOLVER_MODE,
+            progress_timing=PROGRESS_TIMING,
+            mode1_second_solution=MODE1_SECOND_SOLUTION,
+            mode2_random_pattern=MODE2_RANDOM_PATTERN,
+            **kwargs,
+            ):
+        """ Initializes `SettingsContainer` class object """
 
         # check if given number of colors is correct
         if colors_number in range(2, COLORS_NUMBER_MAX + 1):
             self._colors_number = colors_number
         else:
-            raise ValueError("Incorrect number of colors.")
+            raise ValueError(
+                "Incorrect number of colors."
+            )
 
         # check if given number of pegs is correct
         if pegs_number in range(2, PEGS_NUMBER_MAX + 1):
             self._pegs_number = pegs_number
         else:
-            raise ValueError("Incorrect number of pegs.")
+            raise ValueError(
+                "Incorrect number of pegs."
+            )
 
         # check if given `turns_limit` number is correct
         if turns_limit in range(0, TURNS_LIMIT_MAX + 1):  # turns_limit = 0 means unlimited turns
             self._turns_limit = turns_limit
         else:
-            raise ValueError("Incorrect turns limit number.")
+            raise ValueError(
+                "Incorrect turns limit number."
+            )
 
         # check if given `solver_mode` is correct
         if solver_mode in {1, 2}:
             self._solver_mode = solver_mode
         else:
-            raise ValueError("Incorrect solving mode.")
+            raise ValueError(
+                "Incorrect solving mode."
+            )
 
         self._shuffle_before = bool(shuffle_before)
         self._shuffle_after = bool(shuffle_after)
@@ -323,7 +365,11 @@ class Mastermind:
     """ Contains whole game, base class for MastermindGame and MastermindSolver classes """
 
     @abstractmethod
-    def __init__(self, *args, **kwargs):
+    def __init__(
+            self,
+            *args,
+            **kwargs,
+            ):
         """ Initializes new game with given settings """
 
         self._settings = SettingsContainer(*args, **kwargs)
@@ -332,42 +378,29 @@ class Mastermind:
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
 
     @property
-    def settings(self):
-        """ Returns `SettingsContainer` class object """
-
-        return self._settings
-
-    @property
-    def turns(self):  # TODO: iteration through property?
-        """ Returns `TurnsContainer` class object """
-
-        return self._turns
-
-    @property
-    def turns_counter(self):
-        """ Returns turn counter """
-
-        return self._turns.turns_index
-
-    @property
     def solution(self):
         """ Returns solution pattern (only when game is ended) """
 
         if self._game_status == 0:
-            raise PermissionError("No access to the solution when game is active!")
+            raise PermissionError(
+                "No access to the solution when game is active!"
+            )
         else:
             if self._solution is None:
-                raise ValueError("No saved solution in this game!")
+                raise ValueError(
+                    "No saved solution in this game!"
+                )
             else:
                 return self._solution
 
+    # TODO: del
     @property
     def game_status(self):
         """ Returns game status """
 
         return self._game_status
 
-    def get_random_pattern(self):
+    def _get_random_pattern(self):
         """ Returns random pattern for generating the solution or giving a demo pattern """
 
         return Pattern(
@@ -482,22 +515,64 @@ class Mastermind:
 class MastermindGame(Mastermind):
     """ Contains Mastermind Game mode, inherits from Mastermind class """
 
-    def __init__(self,
-                 *args,
-                 solution=None,  # TODO: give tuple or Pattern object?
-                 **kwargs,
-                 ):
-        """ Initializes Mastermind Game class object """
+    def __init__(
+            self,
+            *args,
+            solution=None,  # TODO: give tuple or Pattern object?
+            **kwargs,
+            ):
+        """ Initializes `MastermindGame` class object """
 
         super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
         if solution is None:  # check if `solution` is given
-            self._solution = self.get_random_pattern()
+            self._solution = self._get_random_pattern()
         else:
             if self._validate_pattern(solution):  # TODO: validate Pattern object?
                 self._solution = Pattern(solution)
             else:
-                raise ValueError("Incorrect solution pattern.")
+                raise ValueError(
+                    "Incorrect solution pattern."
+                )
+
+    def game_intro(self):
+        """ Prints intro """
+
+        print(
+            """
+            ###################################
+            #   Welcome to Mastermind Game!   #
+            ###################################
+            """
+        )
+
+        print(
+            "I am CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {list}."
+            .format(
+                pegs=self._settings.pegs_number,
+                colors=self._settings.colors_number,
+                list=self._settings.pegs_list,
+            )
+        )
+
+        print(
+            "You are CodeBreaker and you have {turns}"
+            .format(
+                turns=self._settings.turns_limit if self._settings.turns_limit else "unlimited",
+            ),
+            "turn" if self._settings.turns_limit == 1 else "turns",
+            "to guess the solution pattern."
+        )
+
+        print(
+            "There are {number} possible patterns in this game. Example pattern is {pattern}."
+            .format(
+                number=self._settings.patterns_number,
+                pattern=self._get_random_pattern(),
+            )
+        )
+
+        print()
 
     @property
     def game_prompt(self):
@@ -514,15 +589,20 @@ class MastermindGame(Mastermind):
         """ Takes turn as CodeMaker (with `pattern` or `pattern_string` from CodeBreaker) """
 
         if self._game_status != 0:
-            raise PermissionError("Game is ended! You can't take turn.")
+            raise PermissionError(
+                "[Game] Game is ended! You can't take turn."
+            )
 
         if pattern is None:
             pattern = self._decode_pattern(pattern_string)
             if pattern is None:
-                raise ValueError("Given `pattern` is incorrect! Enter again.")
+                raise ValueError(
+                    "[Game] Given `pattern` is incorrect! Enter again."
+                )
 
         response = self._calculate_response(pattern, self._solution)
 
+        print()
         # TODO: use Solver (MODE1) `check_possible_solution` method here
         #  to print info if given pattern could be the solution (like in Helper)
 
@@ -540,12 +620,45 @@ class MastermindGame(Mastermind):
             self._game_status = 2  # reached turns limit
             return
 
+    def game_outro(self):
+        """ Prints outro """
+
+        print()
+
+        if self._game_status == 1:
+            print(
+                "You found the solution in {turns}"
+                .format(
+                    turns=self._turns.turns_index,
+                ),
+                "turn." if self._turns.turns_index == 1 else "turns."
+            )
+        elif self._game_status == 2:
+            print(
+                "You reached turns limit. Game over!"
+            )
+
+        print(
+            "The solution was {pattern}."
+            .format(
+                pattern=self.solution,
+            )
+        )
+
+        print(
+            "Thanks for playing!"
+        )
+
 
 class MastermindSolver(Mastermind):
     """ Contains Mastermind Solver mode, inherits from Mastermind class """
 
-    def __init__(self, *args, **kwargs):
-        """ Initializes Mastermind Solver class object """
+    def __init__(
+            self,
+            *args,
+            **kwargs,
+            ):
+        """ Initializes `MastermindSolver` class object """
 
         super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
@@ -562,6 +675,54 @@ class MastermindSolver(Mastermind):
             self._calculate_black_pegs,
             self._calculate_black_white_pegs,
         )
+
+    def solver_intro(self):
+        """ Prints intro """
+
+        print(
+            """
+            #####################################
+            #   Welcome to Mastermind Solver!   #
+            #####################################
+            """
+        )
+
+        print(
+            "You are CodeMaker and you have prepared {pegs}-peg pattern using {colors} different colors: {list}."
+            .format(
+                pegs=self._settings.pegs_number,
+                colors=self._settings.colors_number,
+                list=self._settings.pegs_list,
+            )
+        )
+
+        print(
+            "I am CodeBreaker and I have {turns}"
+            .format(
+                turns=self._settings.turns_limit if self._settings.turns_limit else "unlimited",
+            ),
+            "turn" if self._settings.turns_limit == 1 else "turns",
+            "to guess the solution pattern."
+        )
+
+        print(
+            "There are {number} possible patterns in this game. Example pattern is {pattern}."
+            .format(
+                number=self._settings.patterns_number,
+                pattern=self._get_random_pattern(),
+            )
+        )
+
+        print(
+            "Settings: shuffle_before = {shuffle_before}, shuffle_after = {shuffle_after}, solver_mode = {solver_mode}."
+            .format(
+                shuffle_before=self._settings.shuffle_before,
+                shuffle_after=self._settings.shuffle_after,
+                solver_mode=self._settings.solver_mode,
+            )
+        )
+
+        print()
 
     @property
     def possible_solutions_number(self):
@@ -592,12 +753,16 @@ class MastermindSolver(Mastermind):
         """ Takes turn as CodeBreaker (with `response` or `response_string` from CodeMaker) """
 
         if self._game_status != 0:
-            raise PermissionError("Game is ended! You can't take turn.")
+            raise PermissionError(
+                "[Solver] Game is ended! You can't take turn."
+            )
 
         if response is None:
             response = self._decode_response(response_string)
             if response is None:
-                raise ValueError("Given `response` is incorrect! Enter again.")
+                raise ValueError(
+                    "[Solver] Given `response` is incorrect! Enter again."
+                )
 
         print()
         pattern = self._solver.current_possible_solution
@@ -624,16 +789,110 @@ class MastermindSolver(Mastermind):
         # game is still active
 
         if self._solver.single_solution_flag:
-            print("Now I know there is only one possible solution!")
+            print(
+                "[Solver] Now I know there is only one possible solution!"
+            )
+
+    def solver_outro(self):
+        """ Prints outro """
+
+        print()
+
+        if self._game_status == 1:
+            print(
+                "The solution is {pattern}."
+                .format(
+                    pattern=self.solution,
+                )
+            )
+            print(
+                "I found the solution in {turns}"
+                .format(
+                    turns=self._turns.turns_index,
+                ),
+                "turn." if self._turns.turns_index == 1 else "turns."
+            )
+        elif self._game_status == 2:
+            print(
+                "I reached turns limit. Game over!"
+            )
+        elif self._game_status == 3:
+            print(
+                "Sorry. No possible solution found!"
+            )
+
+        if self._settings.progress_timing:
+            print(
+                "Total solving time: {time:.3f}s."
+                .format(
+                    time=self.solving_time,
+                ),
+            )
+
+        print(
+            "Thanks for playing!"
+        )
 
 
 class MastermindHelper(MastermindSolver):
     """ Contains Mastermind Helper mode, inherits from MastermindSolver class """
 
-    def __init__(self, *args, **kwargs):
-        """ Initializes Mastermind Helper class object """
+    def __init__(
+            self,
+            *args,
+            **kwargs,
+            ):
+        """ Initializes `MastermindHelper` class object """
 
         super().__init__(*args, **kwargs)  # initialize MastermindSolver class object
+
+    def helper_intro(self):
+        """ Prints intro """
+
+        print(
+            """
+            #####################################
+            #   Welcome to Mastermind Helper!   #
+            #####################################
+            """
+        )
+
+        print(
+            "You are CodeBreaker and somebody has prepared {pegs}-peg pattern using {colors} different colors: {list}."
+            .format(
+                pegs=self._settings.pegs_number,
+                colors=self._settings.colors_number,
+                list=self._settings.pegs_list,
+            )
+        )
+
+        print(
+            "I am Helper and I have {turns}"
+            .format(
+                turns=self._settings.turns_limit if self._settings.turns_limit else "unlimited",
+            ),
+            "turn" if self._settings.turns_limit == 1 else "turns",
+            "to help you guess the solution pattern."
+        )
+
+        print(
+            "There are {number} possible patterns in this game. Example pattern is {pattern}."
+            .format(
+                number=self._settings.patterns_number,
+                pattern=self._get_random_pattern(),
+            )
+        )
+
+        print(
+            "Settings: shuffle_before = {shuffle_before}, shuffle_after = {shuffle_after}, solver_mode = {solver_mode}."
+            .format(
+                shuffle_before=self._settings.shuffle_before,
+                shuffle_after=self._settings.shuffle_after,
+                solver_mode=self._settings.solver_mode,
+            )
+        )
+
+        print()
 
     @property
     def helper_prompt(self):
@@ -652,20 +911,29 @@ class MastermindHelper(MastermindSolver):
         """ Takes turn in Helper mode (with `pattern` and `response` from human) """
 
         if self._game_status != 0:
-            raise PermissionError("Game is ended! You can't take turn.")
+            raise PermissionError(
+                "[Helper] Game is ended! You can't take turn."
+            )
 
         if pattern is None or response is None:
             pattern, response = self._decode_pattern_response(pattern_response_string)
             if pattern is None:
                 pattern = self._solver.current_possible_solution  # get `pattern` if user enters "=response" only
             if response is None:
-                raise ValueError("Given `pattern=response` is incorrect! Enter again.")
+                raise ValueError(
+                    "[Helper] Given `pattern=response` is incorrect! Enter again."
+                )
 
         print()
         if self._solver.check_possible_solution(pattern):
-            print("Nice try. Given pattern could be the solution!")  # TODO: ...and sometimes "was the solution!"
+            print(
+                "[Helper] Nice try. Given pattern could be the solution."
+            )
+            # TODO: ...and sometimes "was the solution!"
         else:
-            print("Unfortunately given pattern couldn't be the solution!")
+            print(
+                "[Helper] Unfortunately given pattern couldn't be the solution!"
+            )
 
         self._turns.add_turn(pattern, response)
         self._turns.print_turns()
@@ -692,21 +960,69 @@ class MastermindHelper(MastermindSolver):
         # game is still active
 
         print(
-            "One of the possible solution is {pattern}."
+            "[Helper] One of the possible solution is {pattern}."
             .format(
                 pattern=self._solver.current_possible_solution,
             )
         )
 
         if self._solver.single_solution_flag:
-            print("Now I know there is only one possible solution!")
+            print(
+                "[Helper] Now I know there is only one possible solution!"
+            )
+
+    def helper_outro(self):
+        """ Prints outro """
+
+        print()
+
+        if self._game_status == 1:
+            print(
+                "The solution is {pattern}."
+                .format(
+                    pattern=self.solution,
+                )
+            )
+            print(
+                "We found the solution in {turns}"
+                .format(
+                    turns=self._turns.turns_index,
+                ),
+                "turn." if self._turns.turns_index == 1 else "turns."
+            )
+        elif self._game_status == 2:
+            print(
+                "We reached turns limit. Game over!"
+            )
+        elif self._game_status == 3:
+            print(
+                "Sorry. No possible solution found!"
+            )
+
+        if self._settings.progress_timing:
+            print(
+                "Total solving time: {time:.3f}s."
+                .format(
+                    time=self.solving_time,
+                ),
+            )
+
+        print(
+            "Thanks for playing!"
+        )
 
 
 class MastermindSolverMode1:
     """ Contains Mastermind Solver MODE 1 (patterns checking generator mode) """
 
-    def __init__(self, settings, turns, calculate_black_pegs, calculate_black_white_pegs):
-        """ (MODE 1) Initializes Mastermind Solver MODE 1 class object """
+    def __init__(
+            self,
+            settings,
+            turns,
+            calculate_black_pegs,
+            calculate_black_white_pegs,
+            ):
+        """ (MODE 1) Initializes `MastermindSolverMode1` class object """
 
         # TODO: temporary given labels
         self._settings = settings
@@ -727,7 +1043,9 @@ class MastermindSolverMode1:
     def possible_solutions_number(self):
         """ (MODE 1) Returns number of possible solutions """
 
-        raise NotImplementedError("It is impossible to calculate number of possible solutions in MODE 1!")
+        raise NotImplementedError(
+            "It is impossible to calculate number of possible solutions in MODE 1!"
+        )
 
     @property
     def current_possible_solution(self):
@@ -772,14 +1090,20 @@ class MastermindSolverMode1:
         self._single_solution_flag = False  # reset the flag
 
         if self.check_possible_solution(self._current_possible_solution):
-            print("Previously found first possible solution still can be a first solution. Not changed.")
+            print(
+                "[Solver1] Previously found first possible solution still can be a first solution. Not changed."
+            )
         else:
             if self._settings.mode1_second_solution and self.check_possible_solution(self._second_possible_solution):
-                print("Previously found second possible solution still can be a solution. Saved as first.")
+                print(
+                    "[Solver1] Previously found second possible solution still can be a solution. Saved as first."
+                )
                 self._current_possible_solution = self._second_possible_solution
                 self._second_possible_solution = None
             else:
-                self._current_possible_solution = self._generator.get_next("Searching for first possible solution...")
+                self._current_possible_solution = self._generator.get_next(
+                    "[Solver1] Searching for first possible solution..."
+                )
                 # TODO: ^^ not always `first` (especially when second_solution is off)
                 if self._current_possible_solution is None:  # no possible solution
                     self._second_possible_solution = None  # no second possible solution also
@@ -787,9 +1111,13 @@ class MastermindSolverMode1:
 
         if self._settings.mode1_second_solution:
             if self.check_possible_solution(self._second_possible_solution):
-                print("Previously found second possible solution still can be a second solution. Not changed.")
+                print(
+                    "[Solver1] Previously found second possible solution still can be a second solution. Not changed."
+                )
             else:
-                self._second_possible_solution = self._generator.get_next("Searching for second possible solution...")
+                self._second_possible_solution = self._generator.get_next(
+                    "[Solver1] Searching for second possible solution..."
+                )
                 if self._second_possible_solution is None:  # no second possible solution -> only one solution!
                     self._single_solution_flag = True  # set the flag
 
@@ -799,8 +1127,12 @@ class MastermindSolverMode1:
 class MastermindSolverMode1Generator:
     """ (MODE 1) Contains possible solutions generator """
 
-    def __init__(self, settings, check_possible_solution):
-        """ (MODE 1 Generator) Initializes Mastermind Solver MODE 1 Generator class object """
+    def __init__(
+            self,
+            settings,
+            check_possible_solution,
+            ):
+        """ (MODE 1 Generator) Initializes `MastermindSolverMode1Generator` class object """
 
         # TODO: temporary given labels
         self._settings = settings
@@ -824,7 +1156,9 @@ class MastermindSolverMode1Generator:
 
         # TODO: generator exhausted bug
         # if self._exhausted:
-        #     raise RuntimeError("MODE 1 Generator is already exhausted!")
+        #     raise RuntimeError(
+        #       "MODE 1 Generator is already exhausted!"
+        #     )
 
         self._progress.start(
             title=progress_title,
@@ -872,8 +1206,14 @@ class MastermindSolverMode1Generator:
 class MastermindSolverMode2:
     """ Contains Mastermind Solver MODE 2 (patterns list filtering mode) """
 
-    def __init__(self, settings, turns, calculate_black_pegs, calculate_black_white_pegs):
-        """ (MODE 2) Initializes Mastermind Solver MODE 2 class object """
+    def __init__(
+            self,
+            settings,
+            turns,
+            calculate_black_pegs,
+            calculate_black_white_pegs,
+            ):
+        """ (MODE 2) Initializes `MastermindSolverMode2` class object """
 
         # TODO: temporary given labels
         self._settings = settings
@@ -938,7 +1278,7 @@ class MastermindSolverMode2:
 
         progress = Progress(
             items_number=patterns_old_number,
-            title="Filtering patterns list...",
+            title="[Solver2] Filtering patterns list...",
             timing=self._settings.progress_timing,
         )
 
@@ -963,7 +1303,7 @@ class MastermindSolverMode2:
 
         patterns_new_number = self._possible_solutions_number
         print(
-            "Number of possible solutions is now {new} of {old} (rejected {percent:.2f}% of patterns)."
+            "[Solver2] Number of possible solutions is now {new} of {old} (rejected {percent:.2f}% of patterns)."
             .format(
                 new=patterns_new_number,
                 old=patterns_old_number,
