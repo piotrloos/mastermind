@@ -393,13 +393,6 @@ class Mastermind:
             else:
                 return self._solution
 
-    # TODO: del
-    @property
-    def game_status(self):
-        """ Returns game status """
-
-        return self._game_status
-
     def _get_random_pattern(self):
         """ Returns random pattern for generating the solution or giving a demo pattern """
 
@@ -535,7 +528,11 @@ class MastermindGame(Mastermind):
                     "Incorrect solution pattern."
                 )
 
-    def game_intro(self):
+        self._game_intro()
+        self._game_loop()
+        self._game_outro()
+
+    def _game_intro(self):
         """ Prints intro """
 
         print(
@@ -574,8 +571,17 @@ class MastermindGame(Mastermind):
 
         print()
 
+    def _game_loop(self):
+        """ Main `Game` loop """
+
+        while not self._game_status:
+            try:
+                self._game_take_turn(input(self._game_prompt))
+            except ValueError as err:
+                print(err)
+
     @property
-    def game_prompt(self):
+    def _game_prompt(self):
         """ Returns formatted prompt for `input` function """
 
         return (
@@ -585,7 +591,7 @@ class MastermindGame(Mastermind):
             )
         )
 
-    def game_take_turn(self, pattern_string, pattern=None):
+    def _game_take_turn(self, pattern_string, pattern=None):
         """ Takes turn as CodeMaker (with `pattern` or `pattern_string` from CodeBreaker) """
 
         if self._game_status != 0:
@@ -620,7 +626,7 @@ class MastermindGame(Mastermind):
             self._game_status = 2  # reached turns limit
             return
 
-    def game_outro(self):
+    def _game_outro(self):
         """ Prints outro """
 
         print()
@@ -641,7 +647,7 @@ class MastermindGame(Mastermind):
         print(
             "The solution was {pattern}."
             .format(
-                pattern=self.solution,
+                pattern=self._solution,
             )
         )
 
@@ -676,7 +682,11 @@ class MastermindSolver(Mastermind):
             self._calculate_black_white_pegs,
         )
 
-    def solver_intro(self):
+        self._solver_intro()
+        self._solver_loop()
+        self._solver_outro()
+
+    def _solver_intro(self):
         """ Prints intro """
 
         print(
@@ -724,20 +734,29 @@ class MastermindSolver(Mastermind):
 
         print()
 
+    def _solver_loop(self):
+        """ Main `Solver` loop """
+
+        while not self._game_status:
+            try:
+                self._solver_take_turn(input(self._solver_prompt))
+            except ValueError as err:
+                print(err)
+
     @property
-    def possible_solutions_number(self):
+    def _possible_solutions_number(self):
         """ Returns number of possible solutions """
 
         return self._solver.possible_solutions_number
 
     @property
-    def solving_time(self):
+    def _solving_time(self):
         """ Returns total solving time """
 
         return self._solver.solving_time
 
     @property
-    def solver_prompt(self):
+    def _solver_prompt(self):
         """ Returns formatted prompt for `input` function """
 
         return (
@@ -749,7 +768,7 @@ class MastermindSolver(Mastermind):
         )
 
     # TODO: refactor with `helper_take_turn`
-    def solver_take_turn(self, response_string, response=None):
+    def _solver_take_turn(self, response_string, response=None):
         """ Takes turn as CodeBreaker (with `response` or `response_string` from CodeMaker) """
 
         if self._game_status != 0:
@@ -793,7 +812,7 @@ class MastermindSolver(Mastermind):
                 "[Solver] Now I know there is only one possible solution!"
             )
 
-    def solver_outro(self):
+    def _solver_outro(self):
         """ Prints outro """
 
         print()
@@ -802,7 +821,7 @@ class MastermindSolver(Mastermind):
             print(
                 "The solution is {pattern}."
                 .format(
-                    pattern=self.solution,
+                    pattern=self._solution,
                 )
             )
             print(
@@ -825,7 +844,7 @@ class MastermindSolver(Mastermind):
             print(
                 "Total solving time: {time:.3f}s."
                 .format(
-                    time=self.solving_time,
+                    time=self._solving_time,
                 ),
             )
 
@@ -846,7 +865,11 @@ class MastermindHelper(MastermindSolver):
 
         super().__init__(*args, **kwargs)  # initialize MastermindSolver class object
 
-    def helper_intro(self):
+        self._helper_intro()
+        self._helper_loop()
+        self._helper_outro()
+
+    def _helper_intro(self):
         """ Prints intro """
 
         print(
@@ -894,8 +917,17 @@ class MastermindHelper(MastermindSolver):
 
         print()
 
+    def _helper_loop(self):
+        """ Main `Helper` loop """
+
+        while not self._game_status:
+            try:
+                self._helper_take_turn(input(self._helper_prompt))
+            except ValueError as err:
+                print(err)
+
     @property
-    def helper_prompt(self):
+    def _helper_prompt(self):
         """ Returns formatted prompt for `input` function """
 
         return (
@@ -907,7 +939,7 @@ class MastermindHelper(MastermindSolver):
         )
 
     # TODO: refactor with `solver_take_turn`
-    def helper_take_turn(self, pattern_response_string, pattern=None, response=None):
+    def _helper_take_turn(self, pattern_response_string, pattern=None, response=None):
         """ Takes turn in Helper mode (with `pattern` and `response` from human) """
 
         if self._game_status != 0:
@@ -971,7 +1003,7 @@ class MastermindHelper(MastermindSolver):
                 "[Helper] Now I know there is only one possible solution!"
             )
 
-    def helper_outro(self):
+    def _helper_outro(self):
         """ Prints outro """
 
         print()
@@ -980,7 +1012,7 @@ class MastermindHelper(MastermindSolver):
             print(
                 "The solution is {pattern}."
                 .format(
-                    pattern=self.solution,
+                    pattern=self._solution,
                 )
             )
             print(
@@ -1003,7 +1035,7 @@ class MastermindHelper(MastermindSolver):
             print(
                 "Total solving time: {time:.3f}s."
                 .format(
-                    time=self.solving_time,
+                    time=self._solving_time,
                 ),
             )
 

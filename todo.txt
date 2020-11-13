@@ -3,7 +3,6 @@
 # TODO: exhausted generator bug
 
 # TODO: parametry wejściowe przy uruchamianiu gry
-# TODO: przenieść pętlę input do klasy
 # TODO: uruchamianie gry z podanym obiektem Settings
 # TODO: porozdzielanie klas do różnych plików
 # TODO: stworzenie pliku `readme.md`

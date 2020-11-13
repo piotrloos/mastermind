@@ -1,37 +1,27 @@
 ########################################
 # My version of famous game Mastermind #
-# helper.py                            #
-# Mastermind Helper I/O file           #
+# solver.py                            #
+# Mastermind Solver I/O file           #
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-from mastermind import MastermindHelper
+from mastermind import MastermindSolver
 
 
 def main():
-    """ Main I/O file for Mastermind Helper """
+    """ Main I/O file for Mastermind Solver """
 
-    mh = MastermindHelper(
+    MastermindSolver(
         colors_number=8,
         pegs_number=8,
         turns_limit=0,
         shuffle_before=False,
         shuffle_after=False,
-        solver_mode=2,
+        solver_mode=1,
         progress_timing=True,
         mode1_second_solution=True,
         mode2_random_pattern=False,
     )
-
-    mh.helper_intro()
-
-    while not mh.game_status:
-        try:
-            mh.helper_take_turn(input(mh.helper_prompt))
-        except ValueError as err:
-            print(err)
-
-    mh.helper_outro()
 
 
 if __name__ == "__main__":
