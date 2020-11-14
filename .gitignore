@@ -108,3 +108,8 @@ venv.bak/
 
 # my drafts
 drafts/
+
+# shortcuts
+g.py
+h.py
+s.py
