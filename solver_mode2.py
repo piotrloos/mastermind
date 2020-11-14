@@ -6,7 +6,7 @@
 ########################################
 
 from tools import Progress
-from components import PatternsContainer
+from components import Patterns
 from random import randrange
 
 
@@ -31,7 +31,7 @@ class MastermindSolverMode2:
         self._solving_time = 0
 
         # TODO: for first time it's PatternsContainer object, later it's just list
-        self._possible_solutions_list = PatternsContainer(self._settings)  # get list of all possible solutions
+        self._possible_solutions_list = Patterns(self._settings)  # get list of all possible solutions
         self._analyze_the_list()
 
     def _analyze_the_list(self):

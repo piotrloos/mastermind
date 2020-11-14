@@ -6,7 +6,7 @@
 ########################################
 
 from tools import Progress
-from components import PatternsContainer
+from components import Patterns
 
 
 class MastermindSolverMode1Generator:
@@ -23,7 +23,7 @@ class MastermindSolverMode1Generator:
         self._settings = settings
         self._check_possible_solution = check_possible_solution
 
-        self._patterns_list = PatternsContainer(self._settings)  # get list of all possible solutions to be checked
+        self._patterns_list = Patterns(self._settings)  # get list of all possible solutions to be checked
         self._patterns_index = 0  # initialize possible solutions index
         self._patterns_number = len(self._patterns_list)
 

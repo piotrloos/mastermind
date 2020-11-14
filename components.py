@@ -23,16 +23,16 @@ class Peg(int):
         )
 
 
-class PegsContainer(list):
+class Pegs(list):
     """ Class for list of pegs """
 
     def __init__(self, colors_number):
-        """ Initializes `PegsContainer` class object """
+        """ Initializes `Pegs` class object """
 
         super().__init__([Peg(peg_value) for peg_value in range(colors_number)])
 
     def __str__(self):
-        """ Formats `pegs` list to be printed """
+        """ Formats `Pegs` list to be printed """
 
         return (
             "{{{pegs}}}"
@@ -56,7 +56,7 @@ class Pattern(tuple):
         )
 
 
-class PatternsContainer(list):
+class Patterns(list):
     """ Class for list of all possible patterns (to be iterated on or to be filtered) """
 
     def __init__(self, settings):
@@ -188,17 +188,17 @@ class Turn(tuple):
         return self[2]
 
 
-class TurnsContainer(list):
+class Turns(list):
     """ CLass for list of all turns in the game """
 
     def __init__(self):
-        """ Initializes `TurnsContainer` class object """
+        """ Initializes `Turns` class object """
 
         super().__init__()
         self._turns_index = 0
 
     def add_turn(self, pattern, response):
-        """ Adds current turn to TurnsContainer """
+        """ Adds current turn to `Turns` """
 
         self._turns_index += 1
         self.append(Turn((self._turns_index, pattern, response)))
@@ -216,7 +216,7 @@ class TurnsContainer(list):
         return self._turns_index
 
 
-class SettingsContainer:
+class Settings:
     """ Class for all the game settings """
 
     def __init__(
@@ -225,22 +225,22 @@ class SettingsContainer:
             colors_number=COLORS_NUMBER,
             pegs_number=PEGS_NUMBER,
             turns_limit=TURNS_LIMIT,
+            solver_mode=SOLVER_MODE,
             shuffle_before=SHUFFLE_BEFORE,
             shuffle_after=SHUFFLE_AFTER,
-            solver_mode=SOLVER_MODE,
             progress_timing=PROGRESS_TIMING,
             mode1_second_solution=MODE1_SECOND_SOLUTION,
             mode2_random_pattern=MODE2_RANDOM_PATTERN,
             **kwargs,
             ):
-        """ Initializes `SettingsContainer` class object """
+        """ Initializes `Settings` class object """
 
         # check if given number of colors is correct
         if colors_number in range(2, COLORS_NUMBER_MAX + 1):
             self._colors_number = colors_number
         else:
             raise ValueError(
-                "Incorrect number of colors."
+                f"Incorrect number of colors ({colors_number})."
             )
 
         # check if given number of pegs is correct
@@ -248,7 +248,7 @@ class SettingsContainer:
             self._pegs_number = pegs_number
         else:
             raise ValueError(
-                "Incorrect number of pegs."
+                f"Incorrect number of pegs ({pegs_number})."
             )
 
         # check if given `turns_limit` number is correct
@@ -256,7 +256,7 @@ class SettingsContainer:
             self._turns_limit = turns_limit
         else:
             raise ValueError(
-                "Incorrect turns limit number."
+                f"Incorrect turns limit number ({turns_limit})."
             )
 
         # check if given `solver_mode` is correct
@@ -264,7 +264,7 @@ class SettingsContainer:
             self._solver_mode = solver_mode
         else:
             raise ValueError(
-                "Incorrect solving mode."
+                f"Incorrect solving mode ({solver_mode})."
             )
 
         self._shuffle_before = bool(shuffle_before)
@@ -273,23 +273,16 @@ class SettingsContainer:
         self._mode1_second_solution = bool(mode1_second_solution)
         self._mode2_random_pattern = bool(mode2_random_pattern)
 
-        self._pegs_list = PegsContainer(self._colors_number)
+        self._pegs_list = Pegs(self._colors_number)
 
         for attribute in args:
             print(
-                "Attribute '{attribute}' hasn't been recognized! Ignoring."
-                .format(
-                    attribute=attribute,
-                )
+                f"Attribute '{attribute}' has not been recognized! Ignoring."
             )
 
         for key, value in kwargs.items():
             print(
-                "Keyword '{key}' and it's value '{value}' hasn't been recognized! Ignoring."
-                .format(
-                    key=key,
-                    value=value,
-                )
+                f"Keyword '{key}' and it's value '{value}' has not been recognized! Ignoring."
             )
 
     @property
@@ -317,6 +310,12 @@ class SettingsContainer:
         return self._turns_limit
 
     @property
+    def solver_mode(self):
+        """ Returns solver mode number """
+
+        return self._solver_mode
+
+    @property
     def shuffle_before(self):
         """ Returns 'patterns shuffle before building list' setting """
 
@@ -327,12 +326,6 @@ class SettingsContainer:
         """ Returns 'patterns shuffle after building list' setting """
 
         return self._shuffle_after
-
-    @property
-    def solver_mode(self):
-        """ Returns solver mode number """
-
-        return self._solver_mode
 
     @property
     def progress_timing(self):

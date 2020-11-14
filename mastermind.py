@@ -7,7 +7,7 @@
 
 from abc import abstractmethod
 from random import randrange
-from components import Pattern, Response, SettingsContainer, TurnsContainer
+from components import Pattern, Response, Settings, Turns
 
 
 class Mastermind:
@@ -17,12 +17,17 @@ class Mastermind:
     def __init__(
             self,
             *args,
+            settings,
             **kwargs,
             ):
         """ Initializes new game with given settings """
 
-        self._settings = SettingsContainer(*args, **kwargs)
-        self._turns = TurnsContainer()  # initialize list of turns
+        if isinstance(settings, Settings):
+            self._settings = settings
+        else:
+            self._settings = Settings(*args, **kwargs)
+
+        self._turns = Turns()  # initialize list of turns
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
 
