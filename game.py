@@ -47,29 +47,19 @@ class MastermindGame(Mastermind):
         )
 
         print(
-            "I am CodeMaker and I have prepared {pegs}-peg pattern using {colors} different colors: {list}."
-            .format(
-                pegs=self._settings.pegs_number,
-                colors=self._settings.colors_number,
-                list=self._settings.pegs_list,
-            )
+            f"I am CodeMaker and I have prepared {self._settings.pegs_number}-peg pattern",
+            f"using {self._settings.colors_number} different colors: {self._settings.pegs_list}."
         )
 
         print(
-            "You are CodeBreaker and you have {turns}"
-            .format(
-                turns=self._settings.turns_limit if self._settings.turns_limit else "unlimited",
-            ),
-            "turn" if self._settings.turns_limit == 1 else "turns",
-            "to guess the solution pattern."
+            f"You are CodeBreaker",
+            f"and you have {self._settings.turns_limit if self._settings.turns_limit else 'unlimited'}",
+            f"turn{'s' if self._settings.turns_limit != 1 else ''} to guess the solution pattern."
         )
 
         print(
-            "There are {number} possible patterns in this game. Example pattern is {pattern}."
-            .format(
-                number=self._settings.patterns_number,
-                pattern=self._get_random_pattern(),
-            )
+            f"There are {self._settings.patterns_number} possible patterns in this game.",
+            f"Example pattern is {self._get_random_pattern()}."
         )
 
         print()
@@ -88,10 +78,7 @@ class MastermindGame(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{index:>3d}. Enter `pattern`: "
-            .format(
-                index=self._turns.turns_index + 1,
-            )
+            f"{self._turns.turns_index + 1:>3d}. Enter `pattern`: "
         )
 
     def _game_take_turn(self, pattern_string, pattern=None):
@@ -136,11 +123,8 @@ class MastermindGame(Mastermind):
 
         if self._game_status == 1:
             print(
-                "You found the solution in {turns}"
-                .format(
-                    turns=self._turns.turns_index,
-                ),
-                "turn." if self._turns.turns_index == 1 else "turns."
+                f"You found the solution in {self._turns.turns_index}",
+                f"turn{'s' if self._turns.turns_index != 1 else ''}."
             )
         elif self._game_status == 2:
             print(
@@ -148,10 +132,7 @@ class MastermindGame(Mastermind):
             )
 
         print(
-            "The solution was {pattern}."
-            .format(
-                pattern=self._solution,
-            )
+            f"The solution was {self._solution}."
         )
 
         print(

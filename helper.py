@@ -18,6 +18,7 @@ class MastermindHelper(MastermindSolver):
             ):
         """ Initializes `MastermindHelper` class object """
 
+        # TODO: bug! init runs Solver
         super().__init__(*args, **kwargs)  # initialize MastermindSolver class object
 
         self._helper_intro()
@@ -36,41 +37,26 @@ class MastermindHelper(MastermindSolver):
         )
 
         print(
-            "You are CodeBreaker and somebody has prepared {pegs}-peg pattern using {colors} different colors: {list}."
-            .format(
-                pegs=self._settings.pegs_number,
-                colors=self._settings.colors_number,
-                list=self._settings.pegs_list,
-            )
+            f"You are CodeBreaker and somebody has prepared {self._settings.pegs_number}-peg pattern",
+            f"using {self._settings.colors_number} different colors: {self._settings.pegs_list}."
         )
 
         print(
-            "I am Helper and I have {turns}"
-            .format(
-                turns=self._settings.turns_limit if self._settings.turns_limit else "unlimited",
-            ),
-            "turn" if self._settings.turns_limit == 1 else "turns",
-            "to help you guess the solution pattern."
+            f"I am Helper and I have {self._settings.turns_limit if self._settings.turns_limit else 'unlimited'}",
+            f"turn{'s' if self._settings.turns_limit != 1 else ''} to help you guess the solution pattern."
         )
 
         print(
-            "There are {number} possible patterns in this game. Example pattern is {pattern}."
-            .format(
-                number=self._settings.patterns_number,
-                pattern=self._get_random_pattern(),
-            )
+            f"There are {self._settings.patterns_number} possible patterns in this game.",
+            f"Example pattern is {self._get_random_pattern()}."
         )
 
         print(
-            "Settings: shuffle_before = {shuffle_before}, shuffle_after = {shuffle_after}, solver_mode = {solver_mode}."
-            .format(
-                shuffle_before=self._settings.shuffle_before,
-                shuffle_after=self._settings.shuffle_after,
-                solver_mode=self._settings.solver_mode,
-            )
+            f"Settings:\n",
+            f"solver_mode = {self._settings.solver_mode}\n",
+            f"shuffle_before = {self._settings.shuffle_before}\n",
+            f"shuffle_after = {self._settings.shuffle_after}\n"
         )
-
-        print()
 
     def _helper_loop(self):
         """ Main `Helper` loop """
@@ -86,11 +72,8 @@ class MastermindHelper(MastermindSolver):
         """ Returns formatted prompt for `input` function """
 
         return (
-            "{index:>3d}. Enter `pattern=response` (empty pattern means {pattern}): "
-            .format(
-                index=self._turns.turns_index + 1,
-                pattern=self._solver.current_possible_solution,
-            )
+            f"{self._turns.turns_index + 1:>3d}. "
+            f"Enter `pattern=response` (empty pattern means {self._solver.current_possible_solution}): "
         )
 
     # TODO: refactor with `solver_take_turn`
@@ -147,10 +130,7 @@ class MastermindHelper(MastermindSolver):
         # game is still active
 
         print(
-            "[Helper] One of the possible solution is {pattern}."
-            .format(
-                pattern=self._solver.current_possible_solution,
-            )
+            f"[Helper] One of the possible solution is {self._solver.current_possible_solution}."
         )
 
         if self._solver.single_solution_flag:
@@ -165,17 +145,11 @@ class MastermindHelper(MastermindSolver):
 
         if self._game_status == 1:
             print(
-                "The solution is {pattern}."
-                .format(
-                    pattern=self._solution,
-                )
+                f"The solution is {self._solution}."
             )
             print(
-                "We found the solution in {turns}"
-                .format(
-                    turns=self._turns.turns_index,
-                ),
-                "turn." if self._turns.turns_index == 1 else "turns."
+                f"We found the solution in {self._turns.turns_index}",
+                f" turn{'s' if self._turns.turns_index != 1 else ''}."
             )
         elif self._game_status == 2:
             print(
@@ -188,10 +162,7 @@ class MastermindHelper(MastermindSolver):
 
         if self._settings.progress_timing:
             print(
-                "Total solving time: {time:.3f}s."
-                .format(
-                    time=self._solving_time,
-                ),
+                f"Total solving time: {self._solving_time:.3f}s."
             )
 
         print(

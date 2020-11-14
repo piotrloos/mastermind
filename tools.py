@@ -44,31 +44,21 @@ class Progress:
         """ Prints `title` and `value` """
 
         self._print(
-            "\r{title} {value:3d}%"  # start from the beginning of line
-            .format(
-                title=self._title,
-                value=int(round(self._index * self._inv)),
-            )
+            f"\r{self._title} {int(round(self._index * self._inv)):3d}%"  # start from the beginning of line
         )
 
     def _print_value(self):
         """ Prints `value` """
 
         self._print(
-            "\b\b\b\b{value:3d}%"  # 4 backspaces and the new value (in the same place)
-            .format(
-                value=int(round(self._index * self._inv)),
-            )
+            f"\b\b\b\b{int(round(self._index * self._inv)):3d}%"  # 4 backspaces and the new value (in the same place)
         )
 
     def _print_summary(self):
         """ Prints `summary` in place of `value` """
 
         self._print(
-            "\b\b\b\b{summary}\n"  # 4 backspaces and the summary (in the same place), go to the new line
-            .format(
-                summary=self._summary,
-            )
+            f"\b\b\b\b{self._summary}\n"  # 4 backspaces and the summary (in the same place), go to the new line
         )
 
     def _check_state(self, should_be_running):
@@ -116,12 +106,9 @@ class Progress:
             self._total_time += partial_time
 
             # TODO: 3 different states, clean it up
-            self._summary += \
-                (" (partial time: {partial_time:.3f}s" + ("" if pause else ", total time: {total_time:.3f}s") + ")")\
-                .format(
-                    partial_time=partial_time,
-                    total_time=self._total_time,
-                )
+            self._summary += (
+                f" (partial time: {partial_time:.3f}s{'' if pause else f', total time: {self._total_time:.3f}s'})"
+            )
 
         self._print_summary()
 

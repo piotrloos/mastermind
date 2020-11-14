@@ -110,12 +110,8 @@ class MastermindSolverMode2:
 
         patterns_new_number = self._possible_solutions_number
         print(
-            "[Solver2] Number of possible solutions is now {new} of {old} (rejected {percent:.2f}% of patterns)."
-            .format(
-                new=patterns_new_number,
-                old=patterns_old_number,
-                percent=100 * (1 - patterns_new_number / patterns_old_number),
-            )
+            f"[Solver2] Number of possible solutions is now {patterns_new_number} of {patterns_old_number}"
+            f" (rejected {100 * (1 - patterns_new_number / patterns_old_number):.2f}% of patterns)."
         )
 
         return self._current_possible_solution

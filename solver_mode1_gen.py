@@ -57,24 +57,16 @@ class MastermindSolverMode1Generator:
             if self._progress.item(self._check_possible_solution(pattern)):  # wrapped the long-taking operation
                 self._solving_time = self._progress.stop(
                     pause=True,
-                    summary="Found! It's index is {index} of {all} overall ({percent:.2f}%)."
-                    .format(
-                        index=self._patterns_index,
-                        all=self._patterns_number,
-                        percent=100 * self._patterns_index / self._patterns_number,
-                    ),
+                    summary=f"Found! It's index is {self._patterns_index} of {self._patterns_number}"
+                            f" overall ({100 * self._patterns_index / self._patterns_number:.2f}%)."
                 )
                 return pattern
 
         # after return the last pattern
         self._solving_time = self._progress.stop(
             pause=False,
-            summary="Finished. Reached index {index} of {all} overall ({percent:.2f}%)."
-            .format(
-                index=self._patterns_index,
-                all=self._patterns_number,
-                percent=100 * self._patterns_index / self._patterns_number,  # should be always 100.00%
-            ),
+            summary=f"Finished. Reached index {self._patterns_index} of {self._patterns_number}"
+                    f" overall ({100 * self._patterns_index / self._patterns_number:.2f}%)."  # should be always 100.00%
         )
 
         # no possible solution

@@ -15,12 +15,7 @@ class Peg(int):
     def __str__(self):
         """ Formats `peg` to be printed """
 
-        return (
-            "({peg})"
-            .format(
-                peg=chr(self + 97),  # TODO: implement different styles of formatting peg object
-            )
-        )
+        return f"({chr(self + 97)})"
 
 
 class Pegs(list):
@@ -34,12 +29,7 @@ class Pegs(list):
     def __str__(self):
         """ Formats `Pegs` list to be printed """
 
-        return (
-            "{{{pegs}}}"
-            .format(
-                pegs=",".join(peg.__str__() for peg in self),
-            )
-        )
+        return f"{{{','.join(peg.__str__() for peg in self)}}}"
 
 
 class Pattern(tuple):
@@ -48,12 +38,7 @@ class Pattern(tuple):
     def __str__(self):
         """ Formats `pattern` to be printed """
 
-        return (
-            "[{pegs}]"
-            .format(
-                pegs="".join(peg.__str__() for peg in self),
-            )
-        )
+        return f"[{''.join(peg.__str__() for peg in self)}]"
 
 
 class Patterns(list):
@@ -167,13 +152,14 @@ class Turn(tuple):
         """ Formats `turn` to be printed """
 
         return (
-            "{turn_index:>3d}. {pattern} => {response}"
-            .format(
-                turn_index=self[0],
-                pattern=self[1],
-                response=self[2],
-            )
+            f"{self.turn_index:>3d}. {self.pattern} => {self.response}"
         )
+
+    @property
+    def turn_index(self):
+        """ Returns `turn_index` from turn """
+
+        return self[0]
 
     @property
     def pattern(self):
