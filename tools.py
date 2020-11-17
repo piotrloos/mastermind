@@ -12,7 +12,12 @@ from time import time
 class Progress:
     """ Displays progress (percentage) during long-taking operations """
 
-    def __init__(self, items_number, title="", timing=True):
+    def __init__(
+            self,
+            items_number,
+            title="",
+            timing=True
+    ):
         """ Initializes Progress class object """
 
         if items_number < 1:

@@ -19,7 +19,7 @@ class Mastermind:
             *args,
             settings,
             **kwargs,
-            ):
+    ):
         """ Initializes new game with given settings """
 
         if isinstance(settings, Settings):
@@ -50,8 +50,9 @@ class Mastermind:
     def _get_random_pattern(self):
         """ Returns random pattern for generating the solution or giving a demo pattern """
 
+        # TODO: random pattern from `all_patterns_list`?
         return Pattern(
-            self._settings.pegs_list[randrange(self._settings.colors_number)]
+            self._settings.all_colors_list[randrange(self._settings.colors_number)]
             for _ in range(self._settings.pegs_number)
         )
 
@@ -59,7 +60,8 @@ class Mastermind:
         """ Returns Peg object converted from formatted `peg_char` """
 
         if len(peg_char) == 1:
-            return self._settings.pegs_list[ord(peg_char) - 97]  # TODO: input digits, lowercase or uppercase letters
+            return self._settings.all_colors_list[ord(peg_char) - 97]
+            # TODO: input digits, lowercase or uppercase letters, or own list of pegs
         else:
             return None
 
@@ -112,7 +114,7 @@ class Mastermind:
             isinstance(pattern_tuple, tuple)
             and len(pattern_tuple) == self._settings.pegs_number
             and all(
-                pattern_peg in self._settings.pegs_list
+                pattern_peg in self._settings.all_colors_list
                 for pattern_peg in pattern_tuple
             )
         )
@@ -144,8 +146,8 @@ class Mastermind:
         """ Returns `black_white_pegs` number (how many pegs are in proper color regardless to location) """
 
         return sum(
-            min(pattern1.count(pattern_peg), pattern2.count(pattern_peg))
-            for pattern_peg in self._settings.pegs_list
+            min(pattern1.count(color_peg), pattern2.count(color_peg))
+            for color_peg in self._settings.all_colors_list
         )
 
     def _calculate_response(self, pattern1, pattern2):

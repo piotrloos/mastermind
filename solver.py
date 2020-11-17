@@ -17,13 +17,14 @@ class MastermindSolver(Mastermind):
             self,
             *args,
             **kwargs,
-            ):
+    ):
         """ Initializes `MastermindSolver` class object """
 
         super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
         # TODO: new flag needed: `self._first_turn`
 
+        # TODO: move this section to Settings class
         solvers = {
             1: MastermindSolverMode1,  # patterns checking generator mode
             2: MastermindSolverMode2,  # patterns list filtering mode
@@ -36,6 +37,7 @@ class MastermindSolver(Mastermind):
             self._calculate_black_white_pegs,
         )
 
+        # TODO: bug! helper runs these methods
         self._solver_intro()
         self._solver_loop()
         self._solver_outro()
@@ -53,7 +55,7 @@ class MastermindSolver(Mastermind):
 
         print(
             f"You are CodeMaker and you have prepared {self._settings.pegs_number}-peg pattern",
-            f"using {self._settings.colors_number} different colors: {self._settings.pegs_list}."
+            f"using {self._settings.colors_number} different colors: {self._settings.all_colors_list}."
         )
 
         print(

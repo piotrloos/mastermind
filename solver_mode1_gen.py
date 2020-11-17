@@ -6,7 +6,6 @@
 ########################################
 
 from tools import Progress
-from components import Patterns
 
 
 class MastermindSolverMode1Generator:
@@ -16,22 +15,22 @@ class MastermindSolverMode1Generator:
             self,
             settings,
             check_possible_solution,
-            ):
+    ):
         """ (MODE 1 Generator) Initializes `MastermindSolverMode1Generator` class object """
 
         # TODO: temporary given labels
         self._settings = settings
         self._check_possible_solution = check_possible_solution
 
-        self._patterns_list = Patterns(self._settings)  # get list of all possible solutions to be checked
-        self._patterns_index = 0  # initialize possible solutions index
-        self._patterns_number = len(self._patterns_list)
+        self._all_patterns_list = self._settings.all_patterns_list  # get list of all possible solutions to be checked
+        self._all_patterns_index = 0  # initialize possible solutions index
+        self._all_patterns_number = len(self._all_patterns_list)
 
         self._exhausted = False
         self._solving_time = 0
 
         self._progress = Progress(
-            items_number=self._patterns_number,
+            items_number=self._all_patterns_number,
             title="",
             timing=self._settings.progress_timing,
         )
@@ -49,24 +48,25 @@ class MastermindSolverMode1Generator:
             title=progress_title,
         )
 
-        while self._patterns_index < self._patterns_number:  # index is between 0 and `patterns_number`-1
+        while self._all_patterns_index < self._all_patterns_number:  # index is between 0 and `all_patterns_number`-1
 
-            pattern = self._patterns_list[self._patterns_index]  # get pattern from list
-            self._patterns_index += 1  # index is now between 1 and `patterns_number`
+            pattern = self._all_patterns_list[self._all_patterns_index]  # get pattern from list
+            self._all_patterns_index += 1  # index is now between 1 and `all_patterns_number`
 
             if self._progress.item(self._check_possible_solution(pattern)):  # wrapped the long-taking operation
                 self._solving_time = self._progress.stop(
                     pause=True,
-                    summary=f"Found! It's index is {self._patterns_index} of {self._patterns_number}"
-                            f" overall ({100 * self._patterns_index / self._patterns_number:.2f}%)."
+                    summary=f"Found! It's index is {self._all_patterns_index} of {self._all_patterns_number}"
+                            f" overall ({100 * self._all_patterns_index / self._all_patterns_number:.2f}%)."
                 )
                 return pattern
 
         # after return the last pattern
         self._solving_time = self._progress.stop(
             pause=False,
-            summary=f"Finished. Reached index {self._patterns_index} of {self._patterns_number}"
-                    f" overall ({100 * self._patterns_index / self._patterns_number:.2f}%)."  # should be always 100.00%
+            summary=f"Finished. Reached index {self._all_patterns_index} of {self._all_patterns_number}"
+                    f" overall ({100 * self._all_patterns_index / self._all_patterns_number:.2f}%)."
+                    # ^ should be always 100.00%
         )
 
         # no possible solution

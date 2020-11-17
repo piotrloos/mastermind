@@ -18,16 +18,26 @@ class Peg(int):
         return f"({chr(self + 97)})"
 
 
-class Pegs(list):
-    """ Class for list of pegs """
+class Colors(list):
+    """ Class for list of all peg colors """
 
-    def __init__(self, colors_number):
-        """ Initializes `Pegs` class object """
+    def __init__(
+            self,
+            settings,
+    ):
+        """ Initializes `Colors` class object """
 
-        super().__init__([Peg(peg_value) for peg_value in range(colors_number)])
+        if isinstance(settings, Settings):
+            self._settings = settings
+        else:
+            raise TypeError(
+                "Given `settings` parameter is not Settings object!"
+            )
+
+        super().__init__([Peg(color) for color in range(self._settings.colors_number)])
 
     def __str__(self):
-        """ Formats `Pegs` list to be printed """
+        """ Formats `Colors` list to be printed """
 
         return f"{{{','.join(peg.__str__() for peg in self)}}}"
 
@@ -44,13 +54,29 @@ class Pattern(tuple):
 class Patterns(list):
     """ Class for list of all possible patterns (to be iterated on or to be filtered) """
 
-    def __init__(self, settings):
-        """ Generates all possible patterns """
+    def __init__(
+            self,
+            lst=None,
+            settings=None,
+    ):
+        """ Initializes `Patterns` class object """
 
-        self._settings = settings
+        if isinstance(lst, list):
+            super().__init__(lst)
+        else:
+            if isinstance(settings, Settings):
+                self._settings = settings
+                super().__init__(self._build())
+            else:
+                raise TypeError(
+                    "Given `settings` parameter is not Settings object!"
+                )
 
-        patterns_list = [()]  # initialize temporary list containing empty tuple
-        pegs_list = self._settings.pegs_list[:]  # get local `pegs_list` to be shuffled
+    def _build(self):
+        """ Builds list of all possible patterns """
+
+        all_patterns_list = [()]  # initialize temporary list containing empty tuple
+        all_colors_list = self._settings.all_colors_list[:]  # get local `all_colors_list` to be shuffled
 
         progress = Progress(
             items_number=sum(self._settings.colors_number ** i for i in range(1, self._settings.pegs_number + 1)),
@@ -63,36 +89,34 @@ class Patterns(list):
         # iterate for `pegs_number`-1 times
         for _ in range(self._settings.pegs_number - 1):
 
-            # shuffle `pegs_list` to build patterns from (on every iteration)
+            # shuffle `all_colors_list` to build patterns from (on every iteration)
             if self._settings.shuffle_before:
                 shuffle(
-                    pegs_list,
+                    all_colors_list,
                     progress=None,
                 )
 
             # make temporary list of tuples (on every iteration)
-            patterns_list = [
+            all_patterns_list = [
                 progress.item((*pattern, new_peg))
-                for pattern in patterns_list
-                for new_peg in pegs_list
+                for pattern in all_patterns_list
+                for new_peg in all_colors_list
             ]
             # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
 
-        # shuffle `pegs_list` to build Pattern objects from
+        # shuffle `all_colors_list` to build Pattern objects from
         if self._settings.shuffle_before:
             shuffle(
-                pegs_list,
+                all_colors_list,
                 progress=None,
             )
 
         # make final list of Pattern objects
-        super().__init__(
-            [
-                progress.item(Pattern((*pattern, new_peg)))
-                for pattern in patterns_list
-                for new_peg in pegs_list
-            ]
-        )
+        all_patterns_list = [
+            progress.item(Pattern((*pattern, new_peg)))
+            for pattern in all_patterns_list
+            for new_peg in all_colors_list
+        ]
         # new pattern is Pattern object a one peg bigger (unpacked "old" pegs + "new" one)
 
         progress.stop()
@@ -100,13 +124,15 @@ class Patterns(list):
         # shuffle generated patterns list (whole list at once)
         if self._settings.shuffle_after:
             shuffle(
-                self,
+                all_patterns_list,
                 progress=Progress(
                     items_number=self.__len__() - 1,
                     title="Shuffling patterns list...",
                     timing=self._settings.progress_timing,
                 )
             )
+
+        return all_patterns_list
 
     def print_patterns(self):
         """ Prints all patterns """
@@ -218,7 +244,7 @@ class Settings:
             mode1_second_solution=MODE1_SECOND_SOLUTION,
             mode2_random_pattern=MODE2_RANDOM_PATTERN,
             **kwargs,
-            ):
+    ):
         """ Initializes `Settings` class object """
 
         # check if given number of colors is correct
@@ -259,8 +285,6 @@ class Settings:
         self._mode1_second_solution = bool(mode1_second_solution)
         self._mode2_random_pattern = bool(mode2_random_pattern)
 
-        self._pegs_list = Pegs(self._colors_number)
-
         for attribute in args:
             print(
                 f"Attribute '{attribute}' has not been recognized! Ignoring."
@@ -270,6 +294,9 @@ class Settings:
             print(
                 f"Keyword '{key}' and it's value '{value}' has not been recognized! Ignoring."
             )
+
+        self._all_colors_list = Colors(settings=self)
+        self._all_patterns_list = Patterns(settings=self)
 
     @property
     def colors_number(self):
@@ -332,7 +359,13 @@ class Settings:
         return self._mode2_random_pattern
 
     @property
-    def pegs_list(self):
-        """ Returns list of pegs """
+    def all_colors_list(self):
+        """ Returns `Colors` object containing list of pegs with all possible colors """
 
-        return self._pegs_list
+        return self._all_colors_list
+
+    @property
+    def all_patterns_list(self):
+        """ Returns `Patterns` object containing list of all possible patterns """
+
+        return self._all_patterns_list

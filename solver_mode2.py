@@ -19,7 +19,7 @@ class MastermindSolverMode2:
             turns,
             calculate_black_pegs,
             calculate_black_white_pegs,
-            ):
+    ):
         """ (MODE 2) Initializes `MastermindSolverMode2` class object """
 
         # TODO: temporary given labels
@@ -30,8 +30,7 @@ class MastermindSolverMode2:
 
         self._solving_time = 0
 
-        # TODO: for first time it's PatternsContainer object, later it's just list
-        self._possible_solutions_list = Patterns(self._settings)  # get list of all possible solutions
+        self._possible_solutions_list = self._settings.all_patterns_list.copy()  # get list of all possible solutions
         self._analyze_the_list()
 
     def _analyze_the_list(self):
@@ -91,10 +90,15 @@ class MastermindSolverMode2:
 
         progress.start()
 
+        # if self._possible_solutions_list is None:
+        #     patterns_list = self._settings.all_patterns
+        # else:
+        #     patterns_list = self._possible_solutions_list
+
         # TODO: try to speed up these calculations
-        self._possible_solutions_list = [
+        self._possible_solutions_list = Patterns(lst=[
             possible_solution
-            for possible_solution in self._possible_solutions_list
+            for possible_solution in self._possible_solutions_list  # patterns_list
             if progress.item(
                 self._calculate_black_pegs(turn_pattern, possible_solution) ==
                 turn_response.black_pegs
@@ -102,7 +106,7 @@ class MastermindSolverMode2:
                 self._calculate_black_white_pegs(turn_pattern, possible_solution) ==
                 turn_response.black_pegs + turn_response.white_pegs
             )
-        ]
+        ])
 
         self._solving_time += progress.stop()
 

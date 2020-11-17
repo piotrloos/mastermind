@@ -17,7 +17,7 @@ class MastermindSolverMode1:
             turns,
             calculate_black_pegs,
             calculate_black_white_pegs,
-            ):
+    ):
         """ (MODE 1) Initializes `MastermindSolverMode1` class object """
 
         # TODO: temporary given labels

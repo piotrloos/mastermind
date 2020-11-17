@@ -15,7 +15,7 @@ class MastermindHelper(MastermindSolver):
             self,
             *args,
             **kwargs,
-            ):
+    ):
         """ Initializes `MastermindHelper` class object """
 
         # TODO: bug! init runs Solver
@@ -38,7 +38,7 @@ class MastermindHelper(MastermindSolver):
 
         print(
             f"You are CodeBreaker and somebody has prepared {self._settings.pegs_number}-peg pattern",
-            f"using {self._settings.colors_number} different colors: {self._settings.pegs_list}."
+            f"using {self._settings.colors_number} different colors: {self._settings.all_colors_list}."
         )
 
         print(
@@ -129,10 +129,13 @@ class MastermindHelper(MastermindSolver):
 
         # game is still active
 
+        # TODO: print this before turn
         print(
             f"[Helper] One of the possible solution is {self._solver.current_possible_solution}."
         )
+        # TODO: print info if it's the same proposition as in previous turn or another (new pattern)
 
+        # TODO: print this by `solver1` or `solver2`, not here
         if self._solver.single_solution_flag:
             print(
                 "[Helper] Now I know there is only one possible solution!"
