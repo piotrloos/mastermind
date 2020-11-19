@@ -5,13 +5,13 @@
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: stworzenie pliku `readme.md`
 
-# TODO: klasa Generator dla MODE 2?
+# TODO: klasa Generator dla Solver2?
 # TODO: możliwość wyłączenia Progressu
 # TODO: formatowanie patternów (Colorama)
 
 # optymalizacja
 
-# TODO: optymalizacja grupowego filtrowania patternów (MODE 1 i MODE 2)
+# TODO: optymalizacja grupowego filtrowania patternów (Solver1 i Solver2)
 
 # polecenia "shella":
 
@@ -19,7 +19,7 @@
 # TODO: !next: inna propozycja rozwiązania w Helperze
 # TODO: !help: pomoc, możliwe polecenia, instrukcja gry
 # TODO: !exit: skrót do wyjścia z gry
-# TODO: !list: lista możliwych rozwiązań w Helperze (tylko MODE 2?)
+# TODO: !list: lista możliwych rozwiązań w Helperze (tylko Solver2?)
 # TODO: !undo: cofnięcie ostatniego ruchu
 # TODO: !pass: opcja poddania się (nowy `_game_status`)
 # TODO: !restart: restart gry z tym samym rozwiązaniem
@@ -30,11 +30,11 @@
 
 # później, pomysły itp.:
 
-# TODO: MODE1 - liczenie liczby możliwych patternów generatora (kopiowanie generatora wraz ze stanem)
+# TODO: Solver1 - liczenie liczby możliwych patternów generatora (kopiowanie generatora wraz ze stanem)
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
 # TODO: przyjmowanie własnej listy Pegów
 # TODO: opcje: allow_duplicates, allow_blanks
-# TODO: MODE 1 - przyspieszenie generatora:
+# TODO: Solver1 - przyspieszenie generatora:
 # TODO:     ocena ważności wyniku i sprawdzanie all() po ważności
 # TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
 # TODO:     wielowątkowość

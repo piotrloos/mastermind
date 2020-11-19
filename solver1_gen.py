@@ -1,22 +1,22 @@
 ########################################
 # My version of famous game Mastermind #
-# solver_mode1_gen.py                  #
-# Mastermind Solver MODE 1 Generator   #
+# solver1_gen.py                       #
+# Mastermind Solver1 Generator         #
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
 from tools import Progress
 
 
-class MastermindSolverMode1Generator:
-    """ (MODE 1) Contains possible solutions generator """
+class MastermindSolver1Generator:
+    """ (Solver1) Contains possible solutions generator for Solver1 """
 
     def __init__(
             self,
             settings,
             check_possible_solution,
     ):
-        """ (MODE 1 Generator) Initializes `MastermindSolverMode1Generator` class object """
+        """ (Solver1 Generator) Initializes `MastermindSolver1Generator` class object """
 
         # TODO: temporary given labels
         self._settings = settings
@@ -36,12 +36,12 @@ class MastermindSolverMode1Generator:
         )
 
     def get_next(self, progress_title):
-        """ (MODE 1 Generator) Returns the first possible solution based on all previous turns """
+        """ (Solver1 Generator) Returns the first possible solution based on all previous turns """
 
         # TODO: generator exhausted bug
         # if self._exhausted:
         #     raise RuntimeError(
-        #       "MODE 1 Generator is already exhausted!"
+        #       "Solver1 Generator is already exhausted!"
         #     )
 
         self._progress.start(
@@ -75,6 +75,6 @@ class MastermindSolverMode1Generator:
 
     @property
     def solving_time(self):
-        """ (MODE 1 Generator) Returns total solving time """
+        """ (Solver1 Generator) Returns total solving time """
 
         return self._solving_time

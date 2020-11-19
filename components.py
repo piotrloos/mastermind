@@ -5,7 +5,7 @@
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-from consts import *
+from consts import Consts
 from tools import Progress, shuffle
 
 
@@ -234,21 +234,21 @@ class Settings:
     def __init__(
             self,
             *args,
-            colors_number=COLORS_NUMBER,
-            pegs_number=PEGS_NUMBER,
-            turns_limit=TURNS_LIMIT,
-            solver_mode=SOLVER_MODE,
-            shuffle_before=SHUFFLE_BEFORE,
-            shuffle_after=SHUFFLE_AFTER,
-            progress_timing=PROGRESS_TIMING,
-            mode1_second_solution=MODE1_SECOND_SOLUTION,
-            mode2_random_pattern=MODE2_RANDOM_PATTERN,
+            colors_number=Consts.COLORS_NUMBER,
+            pegs_number=Consts.PEGS_NUMBER,
+            turns_limit=Consts.TURNS_LIMIT,
+            solver_index=Consts.SOLVER_INDEX,
+            shuffle_before=Consts.SHUFFLE_BEFORE,
+            shuffle_after=Consts.SHUFFLE_AFTER,
+            progress_timing=Consts.PROGRESS_TIMING,
+            solver1_second_solution=Consts.SOLVER1_SECOND_SOLUTION,
+            solver2_random_pattern=Consts.SOLVER2_RANDOM_PATTERN,
             **kwargs,
     ):
         """ Initializes `Settings` class object """
 
         # check if given number of colors is correct
-        if colors_number in range(2, COLORS_NUMBER_MAX + 1):
+        if colors_number in range(2, Consts.COLORS_NUMBER_MAX + 1):
             self._colors_number = colors_number
         else:
             raise ValueError(
@@ -256,7 +256,7 @@ class Settings:
             )
 
         # check if given number of pegs is correct
-        if pegs_number in range(2, PEGS_NUMBER_MAX + 1):
+        if pegs_number in range(2, Consts.PEGS_NUMBER_MAX + 1):
             self._pegs_number = pegs_number
         else:
             raise ValueError(
@@ -264,26 +264,27 @@ class Settings:
             )
 
         # check if given `turns_limit` number is correct
-        if turns_limit in range(0, TURNS_LIMIT_MAX + 1):  # turns_limit = 0 means unlimited turns
+        if turns_limit in range(0, Consts.TURNS_LIMIT_MAX + 1):  # turns_limit = 0 means unlimited turns
             self._turns_limit = turns_limit
         else:
             raise ValueError(
                 f"Incorrect turns limit number ({turns_limit})."
             )
 
-        # check if given `solver_mode` is correct
-        if solver_mode in {1, 2}:
-            self._solver_mode = solver_mode
+        # check if given `solver_index` is correct
+        if solver_index in Consts.SOLVERS.keys():
+            self._solver_index = solver_index
+            self._solvers = Consts.SOLVERS
         else:
             raise ValueError(
-                f"Incorrect solving mode ({solver_mode})."
+                f"Incorrect solver index ({solver_index})."
             )
 
         self._shuffle_before = bool(shuffle_before)
         self._shuffle_after = bool(shuffle_after)
         self._progress_timing = bool(progress_timing)
-        self._mode1_second_solution = bool(mode1_second_solution)
-        self._mode2_random_pattern = bool(mode2_random_pattern)
+        self._solver1_second_solution = bool(solver1_second_solution)
+        self._solver2_random_pattern = bool(solver2_random_pattern)
 
         for attribute in args:
             print(
@@ -323,10 +324,10 @@ class Settings:
         return self._turns_limit
 
     @property
-    def solver_mode(self):
-        """ Returns solver mode number """
+    def solver_index(self):
+        """ Returns solver index """
 
-        return self._solver_mode
+        return self._solver_index
 
     @property
     def shuffle_before(self):
@@ -347,16 +348,16 @@ class Settings:
         return self._progress_timing
 
     @property
-    def mode1_second_solution(self):
-        """ Returns `second_solution` setting for Solver MODE 1 """
+    def solver1_second_solution(self):
+        """ Returns `solver1_second_solution` setting (only for Solver1) """
 
-        return self._mode1_second_solution
+        return self._solver1_second_solution
 
     @property
-    def mode2_random_pattern(self):
-        """ Returns `random_pattern` setting for Solver MODE 2 """
+    def solver2_random_pattern(self):
+        """ Returns `solver2_random_pattern` setting (only for Solver2) """
 
-        return self._mode2_random_pattern
+        return self._solver2_random_pattern
 
     @property
     def all_colors_list(self):
@@ -369,3 +370,9 @@ class Settings:
         """ Returns `Patterns` object containing list of all possible patterns """
 
         return self._all_patterns_list
+
+    @property
+    def solvers(self):
+        """ Returns dict containing all defined solvers (in Consts) """
+
+        return self._solvers

@@ -5,12 +5,12 @@
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-from abc import abstractmethod
+from abc import ABCMeta, abstractmethod
 from random import randrange
 from components import Pattern, Response, Settings, Turns
 
 
-class Mastermind:
+class Mastermind(metaclass=ABCMeta):
     """ Contains whole game, base class for MastermindGame and MastermindSolver classes """
 
     @abstractmethod
@@ -30,6 +30,13 @@ class Mastermind:
         self._turns = Turns()  # initialize list of turns
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
+
+        self._solver = self._settings.solvers[self._settings.solver_index](  # instantiate Solver class
+            self._settings,
+            self._turns,
+            self._calculate_black_pegs,
+            self._calculate_black_white_pegs,
+        )
 
     @property
     def solution(self):

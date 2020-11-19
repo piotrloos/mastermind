@@ -18,7 +18,7 @@ class MastermindHelper(MastermindSolver):
     ):
         """ Initializes `MastermindHelper` class object """
 
-        # TODO: bug! init runs Solver
+        # TODO: inheritance bug! init runs Solver
         super().__init__(*args, **kwargs)  # initialize MastermindSolver class object
 
         self._helper_intro()
@@ -53,7 +53,7 @@ class MastermindHelper(MastermindSolver):
 
         print(
             f"Settings:\n",
-            f"solver_mode = {self._settings.solver_mode}\n",
+            f"solver_index = {self._settings.solver_index}\n",
             f"shuffle_before = {self._settings.shuffle_before}\n",
             f"shuffle_after = {self._settings.shuffle_after}\n"
         )

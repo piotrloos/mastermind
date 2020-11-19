@@ -99,7 +99,7 @@ class MastermindGame(Mastermind):
         response = self._calculate_response(pattern, self._solution)
 
         print()
-        # TODO: use Solver (MODE1) `check_possible_solution` method here
+        # TODO: use Solver1 `check_possible_solution` method here
         #  to print info if given pattern could be the solution (like in Helper)
 
         self._turns.add_turn(pattern, response)

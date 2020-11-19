@@ -1,17 +1,17 @@
 ########################################
 # My version of famous game Mastermind #
-# solver_mode2.py                      #
-# Mastermind Solver MODE 2             #
+# solver2.py                           #
+# Mastermind Solver2                   #
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
 from tools import Progress
-from components import Patterns
+# from components import Patterns  # TODO: circular import bug!
 from random import randrange
 
 
-class MastermindSolverMode2:
-    """ Contains Mastermind Solver MODE 2 (patterns list filtering mode) """
+class MastermindSolver2:
+    """ Contains Mastermind Solver2 (patterns list filtering Solver) """
 
     def __init__(
             self,
@@ -20,7 +20,7 @@ class MastermindSolverMode2:
             calculate_black_pegs,
             calculate_black_white_pegs,
     ):
-        """ (MODE 2) Initializes `MastermindSolverMode2` class object """
+        """ (Solver2) Initializes `MastermindSolver2` class object """
 
         # TODO: temporary given labels
         self._settings = settings
@@ -34,13 +34,13 @@ class MastermindSolverMode2:
         self._analyze_the_list()
 
     def _analyze_the_list(self):
-        """ (MODE 2) Gets the possible solution, gets the possible solutions number and sets the flag """
+        """ (Solver2) Gets the possible solution, gets the possible solutions number and sets the flag """
 
         self._possible_solutions_number = len(self._possible_solutions_list)
         self._single_solution_flag = (self._possible_solutions_number == 1)
 
         if self._possible_solutions_number:
-            if self._settings.mode2_random_pattern:
+            if self._settings.solver2_random_pattern:
                 index = randrange(self._possible_solutions_number)
             else:
                 index = 0
@@ -50,35 +50,35 @@ class MastermindSolverMode2:
 
     @property
     def possible_solutions_number(self):
-        """ (MODE 2) Returns number of possible solutions """
+        """ (Solver2) Returns number of possible solutions """
 
         return self._possible_solutions_number
 
     @property
     def current_possible_solution(self):
-        """ (MODE 2) Returns current possible solution (in this turn) """
+        """ (Solver2) Returns current possible solution (in this turn) """
 
         return self._current_possible_solution
 
     @property
     def single_solution_flag(self):
-        """ (MODE 2) Returns single possible solution flag """
+        """ (Solver2) Returns single possible solution flag """
 
         return self._single_solution_flag
 
     @property
     def solving_time(self):
-        """ (MODE 2) Returns total solving time """
+        """ (Solver2) Returns total solving time """
 
         return self._solving_time
 
     def check_possible_solution(self, possible_solution):
-        """ (MODE 2) Checks if given possible solution can be a solution based on all previous turns """
+        """ (Solver2) Checks if given possible solution can be a solution based on all previous turns """
 
         return possible_solution in self._possible_solutions_list
 
     def calculate_possible_solution(self, turn_pattern, turn_response, *_):
-        """ (MODE 2) Calculates the next possible solution after current turn """
+        """ (Solver2) Calculates the next possible solution after current turn """
 
         patterns_old_number = self._possible_solutions_number
 
@@ -96,7 +96,7 @@ class MastermindSolverMode2:
         #     patterns_list = self._possible_solutions_list
 
         # TODO: try to speed up these calculations
-        self._possible_solutions_list = Patterns(lst=[
+        self._possible_solutions_list = [  # TODO: circular import bug!  # Patterns(lst=[
             possible_solution
             for possible_solution in self._possible_solutions_list  # patterns_list
             if progress.item(
@@ -106,7 +106,7 @@ class MastermindSolverMode2:
                 self._calculate_black_white_pegs(turn_pattern, possible_solution) ==
                 turn_response.black_pegs + turn_response.white_pegs
             )
-        ])
+        ]
 
         self._solving_time += progress.stop()
 

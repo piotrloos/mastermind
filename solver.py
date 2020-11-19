@@ -6,8 +6,6 @@
 ########################################
 
 from mastermind import Mastermind
-from solver_mode1 import MastermindSolverMode1
-from solver_mode2 import MastermindSolverMode2
 
 
 class MastermindSolver(Mastermind):
@@ -24,20 +22,7 @@ class MastermindSolver(Mastermind):
 
         # TODO: new flag needed: `self._first_turn`
 
-        # TODO: move this section to Settings class
-        solvers = {
-            1: MastermindSolverMode1,  # patterns checking generator mode
-            2: MastermindSolverMode2,  # patterns list filtering mode
-        }
-
-        self._solver = solvers[self._settings.solver_mode](
-            self._settings,
-            self._turns,
-            self._calculate_black_pegs,
-            self._calculate_black_white_pegs,
-        )
-
-        # TODO: bug! helper runs these methods
+        # TODO: inheritance bug! helper runs these methods
         self._solver_intro()
         self._solver_loop()
         self._solver_outro()
@@ -70,7 +55,7 @@ class MastermindSolver(Mastermind):
 
         print(
             f"Settings:\n",
-            f"solver_mode = {self._settings.solver_mode}\n",
+            f"solver_index = {self._settings.solver_index}\n",
             f"shuffle_before = {self._settings.shuffle_before}\n",
             f"shuffle_after = {self._settings.shuffle_after}\n"
         )
