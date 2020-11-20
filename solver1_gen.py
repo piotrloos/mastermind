@@ -66,8 +66,10 @@ class MastermindSolver1Generator:
             pause=False,
             summary=f"Finished. Reached index {self._all_patterns_index} of {self._all_patterns_number}"
                     f" overall ({100 * self._all_patterns_index / self._all_patterns_number:.2f}%)."
-                    # ^ should be always 100.00%
         )
+
+        # ensure `index` reached number of all patterns
+        assert self._all_patterns_index == self._all_patterns_number, "[Solver1] Incorrect pattern index value"
 
         # no possible solution
         self._exhausted = True

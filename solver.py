@@ -20,9 +20,6 @@ class MastermindSolver(Mastermind):
 
         super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
-        # TODO: new flag needed: `self._first_turn`
-
-        # TODO: inheritance bug! helper runs these methods
         self._solver_intro()
         self._solver_loop()
         self._solver_outro()

@@ -5,11 +5,11 @@
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-from solver import MastermindSolver
+from solver import Mastermind
 
 
-class MastermindHelper(MastermindSolver):
-    """ Contains Mastermind Helper mode, inherits from MastermindSolver class """
+class MastermindHelper(Mastermind):
+    """ Contains Mastermind Helper mode, inherits from Mastermind class """
 
     def __init__(
             self,
@@ -18,8 +18,7 @@ class MastermindHelper(MastermindSolver):
     ):
         """ Initializes `MastermindHelper` class object """
 
-        # TODO: inheritance bug! init runs Solver
-        super().__init__(*args, **kwargs)  # initialize MastermindSolver class object
+        super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
         self._helper_intro()
         self._helper_loop()
@@ -66,6 +65,18 @@ class MastermindHelper(MastermindSolver):
                 self._helper_take_turn(input(self._helper_prompt))
             except ValueError as err:
                 print(err)
+
+    @property
+    def _possible_solutions_number(self):
+        """ Returns number of possible solutions """
+
+        return self._solver.possible_solutions_number
+
+    @property
+    def _solving_time(self):
+        """ Returns total solving time """
+
+        return self._solver.solving_time
 
     @property
     def _helper_prompt(self):

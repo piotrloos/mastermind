@@ -72,6 +72,7 @@ class Patterns(list):
                     "Given `settings` parameter is not Settings object!"
                 )
 
+    # TODO: setting that builds list of patterns or not
     def _build(self):
         """ Builds list of all possible patterns """
 
