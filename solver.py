@@ -47,7 +47,7 @@ class MastermindSolver(Mastermind):
 
         print(
             f"There are {self._settings.patterns_number} possible patterns in this game.",
-            f"Example pattern is {self._get_random_pattern()}."
+            f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
 
         print(
@@ -97,7 +97,7 @@ class MastermindSolver(Mastermind):
             )
 
         if response is None:
-            response = self._decode_response(response_string)
+            response = self._settings.Response.decode_response(response_string)
             if response is None:
                 raise ValueError(
                     "[Solver] Given `response` is incorrect! Enter again."
@@ -143,7 +143,8 @@ class MastermindSolver(Mastermind):
                 f"The solution is {self._solution}."
             )
             print(
-                f"I found the solution in {self._turns.turns_index} turn{'s' if self._turns.turns_index != 1 else ''}."
+                f"I found the solution in {self._turns.turns_index}",
+                f"turn{'s' if self._turns.turns_index != 1 else ''}."
             )
         elif self._game_status == 2:
             print(

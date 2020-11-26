@@ -15,16 +15,12 @@ class MastermindSolver1:
             self,
             settings,
             turns,
-            calculate_black_pegs,
-            calculate_black_white_pegs,
     ):
         """ (Solver1) Initializes `MastermindSolver1` class object """
 
         # TODO: temporary given labels
         self._settings = settings
         self._turns = turns
-        self._calculate_black_pegs = calculate_black_pegs
-        self._calculate_black_white_pegs = calculate_black_white_pegs
 
         self._generator = MastermindSolver1Generator(self._settings, self.check_possible_solution)
         self._current_possible_solution = None
@@ -69,10 +65,10 @@ class MastermindSolver1:
 
         # TODO: try to speed up these calculations
         return all(
-            self._calculate_black_pegs(turn.pattern, possible_solution) ==
+            self._settings.Pattern.calculate_black_pegs(turn.pattern, possible_solution) ==
             turn.response.black_pegs
             and
-            self._calculate_black_white_pegs(turn.pattern, possible_solution) ==
+            self._settings.Pattern.calculate_black_white_pegs(turn.pattern, possible_solution) ==
             turn.response.black_pegs + turn.response.white_pegs
             for turn in self._turns
         )

@@ -6,7 +6,6 @@
 ########################################
 
 from tools import Progress
-# from components import Patterns  # TODO: circular import bug!
 from random import randrange
 
 
@@ -17,16 +16,12 @@ class MastermindSolver2:
             self,
             settings,
             turns,
-            calculate_black_pegs,
-            calculate_black_white_pegs,
     ):
         """ (Solver2) Initializes `MastermindSolver2` class object """
 
         # TODO: temporary given labels
         self._settings = settings
         self._turns = turns
-        self._calculate_black_pegs = calculate_black_pegs
-        self._calculate_black_white_pegs = calculate_black_white_pegs
 
         self._solving_time = 0
 
@@ -96,17 +91,17 @@ class MastermindSolver2:
         #     patterns_list = self._possible_solutions_list
 
         # TODO: try to speed up these calculations
-        self._possible_solutions_list = [  # TODO: circular import bug!  # Patterns(lst=[
+        self._possible_solutions_list = self._settings.Patterns(lst=[
             possible_solution
             for possible_solution in self._possible_solutions_list  # patterns_list
             if progress.item(
-                self._calculate_black_pegs(turn_pattern, possible_solution) ==
+                self._settings.Pattern.calculate_black_pegs(turn_pattern, possible_solution) ==
                 turn_response.black_pegs
                 and
-                self._calculate_black_white_pegs(turn_pattern, possible_solution) ==
+                self._settings.Pattern.calculate_black_white_pegs(turn_pattern, possible_solution) ==
                 turn_response.black_pegs + turn_response.white_pegs
             )
-        ]
+        ])
 
         self._solving_time += progress.stop()
 

@@ -5,7 +5,7 @@
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-from mastermind import Mastermind, Pattern
+from mastermind import Mastermind
 
 
 class MastermindGame(Mastermind):
@@ -22,10 +22,10 @@ class MastermindGame(Mastermind):
         super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
         if solution is None:  # check if `solution` is given
-            self._solution = self._get_random_pattern()
+            self._solution = self._settings.Pattern.get_random_pattern()
         else:
-            if self._validate_pattern(solution):  # TODO: validate Pattern object?
-                self._solution = Pattern(solution)
+            if self._settings.Pattern.validate_pattern(solution):  # TODO: validate Pattern object?
+                self._solution = self._settings.Pattern(solution)
             else:
                 raise ValueError(
                     "Incorrect solution pattern."
@@ -59,7 +59,7 @@ class MastermindGame(Mastermind):
 
         print(
             f"There are {self._settings.patterns_number} possible patterns in this game.",
-            f"Example pattern is {self._get_random_pattern()}."
+            f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
 
         print()
@@ -90,13 +90,13 @@ class MastermindGame(Mastermind):
             )
 
         if pattern is None:
-            pattern = self._decode_pattern(pattern_string)
+            pattern = self._settings.Pattern.decode_pattern(pattern_string)
             if pattern is None:
                 raise ValueError(
                     "[Game] Given `pattern` is incorrect! Enter again."
                 )
 
-        response = self._calculate_response(pattern, self._solution)
+        response = self._settings.Pattern.calculate_response(pattern, self._solution)
 
         print()
         # TODO: use Solver1 `check_possible_solution` method here
