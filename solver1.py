@@ -60,16 +60,14 @@ class MastermindSolver1:
     def check_possible_solution(self, possible_solution):
         """ (Solver1) Checks if given possible solution can be a solution based on all previous turns """
 
-        if possible_solution is None:
+        if possible_solution is None:  # TODO: after fixing exhausted bug, this `if` should be deleted
             return False
 
         # TODO: try to speed up these calculations
         return all(
-            self._settings.Pattern.calculate_black_pegs(turn.pattern, possible_solution) ==
-            turn.response.black_pegs
+            possible_solution.calculate_black_pegs(turn.pattern) == turn.response.black_pegs
             and
-            self._settings.Pattern.calculate_black_white_pegs(turn.pattern, possible_solution) ==
-            turn.response.black_pegs + turn.response.white_pegs
+            possible_solution.calculate_black_white_pegs(turn.pattern) == turn.response.black_white_pegs
             for turn in self._turns
         )
 

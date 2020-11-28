@@ -30,7 +30,7 @@ def peg_class(settings):
             """ Returns Peg object converted from formatted `peg_char` """
 
             if len(peg_char) == 1:
-                return settings.Peg(ord(peg_char) - 97)  # TODO: return cls(...) does not work
+                return Peg(ord(peg_char) - 97)
                 # TODO: input digits, lowercase or uppercase letters, or own list of pegs
             else:
                 return None
@@ -105,43 +105,49 @@ def pattern_class(settings):
                 return None
 
             if cls.validate_pattern(pattern_tuple):
-                return settings.Pattern(pattern_tuple)  # TODO: return cls(...) does not work
+                return Pattern(pattern_tuple)
             else:
                 return None
 
-        @classmethod
-        def get_random_pattern(cls):
+        @staticmethod
+        def get_random_pattern():
             """ Returns random pattern for generating the solution or giving a demo pattern """
 
-            return settings.Pattern(  # TODO: return cls(...) does not work
+            return Pattern(
                 settings.all_colors_list[__import__('random').randrange(settings.colors_number)]
                 for _ in range(settings.pegs_number)
             )
 
-        @staticmethod
-        def calculate_black_pegs(pattern1, pattern2):
+        def calculate_black_pegs(self, other):
             """ Returns `black_pegs` number (how many pegs are in proper color and in proper location) """
+
+            # return sum(
+            #     int(self[index] == other[index])
+            #     for index in range(settings.pegs_number)
+            # )
 
             return sum(
                 int(pattern1_peg == pattern2_peg)
-                for pattern1_peg, pattern2_peg in zip(pattern1, pattern2)
+                for pattern1_peg, pattern2_peg in zip(self, other)
             )
 
-        @staticmethod
-        def calculate_black_white_pegs(pattern1, pattern2):
+        def calculate_black_white_pegs(self, other):
             """ Returns `black_white_pegs` number (how many pegs are in proper color regardless to location) """
 
+            # if not hasattr(self, '_color_dict'):
+            #     self._color_dict = {color: self.count(color) for color in settings.all_colors_list}
+            #     print(self._color_dict)
+
             return sum(
-                min(pattern1.count(color_peg), pattern2.count(color_peg))
-                for color_peg in settings.all_colors_list
+                min(self.count(color), other.count(color))
+                for color in settings.all_colors_list
             )
 
-        @classmethod
-        def calculate_response(cls, pattern1, pattern2):
+        def calculate_response(self, other):
             """ Returns calculated Response object for given pattern related to other pattern """
 
-            black_pegs = cls.calculate_black_pegs(pattern1, pattern2)
-            black_white_pegs = cls.calculate_black_white_pegs(pattern1, pattern2)
+            black_pegs = self.calculate_black_pegs(other)
+            black_white_pegs = self.calculate_black_white_pegs(other)
 
             # `white_pegs` defines how many pegs are in proper color and wrong location
             # to calculate `white_pegs` it's needed to subtract `black_pegs` from `black_white_pegs`
@@ -281,6 +287,12 @@ def response_class(settings):
 
             return self[1]
 
+        @property
+        def black_white_pegs(self):
+            """ Returns `black_pegs` + `white_pegs` from `response` """
+
+            return self[0] + self[1]
+
         @classmethod
         def validate_response(cls, response_tuple):
             """ Checks if given `response_tuple` is formally correct """
@@ -308,7 +320,7 @@ def response_class(settings):
                 return None
 
             if cls.validate_response(response_tuple):
-                return settings.Response(response_tuple)  # TODO: return cls(...) does not work
+                return Response(response_tuple)
             else:
                 return None
 
@@ -367,7 +379,9 @@ class Turns(list):
         """ Adds current turn to `Turns` """
 
         self._turns_index += 1
-        self.append(Turn((self._turns_index, pattern, response)))
+        turn = Turn((self._turns_index, pattern, response))
+        self.append(turn)
+        return turn
 
     def print_turns(self):
         """ Prints all turns """

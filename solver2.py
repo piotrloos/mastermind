@@ -72,7 +72,7 @@ class MastermindSolver2:
 
         return possible_solution in self._possible_solutions_list
 
-    def calculate_possible_solution(self, turn_pattern, turn_response, *_):
+    def calculate_possible_solution(self, turn, *_):
         """ (Solver2) Calculates the next possible solution after current turn """
 
         patterns_old_number = self._possible_solutions_number
@@ -85,21 +85,14 @@ class MastermindSolver2:
 
         progress.start()
 
-        # if self._possible_solutions_list is None:
-        #     patterns_list = self._settings.all_patterns
-        # else:
-        #     patterns_list = self._possible_solutions_list
-
         # TODO: try to speed up these calculations
         self._possible_solutions_list = self._settings.Patterns(lst=[
             possible_solution
-            for possible_solution in self._possible_solutions_list  # patterns_list
+            for possible_solution in self._possible_solutions_list
             if progress.item(
-                self._settings.Pattern.calculate_black_pegs(turn_pattern, possible_solution) ==
-                turn_response.black_pegs
+                turn.pattern.calculate_black_pegs(possible_solution) == turn.response.black_pegs
                 and
-                self._settings.Pattern.calculate_black_white_pegs(turn_pattern, possible_solution) ==
-                turn_response.black_pegs + turn_response.white_pegs
+                turn.pattern.calculate_black_white_pegs(possible_solution) == turn.response.black_white_pegs
             )
         ])
 

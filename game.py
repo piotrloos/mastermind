@@ -96,7 +96,7 @@ class MastermindGame(Mastermind):
                     "[Game] Given `pattern` is incorrect! Enter again."
                 )
 
-        response = self._settings.Pattern.calculate_response(pattern, self._solution)
+        response = pattern.calculate_response(self._solution)
 
         print()
         # TODO: use Solver1 `check_possible_solution` method here

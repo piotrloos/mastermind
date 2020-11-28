@@ -116,7 +116,7 @@ class MastermindHelper(Mastermind):
                 "[Helper] Unfortunately given pattern couldn't be the solution!"
             )
 
-        self._turns.add_turn(pattern, response)
+        turn = self._turns.add_turn(pattern, response)
         self._turns.print_turns()
 
         # check game end
@@ -134,7 +134,7 @@ class MastermindHelper(Mastermind):
             self._game_status = 2  # reached turns limit
             return
 
-        if self._solver.calculate_possible_solution(pattern, response) is None:
+        if self._solver.calculate_possible_solution(turn) is None:
             self._game_status = 3  # no possible solution found
             return
 
