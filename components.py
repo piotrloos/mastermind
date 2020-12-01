@@ -7,6 +7,8 @@
 
 from consts import Consts
 from tools import Progress, shuffle
+from solver1 import MastermindSolver1
+from solver2 import MastermindSolver2
 
 
 def peg_class(settings):
@@ -402,66 +404,42 @@ class Settings:
     def __init__(
             self,
             *args,
-            colors_number=Consts.COLORS_NUMBER,
-            pegs_number=Consts.PEGS_NUMBER,
-            turns_limit=Consts.TURNS_LIMIT,
-            solver_index=Consts.SOLVER_INDEX,
-            shuffle_before=Consts.SHUFFLE_BEFORE,
-            shuffle_after=Consts.SHUFFLE_AFTER,
-            progress_timing=Consts.PROGRESS_TIMING,
-            solver1_second_solution=Consts.SOLVER1_SECOND_SOLUTION,
-            solver2_random_pattern=Consts.SOLVER2_RANDOM_PATTERN,
+            colors_number=None,
+            pegs_number=None,
+            turns_limit=None,
+            solver_index=None,
+            shuffle_before=None,
+            shuffle_after=None,
+            progress_timing=None,
+            solver1_second_solution=None,
+            solver2_random_pattern=None,
             **kwargs,
     ):
         """ Initializes `Settings` class object """
 
-        # check if given number of colors is correct
-        if colors_number in range(2, Consts.COLORS_NUMBER_MAX + 1):
-            self._colors_number = colors_number
-        else:
-            raise ValueError(
-                f"Incorrect number of colors ({colors_number})."
-            )
+        self._colors_number = self._get_setting(Consts.ColorsNumber, colors_number)
+        self._pegs_number = self._get_setting(Consts.PegsNumber, pegs_number)
+        self._turns_limit = self._get_setting(Consts.TurnsLimitNumber, turns_limit)
+        self._solver_index = self._get_setting(Consts.SolverIndex, solver_index)
+        self._shuffle_before = self._get_setting(Consts.ShufflePatternsBeforeBuilding, shuffle_before)
+        self._shuffle_after = self._get_setting(Consts.ShufflePatternsAfterBuilding, shuffle_after)
+        self._progress_timing = self._get_setting(Consts.ProgressTiming, progress_timing)
+        self._solver1_second_solution = self._get_setting(Consts.Solver1SecondSolution, solver1_second_solution)
+        self._solver2_random_pattern = self._get_setting(Consts.Solver2RandomPattern, solver2_random_pattern)
 
-        # check if given number of pegs is correct
-        if pegs_number in range(2, Consts.PEGS_NUMBER_MAX + 1):
-            self._pegs_number = pegs_number
-        else:
-            raise ValueError(
-                f"Incorrect number of pegs ({pegs_number})."
-            )
-
-        # check if given `turns_limit` number is correct
-        if turns_limit in range(0, Consts.TURNS_LIMIT_MAX + 1):  # turns_limit = 0 means unlimited turns
-            self._turns_limit = turns_limit
-        else:
-            raise ValueError(
-                f"Incorrect turns limit number ({turns_limit})."
-            )
-
-        # check if given `solver_index` is correct
-        if solver_index in Consts.SOLVERS.keys():
-            self._solver_index = solver_index
-            self._solvers = Consts.SOLVERS
-        else:
-            raise ValueError(
-                f"Incorrect solver index ({solver_index})."
-            )
-
-        self._shuffle_before = bool(shuffle_before)
-        self._shuffle_after = bool(shuffle_after)
-        self._progress_timing = bool(progress_timing)
-        self._solver1_second_solution = bool(solver1_second_solution)
-        self._solver2_random_pattern = bool(solver2_random_pattern)
+        self._solvers = {
+            1: MastermindSolver1,  # patterns checking generator Solver
+            2: MastermindSolver2,  # patterns list filtering Solver
+        }
 
         for attribute in args:
             print(
-                f"Attribute '{attribute}' has not been recognized! Ignoring."
+                f"Attribute `{attribute}` has not been recognized! Ignoring."
             )
 
         for key, value in kwargs.items():
             print(
-                f"Keyword '{key}' and it's value '{value}' has not been recognized! Ignoring."
+                f"Keyword `{key}` and it's value `{value}` has not been recognized! Ignoring."
             )
 
         self.Peg = peg_class(self)
@@ -472,6 +450,76 @@ class Settings:
 
         self._all_colors_list = self.Colors()
         self._all_patterns_list = self.Patterns()
+
+    @staticmethod
+    def _get_setting(setting, value):
+        """ Returns validated value (given as a parameter or inputted by user) for setting """
+
+        if setting.type is bool:
+            values_to_check = {0, 1}
+            values_to_print = "0/False or 1/True"
+        elif setting.type is int:
+            values_to_check = range(setting.min_value, setting.max_value + 1)
+            values_to_print = f"from {setting.min_value} to {setting.max_value}"
+        else:
+            raise TypeError(
+                f"Setting type `{setting.type}` for `{setting.name}` is incorrect!"
+            )
+
+        if setting.default_value not in values_to_check:
+            raise ValueError(
+                f"Default `{setting.name}` value ({setting.default_value}) is incorrect!"
+            )
+
+        parameter_flag = True
+        value_str = ""
+
+        while value not in values_to_check:
+
+            if parameter_flag:
+                if value is not None:
+                    print(
+                        f"Given `{setting.name}` value ({value}) as a parameter is incorrect!"
+                    )
+            else:
+                print(
+                    f"Entered `{setting.name}` value ({value_str}) is incorrect!"
+                )
+
+            if not setting.ask_if_not_given:
+                print(
+                    f"Taking default `{setting.name}` value ({setting.default_value})."
+                )
+                value = setting.default_value
+            else:
+                parameter_flag = False
+                value_str = input(
+                    f"Enter `{setting.name}` value ({values_to_print}), "
+                    f"leave empty for default value ({setting.default_value}): "
+                ).strip()
+
+                if value_str == "":
+                    print(
+                        f"Nothing entered. Taking default `{setting.name}` value ({setting.default_value})."
+                    )
+                    value = setting.default_value
+                elif setting.type is bool and value_str.lower() in {"0", "false", "f", "no", "n", "-"}:
+                    print(
+                        f"Entered value `{value_str}` for `{setting.name}` recognized as `False`."
+                    )
+                    value = 0
+                elif setting.type is bool and value_str.lower() in {"1", "true", "t", "yes", "y", "+"}:
+                    print(
+                        f"Entered value `{value_str}` for `{setting.name}` recognized as `True`."
+                    )
+                    value = 1
+                else:
+                    try:
+                        value = int(value_str)
+                    except ValueError:
+                        value = value_str
+
+        return setting.type(value)
 
     @property
     def colors_number(self):

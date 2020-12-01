@@ -47,18 +47,18 @@ class MastermindGame(Mastermind):
         )
 
         print(
-            f"I am CodeMaker and I have prepared {self._settings.pegs_number}-peg pattern",
+            f"I am CodeMaker and I have prepared {self._settings.pegs_number}-peg pattern "
             f"using {self._settings.colors_number} different colors: {self._settings.all_colors_list}."
         )
 
         print(
-            f"You are CodeBreaker",
-            f"and you have {self._settings.turns_limit if self._settings.turns_limit else 'unlimited'}",
+            f"You are CodeBreaker "
+            f"and you have {self._settings.turns_limit if self._settings.turns_limit else 'unlimited'} "
             f"turn{'s' if self._settings.turns_limit != 1 else ''} to guess the solution pattern."
         )
 
         print(
-            f"There are {self._settings.patterns_number} possible patterns in this game.",
+            f"There are {self._settings.patterns_number} possible patterns in this game. "
             f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
 
@@ -123,7 +123,7 @@ class MastermindGame(Mastermind):
 
         if self._game_status == 1:
             print(
-                f"You found the solution in {self._turns.turns_index}",
+                f"You found the solution in {self._turns.turns_index} "
                 f"turn{'s' if self._turns.turns_index != 1 else ''}."
             )
         elif self._game_status == 2:

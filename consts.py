@@ -6,31 +6,69 @@
 ########################################
 
 from abc import ABCMeta
-from solver1 import MastermindSolver1
-from solver2 import MastermindSolver2
 
 
 class Consts(metaclass=ABCMeta):
     """ Namespace for all consts (without instantiating) """
 
-    COLORS_NUMBER = 6               # default number of colors
-    COLORS_NUMBER_MAX = 12          # max number of colors
+    class ColorsNumber(metaclass=ABCMeta):
+        type = int
+        name = "number of colors"
+        min_value = 2
+        max_value = 12
+        default_value = 6
+        ask_if_not_given = True     # if False - take default value without asking user
 
-    PEGS_NUMBER = 4                 # default number of pegs
-    PEGS_NUMBER_MAX = 10            # max number of pegs
+    class PegsNumber(metaclass=ABCMeta):
+        type = int
+        name = "number of pegs"
+        min_value = 2
+        max_value = 10
+        default_value = 4
+        ask_if_not_given = True
 
-    TURNS_LIMIT = 12                # default turns limit number
-    TURNS_LIMIT_MAX = 32            # max turns limit number
+    class TurnsLimitNumber(metaclass=ABCMeta):
+        type = int
+        name = "number of turns limit"
+        min_value = 0
+        max_value = 32
+        default_value = 12
+        ask_if_not_given = False
 
-    SOLVERS = {
-        1: MastermindSolver1,       # patterns checking generator Solver
-        2: MastermindSolver2,       # patterns list filtering Solver
-    }
+    class SolverIndex(metaclass=ABCMeta):
+        type = int
+        name = "solver index"
+        min_value = 1
+        max_value = 2
+        default_value = 1
+        ask_if_not_given = False
 
-    SOLVER_INDEX = 1                # default solver index (one from Solvers list above)
+    class ShufflePatternsBeforeBuilding(metaclass=ABCMeta):
+        type = bool
+        name = "shuffle patterns before building list"
+        default_value = False
+        ask_if_not_given = False
 
-    SHUFFLE_BEFORE = False          # default patterns shuffle before building list setting
-    SHUFFLE_AFTER = False           # default patterns shuffle after building list setting
-    PROGRESS_TIMING = True          # default `progress_timing` setting flag
-    SOLVER1_SECOND_SOLUTION = True  # default `solver1_second_solution` setting flag
-    SOLVER2_RANDOM_PATTERN = False  # default `solver2_random_pattern` setting flag
+    class ShufflePatternsAfterBuilding(metaclass=ABCMeta):
+        type = bool
+        name = "shuffle patterns after building list"
+        default_value = False
+        ask_if_not_given = False
+
+    class ProgressTiming(metaclass=ABCMeta):
+        type = bool
+        name = "enable progress timing"
+        default_value = True
+        ask_if_not_given = False
+
+    class Solver1SecondSolution(metaclass=ABCMeta):
+        type = bool
+        name = "enable Solver1 second solution setting"
+        default_value = True
+        ask_if_not_given = False
+
+    class Solver2RandomPattern(metaclass=ABCMeta):
+        type = bool
+        name = "enable Solver2 random pattern setting"
+        default_value = False
+        ask_if_not_given = False

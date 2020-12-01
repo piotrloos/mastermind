@@ -56,16 +56,16 @@ class MastermindSolver1Generator:
             if self._progress.item(self._check_possible_solution(pattern)):  # wrapped the long-taking operation
                 self._solving_time = self._progress.stop(
                     pause=True,
-                    summary=f"Found! It's index is {self._all_patterns_index} of {self._all_patterns_number}"
-                            f" overall ({100 * self._all_patterns_index / self._all_patterns_number:.2f}%)."
+                    summary=f"Found! It's index is {self._all_patterns_index} of {self._all_patterns_number} "
+                            f"overall ({100 * self._all_patterns_index / self._all_patterns_number:.2f}%)."
                 )
                 return pattern
 
         # after return the last pattern
         self._solving_time = self._progress.stop(
             pause=False,
-            summary=f"Finished. Reached index {self._all_patterns_index} of {self._all_patterns_number}"
-                    f" overall ({100 * self._all_patterns_index / self._all_patterns_number:.2f}%)."
+            summary=f"Finished. Reached index {self._all_patterns_index} of {self._all_patterns_number} "
+                    f"overall ({100 * self._all_patterns_index / self._all_patterns_number:.2f}%)."
         )
 
         # ensure `index` reached number of all patterns

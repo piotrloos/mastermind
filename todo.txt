@@ -1,7 +1,6 @@
 # do zrobienia w najbliższym czasie:
 
 # TODO: exhausted generator bug
-# TODO: metody calculate_response wywoływane na rzecz obiektu Response
 
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: stworzenie pliku `readme.md`

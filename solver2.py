@@ -102,8 +102,8 @@ class MastermindSolver2:
 
         patterns_new_number = self._possible_solutions_number
         print(
-            f"[Solver2] Number of possible solutions is now {patterns_new_number} of {patterns_old_number}"
-            f" (rejected {100 * (1 - patterns_new_number / patterns_old_number):.2f}% of patterns)."
+            f"[Solver2] Number of possible solutions is now {patterns_new_number} of {patterns_old_number} "
+            f"(rejected {100 * (1 - patterns_new_number / patterns_old_number):.2f}% of patterns)."
         )
 
         return self._current_possible_solution

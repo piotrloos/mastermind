@@ -36,24 +36,24 @@ class MastermindHelper(Mastermind):
         )
 
         print(
-            f"You are CodeBreaker and somebody has prepared {self._settings.pegs_number}-peg pattern",
+            f"You are CodeBreaker and somebody has prepared {self._settings.pegs_number}-peg pattern "
             f"using {self._settings.colors_number} different colors: {self._settings.all_colors_list}."
         )
 
         print(
-            f"I am Helper and I have {self._settings.turns_limit if self._settings.turns_limit else 'unlimited'}",
+            f"I am Helper and I have {self._settings.turns_limit if self._settings.turns_limit else 'unlimited'} "
             f"turn{'s' if self._settings.turns_limit != 1 else ''} to help you guess the solution pattern."
         )
 
         print(
-            f"There are {self._settings.patterns_number} possible patterns in this game.",
+            f"There are {self._settings.patterns_number} possible patterns in this game. "
             f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
 
         print(
-            f"Settings:\n",
-            f"solver_index = {self._settings.solver_index}\n",
-            f"shuffle_before = {self._settings.shuffle_before}\n",
+            f"Settings:\n"
+            f"solver_index = {self._settings.solver_index}\n"
+            f"shuffle_before = {self._settings.shuffle_before}\n"
             f"shuffle_after = {self._settings.shuffle_after}\n"
         )
 
@@ -162,7 +162,7 @@ class MastermindHelper(Mastermind):
                 f"The solution is {self._solution}."
             )
             print(
-                f"We found the solution in {self._turns.turns_index}",
+                f"We found the solution in {self._turns.turns_index} "
                 f"turn{'s' if self._turns.turns_index != 1 else ''}."
             )
         elif self._game_status == 2:
