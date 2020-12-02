@@ -5,9 +5,9 @@
 # TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: stworzenie pliku `readme.md`
 
-# TODO: klasa Generator dla Solver2?
+# TODO: scalić Generator dla Solver1
 # TODO: możliwość wyłączenia Progressu
-# TODO: formatowanie patternów (Colorama)
+# TODO: formatowanie patternów (Colorama) + parametr
 
 # optymalizacja
 

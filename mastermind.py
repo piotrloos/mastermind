@@ -6,7 +6,7 @@
 ########################################
 
 from abc import ABCMeta, abstractmethod
-from components import Settings, Turns
+from settings import Settings
 
 
 class Mastermind(metaclass=ABCMeta):
@@ -26,7 +26,7 @@ class Mastermind(metaclass=ABCMeta):
         else:
             self._settings = Settings(*args, **kwargs)
 
-        self._turns = Turns()  # initialize list of turns
+        self._turns = settings.Turns()  # initialize list of turns
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
 

@@ -5,7 +5,7 @@
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-from solver import Mastermind
+from mastermind import Mastermind
 
 
 class MastermindHelper(Mastermind):

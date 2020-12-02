@@ -5,19 +5,14 @@
 #             Piotr Loos (c) 2019-2020 #
 ########################################
 
-from consts import Consts
 from tools import Progress, shuffle
-from solver1 import MastermindSolver1
-from solver2 import MastermindSolver2
 
 
 def peg_class(settings):
     """ Function that creates and returns Peg class with given `settings` """
 
-    if not isinstance(settings, Settings):
-        raise TypeError(
-            "Given `settings` parameter is not Settings object!"
-        )
+    if settings:
+        pass  # TODO: use settings
 
     class Peg(int):
         """ Class for one pattern peg """
@@ -43,11 +38,6 @@ def peg_class(settings):
 def colors_class(settings):
     """ Function that creates and returns Colors class with given `settings` """
 
-    if not isinstance(settings, Settings):
-        raise TypeError(
-            "Given `settings` parameter is not Settings object!"
-        )
-
     class Colors(list):
         """ Class for list of all peg colors """
 
@@ -66,11 +56,6 @@ def colors_class(settings):
 
 def pattern_class(settings):
     """ Function that creates and returns Pattern class with given `settings` """
-
-    if not isinstance(settings, Settings):
-        raise TypeError(
-            "Given `settings` parameter is not Settings object!"
-        )
 
     class Pattern(tuple):
         """ Class for one `pattern` """
@@ -161,11 +146,6 @@ def pattern_class(settings):
 def patterns_class(settings):
     """ Function that creates and returns Patterns class with given `settings` """
 
-    if not isinstance(settings, Settings):
-        raise TypeError(
-            "Given `settings` parameter is not Settings object!"
-        )
-
     class Patterns(list):
         """ Class for list of all possible patterns (to be iterated on or to be filtered) """
 
@@ -255,11 +235,6 @@ def patterns_class(settings):
 def response_class(settings):
     """ Function that creates and returns Response class with given `settings` """
 
-    if not isinstance(settings, Settings):
-        raise TypeError(
-            "Given `settings` parameter is not Settings object!"
-        )
-
     class Response(tuple):
         """ Class for one response """
 
@@ -339,262 +314,73 @@ def response_class(settings):
     return Response
 
 
-class Turn(tuple):
-    """ Class for one game turn """
+def turn_class(settings):
+    """ Function that creates and returns Turn class with given `settings` """
 
-    def __str__(self):
-        """ Formats `turn` to be printed """
+    if settings:
+        pass  # TODO: use settings
 
-        return (
-            f"{self.turn_index:>3d}. {self.pattern} => {self.response}"
-        )
+    class Turn(tuple):
+        """ Class for one game turn """
 
-    @property
-    def turn_index(self):
-        """ Returns `turn_index` from turn """
+        def __str__(self):
+            """ Formats `turn` to be printed """
 
-        return self[0]
-
-    @property
-    def pattern(self):
-        """ Returns `pattern` from turn """
-
-        return self[1]
-
-    @property
-    def response(self):
-        """ Returns `response` from turn """
-
-        return self[2]
-
-
-class Turns(list):
-    """ CLass for list of all turns in the game """
-
-    def __init__(self):
-        """ Initializes `Turns` class object """
-
-        super().__init__()
-        self._turns_index = 0
-
-    def add_turn(self, pattern, response):
-        """ Adds current turn to `Turns` """
-
-        self._turns_index += 1
-        turn = Turn((self._turns_index, pattern, response))
-        self.append(turn)
-        return turn
-
-    def print_turns(self):
-        """ Prints all turns """
-
-        for turn in self:
-            print(turn)
-
-    @property
-    def turns_index(self):
-        """ Returns current turns index """
-
-        return self._turns_index
-
-
-class Settings:
-    """ Class for all the game settings """
-
-    def __init__(
-            self,
-            *args,
-            colors_number=None,
-            pegs_number=None,
-            turns_limit=None,
-            solver_index=None,
-            shuffle_before=None,
-            shuffle_after=None,
-            progress_timing=None,
-            solver1_second_solution=None,
-            solver2_random_pattern=None,
-            **kwargs,
-    ):
-        """ Initializes `Settings` class object """
-
-        self._colors_number = self._get_setting(Consts.ColorsNumber, colors_number)
-        self._pegs_number = self._get_setting(Consts.PegsNumber, pegs_number)
-        self._turns_limit = self._get_setting(Consts.TurnsLimitNumber, turns_limit)
-        self._solver_index = self._get_setting(Consts.SolverIndex, solver_index)
-        self._shuffle_before = self._get_setting(Consts.ShufflePatternsBeforeBuilding, shuffle_before)
-        self._shuffle_after = self._get_setting(Consts.ShufflePatternsAfterBuilding, shuffle_after)
-        self._progress_timing = self._get_setting(Consts.ProgressTiming, progress_timing)
-        self._solver1_second_solution = self._get_setting(Consts.Solver1SecondSolution, solver1_second_solution)
-        self._solver2_random_pattern = self._get_setting(Consts.Solver2RandomPattern, solver2_random_pattern)
-
-        self._solvers = {
-            1: MastermindSolver1,  # patterns checking generator Solver
-            2: MastermindSolver2,  # patterns list filtering Solver
-        }
-
-        for attribute in args:
-            print(
-                f"Attribute `{attribute}` has not been recognized! Ignoring."
+            return (
+                f"{self.turn_index:>3d}. {self.pattern} => {self.response}"
             )
 
-        for key, value in kwargs.items():
-            print(
-                f"Keyword `{key}` and it's value `{value}` has not been recognized! Ignoring."
-            )
+        @property
+        def turn_index(self):
+            """ Returns `turn_index` from turn """
 
-        self.Peg = peg_class(self)
-        self.Colors = colors_class(self)
-        self.Pattern = pattern_class(self)
-        self.Patterns = patterns_class(self)
-        self.Response = response_class(self)
+            return self[0]
 
-        self._all_colors_list = self.Colors()
-        self._all_patterns_list = self.Patterns()
+        @property
+        def pattern(self):
+            """ Returns `pattern` from turn """
 
-    @staticmethod
-    def _get_setting(setting, value):
-        """ Returns validated value (given as a parameter or inputted by user) for setting """
+            return self[1]
 
-        if setting.type is bool:
-            values_to_check = {0, 1}
-            values_to_print = "0/False or 1/True"
-        elif setting.type is int:
-            values_to_check = range(setting.min_value, setting.max_value + 1)
-            values_to_print = f"from {setting.min_value} to {setting.max_value}"
-        else:
-            raise TypeError(
-                f"Setting type `{setting.type}` for `{setting.name}` is incorrect!"
-            )
+        @property
+        def response(self):
+            """ Returns `response` from turn """
 
-        if setting.default_value not in values_to_check:
-            raise ValueError(
-                f"Default `{setting.name}` value ({setting.default_value}) is incorrect!"
-            )
+            return self[2]
 
-        parameter_flag = True
-        value_str = ""
+    return Turn
 
-        while value not in values_to_check:
 
-            if parameter_flag:
-                if value is not None:
-                    print(
-                        f"Given `{setting.name}` value ({value}) as a parameter is incorrect!"
-                    )
-            else:
-                print(
-                    f"Entered `{setting.name}` value ({value_str}) is incorrect!"
-                )
+def turns_class(settings):
+    """ Function that creates and returns Turns class with given `settings` """
 
-            if not setting.ask_if_not_given:
-                print(
-                    f"Taking default `{setting.name}` value ({setting.default_value})."
-                )
-                value = setting.default_value
-            else:
-                parameter_flag = False
-                value_str = input(
-                    f"Enter `{setting.name}` value ({values_to_print}), "
-                    f"leave empty for default value ({setting.default_value}): "
-                ).strip()
+    class Turns(list):
+        """ CLass for list of all turns in the game """
 
-                if value_str == "":
-                    print(
-                        f"Nothing entered. Taking default `{setting.name}` value ({setting.default_value})."
-                    )
-                    value = setting.default_value
-                elif setting.type is bool and value_str.lower() in {"0", "false", "f", "no", "n", "-"}:
-                    print(
-                        f"Entered value `{value_str}` for `{setting.name}` recognized as `False`."
-                    )
-                    value = 0
-                elif setting.type is bool and value_str.lower() in {"1", "true", "t", "yes", "y", "+"}:
-                    print(
-                        f"Entered value `{value_str}` for `{setting.name}` recognized as `True`."
-                    )
-                    value = 1
-                else:
-                    try:
-                        value = int(value_str)
-                    except ValueError:
-                        value = value_str
+        def __init__(self):
+            """ Initializes `Turns` class object """
 
-        return setting.type(value)
+            super().__init__()
+            self._turns_index = 0
 
-    @property
-    def colors_number(self):
-        """ Returns number of colors """
+        def add_turn(self, pattern, response):
+            """ Adds current turn to `Turns` """
 
-        return self._colors_number
+            self._turns_index += 1
+            turn = settings.Turn((self._turns_index, pattern, response))
+            self.append(turn)
+            return turn
 
-    @property
-    def pegs_number(self):
-        """ Returns number of pegs """
+        def print_turns(self):
+            """ Prints all turns """
 
-        return self._pegs_number
+            for turn in self:
+                print(turn)
 
-    @property
-    def patterns_number(self):
-        """ Returns number of all possible patterns """
+        @property
+        def turns_index(self):
+            """ Returns current turns index """
 
-        return self._colors_number ** self._pegs_number
+            return self._turns_index
 
-    @property
-    def turns_limit(self):
-        """ Returns turns limit number """
-
-        return self._turns_limit
-
-    @property
-    def solver_index(self):
-        """ Returns solver index """
-
-        return self._solver_index
-
-    @property
-    def shuffle_before(self):
-        """ Returns 'patterns shuffle before building list' setting """
-
-        return self._shuffle_before
-
-    @property
-    def shuffle_after(self):
-        """ Returns 'patterns shuffle after building list' setting """
-
-        return self._shuffle_after
-
-    @property
-    def progress_timing(self):
-        """ Returns `progress_timing` setting """
-
-        return self._progress_timing
-
-    @property
-    def solver1_second_solution(self):
-        """ Returns `solver1_second_solution` setting (only for Solver1) """
-
-        return self._solver1_second_solution
-
-    @property
-    def solver2_random_pattern(self):
-        """ Returns `solver2_random_pattern` setting (only for Solver2) """
-
-        return self._solver2_random_pattern
-
-    @property
-    def all_colors_list(self):
-        """ Returns `Colors` object containing list of pegs with all possible colors """
-
-        return self._all_colors_list
-
-    @property
-    def all_patterns_list(self):
-        """ Returns `Patterns` object containing list of all possible patterns """
-
-        return self._all_patterns_list
-
-    @property
-    def solvers(self):
-        """ Returns dict containing all defined solvers (in Consts) """
-
-        return self._solvers
+    return Turns
