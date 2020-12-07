@@ -20,7 +20,7 @@ def peg_class(settings):
         def __str__(self):
             """ Formats `peg` to be printed """
 
-            return f"({chr(self + 97)})"
+            return f"({chr(self.__int__() + 97)})"
 
         @classmethod
         def decode_peg(cls, peg_char):

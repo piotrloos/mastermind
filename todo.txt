@@ -1,13 +1,18 @@
 # do zrobienia w najbliższym czasie:
 
 # TODO: exhausted generator bug
+# TODO: parametr mode przy uruchamianiu Mastermind a nie Game/Helper/Solver
+# TODO: refactor podobnych metod w Game/Helper/Solver
 
-# TODO: parametry wejściowe przy uruchamianiu gry
 # TODO: stworzenie pliku `readme.md`
 
+# TODO: prawdziwy generator patternów (bez zużycia pamięci)
 # TODO: scalić Generator dla Solver1
 # TODO: możliwość wyłączenia Progressu
+# TODO: Progress jako context manager (with Progress)
 # TODO: formatowanie patternów (Colorama) + parametr
+# TODO: sys.getsizeof() dla listy patternów
+# TODO: typy zmiennych w deklaracjach funkcji
 
 # optymalizacja
 

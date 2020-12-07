@@ -16,7 +16,7 @@ class Mastermind(metaclass=ABCMeta):
     def __init__(
             self,
             *args,
-            settings,
+            settings=None,
             **kwargs,
     ):
         """ Initializes new game with given settings """
@@ -26,7 +26,7 @@ class Mastermind(metaclass=ABCMeta):
         else:
             self._settings = Settings(*args, **kwargs)
 
-        self._turns = settings.Turns()  # initialize list of turns
+        self._turns = self._settings.Turns()  # initialize list of turns
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
 

@@ -66,6 +66,8 @@ class Settings:
         self._all_colors_list = self.Colors()
         self._all_patterns_list = self.Patterns()
 
+        print()
+
     @staticmethod
     def _get_setting(setting, value):
         """ Returns validated value (given as a parameter or inputted by user) for setting """
@@ -102,9 +104,9 @@ class Settings:
                 )
 
             if not setting.ask_if_not_given:
-                print(
-                    f"Taking default `{setting.name}` value ({setting.default_value})."
-                )
+                # print(
+                #     f"Taking default `{setting.name}` value ({setting.default_value})."
+                # )
                 value = setting.default_value
             else:
                 parameter_flag = False
@@ -133,6 +135,8 @@ class Settings:
                         value = int(value_str)
                     except ValueError:
                         value = value_str
+
+        # TODO: create property for setting
 
         return setting.type(value)
 
