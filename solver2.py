@@ -67,6 +67,11 @@ class MastermindSolver2:
 
         return self._solving_time
 
+    def update_solving_time(self, exe_time):
+        """ (Solver2) Updates execution time by the Progress instance """
+
+        self._solving_time += exe_time
+
     def check_possible_solution(self, possible_solution):
         """ (Solver2) Checks if given possible solution can be a solution based on all previous turns """
 
@@ -77,26 +82,23 @@ class MastermindSolver2:
 
         patterns_old_number = self._possible_solutions_number
 
-        progress = Progress(
+        with Progress(
             items_number=patterns_old_number,
             title="[Solver2] Filtering patterns list...",
             timing=self._settings.progress_timing,
-        )
+            update_time_func=self.update_solving_time,
+        ) as progress:
 
-        progress.start()
-
-        # TODO: try to speed up these calculations
-        self._possible_solutions_list = self._settings.Patterns(lst=[
-            possible_solution
-            for possible_solution in self._possible_solutions_list
-            if progress.item(
-                turn.pattern.calculate_black_pegs(possible_solution) == turn.response.black_pegs
-                and
-                turn.pattern.calculate_black_white_pegs(possible_solution) == turn.response.black_white_pegs
-            )
-        ])
-
-        self._solving_time += progress.stop()
+            # TODO: try to speed up these calculations
+            self._possible_solutions_list = self._settings.Patterns(lst=[
+                possible_solution
+                for possible_solution in self._possible_solutions_list
+                if progress.item(
+                    turn.pattern.calculate_black_pegs(possible_solution) == turn.response.black_pegs
+                    and
+                    turn.pattern.calculate_black_white_pegs(possible_solution) == turn.response.black_white_pegs
+                )
+            ])
 
         self._analyze_the_list()
 

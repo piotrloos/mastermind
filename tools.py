@@ -16,7 +16,8 @@ class Progress:
             self,
             items_number,
             title="",
-            timing=True
+            timing=True,
+            update_time_func=None,
     ):
         """ Initializes Progress class object """
 
@@ -36,8 +37,21 @@ class Progress:
         self._total_time = 0  # (float) total time in seconds
         self._start_time = None  # (float) last resume start timestamp
 
+        self._update_time_func = update_time_func  # (func) func at host which allows to save (increment) progress time
+
         self._running = False  # (bool) flag whether Progress process is currently running
         self._finished = False  # (bool) flag whether Progress process is finished
+
+    def __enter__(self):
+        """ Initializes Progress context manager """
+
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """ Ends Progress context manager """
+
+        self.stop(finish=True)
 
     @staticmethod
     def _print(string):
@@ -95,13 +109,13 @@ class Progress:
 
         self._print_title_value()
 
-    def stop(self, pause=False, summary="Done!"):
+    def stop(self, finish=True, summary="Done!"):
         """ Stops/pauses printing Progress process """
 
         self._check_state(should_be_running=True)
         self._running = False
 
-        if not pause:
+        if finish:
             self._finished = True
 
         self._summary = summary
@@ -112,12 +126,13 @@ class Progress:
 
             # TODO: 3 different states, clean it up
             self._summary += (
-                f" (partial time: {partial_time:.3f}s{'' if pause else f', total time: {self._total_time:.3f}s'})"
+                f" (partial time: {partial_time:.3f}s{'' if not finish else f', total time: {self._total_time:.3f}s'})"
             )
 
-        self._print_summary()
+            if self._update_time_func is not None:
+                self._update_time_func(self._total_time)
 
-        return self._total_time
+        self._print_summary()
 
     def item(self, wrapped_value=None):
         """ Wraps value - checks if next Progress process value should be printed """
@@ -138,9 +153,6 @@ class Progress:
 def shuffle(lst, progress=None):
     """ Shuffles iterable `lst` in place, handles Progress object if given """
 
-    if progress is not None:
-        progress.start()
-
     length = len(lst)
 
     for i in range(length - 1):
@@ -149,6 +161,3 @@ def shuffle(lst, progress=None):
 
         if progress is not None:
             progress.item()
-
-    if progress is not None:
-        progress.stop()

@@ -161,65 +161,65 @@ def patterns_class(settings):
                 super().__init__(self._build())
 
         # TODO: setting that builds list of patterns or not
-        def _build(self):
+        @staticmethod
+        def _build():
             """ Builds list of all possible patterns """
 
             all_patterns_list = [()]  # initialize temporary list containing empty tuple
             all_colors_list = settings.all_colors_list[:]  # get local `all_colors_list` to be shuffled
 
-            progress = Progress(
+            with Progress(
                 items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
                 title="Building patterns list...",
                 timing=settings.progress_timing,
-            )
+                update_time_func=None,
+            ) as progress:
 
-            progress.start()
+                # iterate for `pegs_number`-1 times
+                for _ in range(settings.pegs_number - 1):
 
-            # iterate for `pegs_number`-1 times
-            for _ in range(settings.pegs_number - 1):
+                    # shuffle `all_colors_list` to build patterns from (on every iteration)
+                    if settings.shuffle_before:
+                        shuffle(
+                            all_colors_list,
+                            progress=None,
+                        )
 
-                # shuffle `all_colors_list` to build patterns from (on every iteration)
+                    # make temporary list of tuples (on every iteration)
+                    all_patterns_list = [
+                        progress.item((*pattern, new_peg))
+                        for pattern in all_patterns_list
+                        for new_peg in all_colors_list
+                    ]
+                    # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
+
+                # shuffle `all_colors_list` to build Pattern objects from
                 if settings.shuffle_before:
                     shuffle(
                         all_colors_list,
                         progress=None,
                     )
 
-                # make temporary list of tuples (on every iteration)
+                # make final list of Pattern objects
                 all_patterns_list = [
-                    progress.item((*pattern, new_peg))
+                    progress.item(settings.Pattern((*pattern, new_peg)))
                     for pattern in all_patterns_list
                     for new_peg in all_colors_list
                 ]
-                # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
-
-            # shuffle `all_colors_list` to build Pattern objects from
-            if settings.shuffle_before:
-                shuffle(
-                    all_colors_list,
-                    progress=None,
-                )
-
-            # make final list of Pattern objects
-            all_patterns_list = [
-                progress.item(settings.Pattern((*pattern, new_peg)))
-                for pattern in all_patterns_list
-                for new_peg in all_colors_list
-            ]
-            # new pattern is Pattern object a one peg bigger (unpacked "old" pegs + "new" one)
-
-            progress.stop()
+                # new pattern is Pattern object a one peg bigger (unpacked "old" pegs + "new" one)
 
             # shuffle generated patterns list (whole list at once)
             if settings.shuffle_after:
-                shuffle(
-                    all_patterns_list,
-                    progress=Progress(
-                        items_number=self.__len__() - 1,
-                        title="Shuffling patterns list...",
-                        timing=settings.progress_timing,
+                with Progress(
+                    items_number=len(all_patterns_list) - 1,
+                    title="Shuffling patterns list...",
+                    timing=settings.progress_timing,
+                    update_time_func=None,
+                ) as progress:
+                    shuffle(
+                        all_patterns_list,
+                        progress=progress,
                     )
-                )
 
             return all_patterns_list
 

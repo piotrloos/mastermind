@@ -6,13 +6,13 @@
 
 # TODO: stworzenie pliku `readme.md`
 
-# TODO: prawdziwy generator patternów (bez zużycia pamięci)
+# TODO: prawdziwy generator patternów (bez zużycia pamięci) + parametr on/off
 # TODO: scalić Generator dla Solver1
 # TODO: możliwość wyłączenia Progressu
-# TODO: Progress jako context manager (with Progress)
 # TODO: formatowanie patternów (Colorama) + parametr
 # TODO: sys.getsizeof() dla listy patternów
-# TODO: typy zmiennych w deklaracjach funkcji
+# TODO: typy zmiennych w deklaracjach funkcji (type hints)
+# TODO: porządek w nazwach metod i pól (__name)
 
 # optymalizacja
 

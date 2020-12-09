@@ -121,6 +121,7 @@ class MastermindSolver(Mastermind):
             self._game_status = 2  # reached turns limit
             return
 
+        # TODO: extract running calc function
         if self._solver.calculate_possible_solution(turn) is None:
             self._game_status = 3  # no possible solution found
             return
