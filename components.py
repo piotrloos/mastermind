@@ -172,7 +172,6 @@ def patterns_class(settings):
                 items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
                 title="Building patterns list...",
                 timing=settings.progress_timing,
-                update_time_func=None,
             ) as progress:
 
                 # iterate for `pegs_number`-1 times
@@ -182,7 +181,6 @@ def patterns_class(settings):
                     if settings.shuffle_before:
                         shuffle(
                             all_colors_list,
-                            progress=None,
                         )
 
                     # make temporary list of tuples (on every iteration)
@@ -197,7 +195,6 @@ def patterns_class(settings):
                 if settings.shuffle_before:
                     shuffle(
                         all_colors_list,
-                        progress=None,
                     )
 
                 # make final list of Pattern objects
@@ -214,7 +211,6 @@ def patterns_class(settings):
                     items_number=len(all_patterns_list) - 1,
                     title="Shuffling patterns list...",
                     timing=settings.progress_timing,
-                    update_time_func=None,
                 ) as progress:
                     shuffle(
                         all_patterns_list,

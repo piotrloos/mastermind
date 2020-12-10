@@ -31,13 +31,6 @@ class MastermindSolver1:
 
         self._all_patterns_number = len(self._settings.all_patterns_list)
 
-        # TODO: use Progress as a context manager
-        self._progress = Progress(
-            items_number=self._all_patterns_number,
-            title="",
-            timing=self._settings.progress_timing,
-            update_time_func=self.update_solving_time,
-        )
         self._progress_title = ""
 
         self.calculate_possible_solution()  # get first possible solution
@@ -71,7 +64,7 @@ class MastermindSolver1:
     def update_solving_time(self, exe_time):
         """ (Solver1) Updates execution time by the Progress instance """
 
-        self._solving_time += exe_time
+        self._solving_time = exe_time  # Solver1 overwrites solving time from one Progress instance per game
 
     def check_possible_solution(self, possible_solution):
         """ (Solver1) Checks if given possible solution can be a solution based on all previous turns """
@@ -97,12 +90,12 @@ class MastermindSolver1:
 
         if self.check_possible_solution(self._current_possible_solution):
             print(
-                "[Solver1] Previously found first possible solution still can be a first solution. Not changed."
+                "[Solver1] Previously found 1st possible solution still can be a 1st solution. Not changed."
             )
         else:
             if self._settings.solver1_second_solution and self.check_possible_solution(self._second_possible_solution):
                 print(
-                    "[Solver1] Previously found second possible solution still can be a solution. Saved as first."
+                    "[Solver1] Previously found 2nd possible solution still can be a solution. Saved as 1st."
                 )
                 self._current_possible_solution = self._second_possible_solution
                 self._second_possible_solution = None
@@ -118,7 +111,7 @@ class MastermindSolver1:
         if self._settings.solver1_second_solution:
             if self.check_possible_solution(self._second_possible_solution):
                 print(
-                    "[Solver1] Previously found second possible solution still can be a second solution. Not changed."
+                    "[Solver1] Previously found 2nd possible solution still can be a 2nd solution. Not changed."
                 )
             else:
                 self._second_possible_solution = self._get_next(
@@ -142,34 +135,40 @@ class MastermindSolver1:
     def _solution_generator(self):
         """ (Solver1) Yields possible solution based on all previous turns """
 
-        index = 0
+        with Progress(
+            items_number=self._all_patterns_number,
+            timing=self._settings.progress_timing,
+            update_time_func=self.update_solving_time,
+            auto_start_stop=False,
+        ) as progress:
 
-        self._progress.start(
-            title=self._progress_title,
-        )
+            index = 0
+            progress.start(
+                title=self._progress_title,
+            )
 
-        for index, pattern in enumerate(self._settings.all_patterns_list, 1):
+            for index, pattern in enumerate(self._settings.all_patterns_list, 1):
 
-            if self._progress.item(self.check_possible_solution(pattern)):  # wrapped the long-taking operation
+                if progress.item(self.check_possible_solution(pattern)):  # wrapped the long-taking operation
 
-                self._progress.stop(
-                    finish=False,
-                    summary=f"Found! It's index is {index} of {self._all_patterns_number} "
-                            f"overall ({100 * index / self._all_patterns_number:.2f}%)."
-                )
-                yield pattern
-                self._progress.start(
-                    title=self._progress_title,
-                )
+                    progress.stop(
+                        finish=False,
+                        summary=f"Found! It's index is {index} of {self._all_patterns_number} "
+                                f"overall ({100 * index / self._all_patterns_number:.2f}%)."
+                    )
+                    yield pattern
+                    progress.start(
+                        title=self._progress_title,
+                    )
 
-        # after return the last pattern
-        self._progress.stop(
-            finish=True,
-            summary=f"Finished. Reached index {index} of {self._all_patterns_number} "
-                    f"overall ({100 * index / self._all_patterns_number:.2f}%)."
-        )
+            # ensure `index` reached number of all patterns
+            assert index == self._all_patterns_number, "[Solver1] Incorrect pattern index value!"
 
-        # ensure `index` reached number of all patterns
-        assert index == self._all_patterns_number, "[Solver1] Incorrect pattern index value!"
+            # after yield the last pattern
+            progress.stop(
+                finish=True,
+                summary=f"Finished. Reached index {index} of {self._all_patterns_number} "
+                        f"overall ({100 * index / self._all_patterns_number:.2f}%)."
+            )
 
-        # no possible solution
+            # no possible solution

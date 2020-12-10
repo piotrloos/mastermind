@@ -70,7 +70,7 @@ class MastermindSolver2:
     def update_solving_time(self, exe_time):
         """ (Solver2) Updates execution time by the Progress instance """
 
-        self._solving_time += exe_time
+        self._solving_time += exe_time  # Solver2 accumulates solving time from several Progress instances per game
 
     def check_possible_solution(self, possible_solution):
         """ (Solver2) Checks if given possible solution can be a solution based on all previous turns """

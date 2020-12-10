@@ -15,9 +15,11 @@ class Progress:
     def __init__(
             self,
             items_number,
-            title="",
+            title="Thinking...",
+            summary="Done!",
             timing=True,
             update_time_func=None,
+            auto_start_stop=True,
     ):
         """ Initializes Progress class object """
 
@@ -31,27 +33,31 @@ class Progress:
         self._threshold_int = int(round(self._threshold))  # (int) round the threshold to be compared with index
 
         self._title = str(title)  # (str) Progress process title to be displayed (if given)
-        self._summary = ""  # (str) Progress process summary to be displayed (after finishing)
+        self._summary = str(summary)  # (str) Progress process summary to be displayed (after finishing)
 
         self._timing = bool(timing)  # (bool) flag whether Progress process should be timed
         self._total_time = 0  # (float) total time in seconds
         self._start_time = None  # (float) last resume start timestamp
 
-        self._update_time_func = update_time_func  # (func) func at host which allows to save (increment) progress time
+        self._update_time_func = update_time_func  # (func) Solver func that allows to overwrite/accumulate solving time
 
+        self._auto_start_stop = bool(auto_start_stop)  # (bool) flag whether Progress should start/stop automatically
         self._running = False  # (bool) flag whether Progress process is currently running
         self._finished = False  # (bool) flag whether Progress process is finished
 
     def __enter__(self):
         """ Initializes Progress context manager """
 
-        self.start()
+        if self._auto_start_stop:
+            self.start()
+
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """ Ends Progress context manager """
 
-        self.stop(finish=True)
+        if self._auto_start_stop:
+            self.stop(finish=True)
 
     @staticmethod
     def _print(string):
@@ -93,10 +99,7 @@ class Progress:
             raise RuntimeError("Progress process is already running!")
 
     def start(self, title=None):
-        """ Starts/resumes printing Progress process and changes `title` if given """
-
-        if self._timing:
-            self._start_time = time()
+        """ Starts/resumes printing Progress process and changes `title` text if given """
 
         self._check_state(should_be_running=False)
         self._running = True
@@ -104,10 +107,13 @@ class Progress:
         if title is not None:
             self._title = str(title)
 
+        if self._timing:
+            self._start_time = time()
+
         self._print_title_value()
 
-    def stop(self, finish=True, summary="Done!"):
-        """ Stops/pauses printing Progress process """
+    def stop(self, finish=False, summary=None):
+        """ Stops/pauses printing Progress process and changes `summary` text if given """
 
         self._check_state(should_be_running=True)
         self._running = False
@@ -115,7 +121,8 @@ class Progress:
         if finish:
             self._finished = True
 
-        self._summary = summary
+        if summary is not None:
+            self._summary = str(summary)
 
         if self._timing:
             partial_time = time() - self._start_time
