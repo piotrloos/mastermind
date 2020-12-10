@@ -83,17 +83,14 @@ class Progress:
     def _check_state(self, should_be_running):
         """ Checks `finished` and `running` state and raises exception if needed """
 
-        # TODO: generator exhausted bug
+        if self._finished:
+            raise RuntimeError("Progress process is finished!")
 
-        # if self._finished:
-        #     raise RuntimeError("Progress process is finished!")
-        #
-        # if should_be_running:
-        #     if not self._running:
-        #         raise RuntimeError("Progress process is not running!")
-        # else:
-        #     if self._running:
-        #         raise RuntimeError("Progress process is already running!")
+        if should_be_running and not self._running:
+            raise RuntimeError("Progress process is not running!")
+
+        if not should_be_running and self._running:
+            raise RuntimeError("Progress process is already running!")
 
     def start(self, title=None):
         """ Starts/resumes printing Progress process and changes `title` if given """
