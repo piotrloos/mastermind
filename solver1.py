@@ -25,6 +25,13 @@ class MastermindSolver1:
         self._current_possible_solution = None
         self._second_possible_solution = None
 
+        if self._settings.solver1_second_solution:
+            self._1st = "first "
+            self._2nd = "second "
+        else:
+            self._1st = ""
+            self._2nd = ""
+
         self._solving_time = 0
 
         self._all_patterns_number = len(self._settings.all_patterns_list)
@@ -80,20 +87,21 @@ class MastermindSolver1:
 
         if self.check_possible_solution(self._current_possible_solution):
             print(
-                "[Solver1] Previously found 1st possible solution still can be a 1st solution. Not changed."
+                f"[Solver1] Previously found {self._1st}possible solution {self._current_possible_solution} "
+                f"still can be a {self._1st}solution. Not changed."
             )
         else:
             if self._settings.solver1_second_solution and self.check_possible_solution(self._second_possible_solution):
                 print(
-                    "[Solver1] Previously found 2nd possible solution still can be a solution. Saved as 1st."
+                    f"[Solver1] Previously found {self._2nd}possible solution {self._second_possible_solution} "
+                    f"still can be a solution. Saved as {self._1st}."
                 )
                 self._current_possible_solution = self._second_possible_solution
                 self._second_possible_solution = None
             else:
                 self._current_possible_solution = self._get_next(
-                    "[Solver1] Searching for 1st possible solution..."
+                    f"[Solver1] Searching for {self._1st}possible solution..."
                 )
-                # TODO: ^^ not always `first` (especially when second_solution is off)
                 if self._current_possible_solution is None:  # no possible solution
                     self._second_possible_solution = None  # no second possible solution also
                     return self._current_possible_solution  # (=None)
@@ -101,15 +109,16 @@ class MastermindSolver1:
         if self._settings.solver1_second_solution:
             if self.check_possible_solution(self._second_possible_solution):
                 print(
-                    "[Solver1] Previously found 2nd possible solution still can be a 2nd solution. Not changed."
+                    f"[Solver1] Previously found {self._2nd}possible solution {self._second_possible_solution} "
+                    f"still can be a {self._2nd}solution. Not changed."
                 )
             else:
                 self._second_possible_solution = self._get_next(
-                    "[Solver1] Searching for 2nd possible solution..."
+                    f"[Solver1] Searching for {self._2nd}possible solution..."
                 )
                 if self._second_possible_solution is None:  # no second possible solution -> only one solution!
                     print(
-                        "[Solver1] Now I know there is only one possible solution!"
+                        f"[Solver1] Now I know that {self._current_possible_solution} is the only possible solution!"
                     )
 
         return self._current_possible_solution
@@ -145,7 +154,8 @@ class MastermindSolver1:
 
                     progress.stop(
                         finish=False,
-                        summary=f"Found! It's index is {index} of {self._all_patterns_number} "
+                        summary=f"Found! It is {pattern}.\n"
+                                f"[Solver1] It's index is {index:,} of {self._all_patterns_number:,} "
                                 f"overall ({100 * index / self._all_patterns_number:.2f}%)."
                     )
                     yield pattern
@@ -159,7 +169,8 @@ class MastermindSolver1:
             # after yield the last pattern
             progress.stop(
                 finish=True,
-                summary=f"Finished. Reached index {index} of {self._all_patterns_number} "
+                summary=f"Finished.\n"
+                        f"[Solver1] Reached index {index:,} of {self._all_patterns_number:,} "
                         f"overall ({100 * index / self._all_patterns_number:.2f}%)."
             )
 

@@ -46,7 +46,7 @@ class MastermindHelper(Mastermind):
         )
 
         print(
-            f"There are {self._settings.patterns_number} possible patterns in this game. "
+            f"There are {self._settings.patterns_number:,} possible patterns in this game. "
             f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
 

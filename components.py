@@ -370,6 +370,10 @@ def turns_class(settings):
         def print_turns(self):
             """ Prints all turns """
 
+            print(
+                f"{f'There is 1 turn' if self._turns_index == 1 else f' There are {self._turns_index} turns'} "
+                f"(so far) in this game:"
+            )
             for turn in self:
                 print(turn)
 
