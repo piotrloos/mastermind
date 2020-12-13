@@ -128,12 +128,6 @@ class MastermindSolver(Mastermind):
 
         # game is still active
 
-        # TODO: print this by `solver1` or `solver2`, not here
-        if self._solver.single_solution_flag:
-            print(
-                "[Solver] Now I know there is only one possible solution!"
-            )
-
     def _solver_outro(self):
         """ Prints outro """
 

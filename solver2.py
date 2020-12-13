@@ -15,13 +15,11 @@ class MastermindSolver2:
     def __init__(
             self,
             settings,
-            turns,
+            _,
     ):
         """ (Solver2) Initializes `MastermindSolver2` class object """
 
-        # TODO: temporary given labels
         self._settings = settings
-        self._turns = turns
 
         self._solving_time = 0
 
@@ -29,10 +27,9 @@ class MastermindSolver2:
         self._analyze_the_list()
 
     def _analyze_the_list(self):
-        """ (Solver2) Gets the possible solution, gets the possible solutions number and sets the flag """
+        """ (Solver2) Gets the possible solution and the possible solutions number """
 
         self._possible_solutions_number = len(self._possible_solutions_list)
-        self._single_solution_flag = (self._possible_solutions_number == 1)
 
         if self._possible_solutions_number:
             if self._settings.solver2_random_pattern:
@@ -54,12 +51,6 @@ class MastermindSolver2:
         """ (Solver2) Returns current possible solution (in this turn) """
 
         return self._current_possible_solution
-
-    @property
-    def single_solution_flag(self):
-        """ (Solver2) Returns single possible solution flag """
-
-        return self._single_solution_flag
 
     @property
     def solving_time(self):
@@ -107,5 +98,10 @@ class MastermindSolver2:
             f"[Solver2] Number of possible solutions is now {patterns_new_number} of {patterns_old_number} "
             f"(rejected {100 * (1 - patterns_new_number / patterns_old_number):.2f}% of patterns)."
         )
+
+        if patterns_new_number == 1:
+            print(
+                "[Solver2] Now I know there is only one possible solution!"
+            )
 
         return self._current_possible_solution

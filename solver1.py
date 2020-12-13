@@ -18,14 +18,12 @@ class MastermindSolver1:
     ):
         """ (Solver1) Initializes `MastermindSolver1` class object """
 
-        # TODO: temporary given labels
         self._settings = settings
         self._turns = turns
 
         self._generator = self._solution_generator()
         self._current_possible_solution = None
         self._second_possible_solution = None
-        self._single_solution_flag = False
 
         self._solving_time = 0
 
@@ -48,12 +46,6 @@ class MastermindSolver1:
         """ (Solver1) Returns current possible solution (in this turn) """
 
         return self._current_possible_solution
-
-    @property
-    def single_solution_flag(self):
-        """ (Solver1) Returns single possible solution flag """
-
-        return self._single_solution_flag
 
     @property
     def solving_time(self):
@@ -86,8 +78,6 @@ class MastermindSolver1:
         # TODO: refactor this method to avoid bug in Progress state (when generator is exhausted)
         # TODO: generator exhausted bug
 
-        self._single_solution_flag = False  # reset the flag
-
         if self.check_possible_solution(self._current_possible_solution):
             print(
                 "[Solver1] Previously found 1st possible solution still can be a 1st solution. Not changed."
@@ -118,7 +108,9 @@ class MastermindSolver1:
                     "[Solver1] Searching for 2nd possible solution..."
                 )
                 if self._second_possible_solution is None:  # no second possible solution -> only one solution!
-                    self._single_solution_flag = True  # set the flag
+                    print(
+                        "[Solver1] Now I know there is only one possible solution!"
+                    )
 
         return self._current_possible_solution
 

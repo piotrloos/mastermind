@@ -147,12 +147,6 @@ class MastermindHelper(Mastermind):
         )
         # TODO: print info if it's the same proposition as in previous turn or another (new pattern)
 
-        # TODO: print this by `solver1` or `solver2`, not here
-        if self._solver.single_solution_flag:
-            print(
-                "[Helper] Now I know there is only one possible solution!"
-            )
-
     def _helper_outro(self):
         """ Prints outro """
 
