@@ -15,7 +15,7 @@ class MastermindSolver2:
     def __init__(
             self,
             settings,
-            _,
+            *_,
     ):
         """ (Solver2) Initializes `MastermindSolver2` class object """
 
@@ -23,11 +23,25 @@ class MastermindSolver2:
 
         self._solving_time = 0
 
-        self._possible_solutions_list = self._settings.all_patterns_list.copy()  # get list of all possible solutions
-        self._analyze_the_list()
+        if self._settings.pre_build_patterns:
+            self._possible_solutions_list = self._settings.all_patterns_list.copy()  # get list for filtering (copy)
+        else:
+            with Progress(
+                items_number=self._settings.patterns_number,
+                title="[Solver2] Building list of all patterns from patterns generator...",
+                timing=self._settings.progress_timing,
+            ) as progress:
 
-    def _analyze_the_list(self):
-        """ (Solver2) Gets the possible solution and the possible solutions number """
+                # build list from generator (once per game)
+                self._possible_solutions_list = [
+                    progress.item(pattern)
+                    for pattern in self._settings.all_patterns_gen()
+                ]
+
+        self._get_solution()
+
+    def _get_solution(self):
+        """ (Solver2) Gets and saves one possible solution from the list """
 
         self._possible_solutions_number = len(self._possible_solutions_list)
 
@@ -81,7 +95,7 @@ class MastermindSolver2:
         ) as progress:
 
             # TODO: try to speed up these calculations
-            self._possible_solutions_list = self._settings.Patterns(lst=[
+            self._possible_solutions_list = [
                 possible_solution
                 for possible_solution in self._possible_solutions_list
                 if progress.item(
@@ -89,17 +103,17 @@ class MastermindSolver2:
                     and
                     turn.pattern.calculate_black_white_pegs(possible_solution) == turn.response.black_white_pegs
                 )
-            ])
+            ]
 
-        self._analyze_the_list()
+        self._get_solution()
 
-        patterns_new_number = self._possible_solutions_number
         print(
-            f"[Solver2] Number of possible solutions is now {patterns_new_number:,} of {patterns_old_number:,} "
-            f"(rejected {100 * (1 - patterns_new_number / patterns_old_number):.2f}% of patterns)."
+            f"[Solver2] Number of possible solutions is now "
+            f"{self._possible_solutions_number:,} of {patterns_old_number:,} "
+            f"(rejected {100 * (1 - self._possible_solutions_number / patterns_old_number):.2f}% of patterns)."
         )
 
-        if patterns_new_number == 1:
+        if self._possible_solutions_number == 1:
             print(
                 f"[Solver2] Now I know that {self._current_possible_solution} is the only possible solution!"
             )

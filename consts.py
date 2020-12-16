@@ -43,6 +43,12 @@ class Consts(metaclass=ABCMeta):
         default_value = 1
         ask_if_not_given = False
 
+    class PreBuildPatterns(metaclass=ABCMeta):
+        type = bool
+        name = "pre-build list of all possible patterns"
+        default_value = False
+        ask_if_not_given = False
+
     class ShufflePatternsBeforeBuilding(metaclass=ABCMeta):
         type = bool
         name = "shuffle patterns before building list"

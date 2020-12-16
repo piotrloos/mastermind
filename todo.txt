@@ -6,7 +6,6 @@
 
 # TODO: stworzenie pliku `readme.md`
 
-# TODO: prawdziwy generator patternów (bez zużycia pamięci) + parametr on/off
 # TODO: możliwość wyłączenia Progressu
 # TODO: formatowanie patternów (Colorama) + parametr
 # TODO: sys.getsizeof() dla listy patternów

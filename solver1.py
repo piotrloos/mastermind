@@ -21,20 +21,18 @@ class MastermindSolver1:
         self._settings = settings
         self._turns = turns
 
+        self._solving_time = 0
+
+        if self._settings.pre_build_patterns:
+            self._all_patterns = self._settings.all_patterns_list  # get list for iteration (reference)
+        else:
+            self._all_patterns = self._settings.all_patterns_gen()  # init generator for iteration
+
         self._generator = self._solution_generator()
         self._current_possible_solution = None
         self._second_possible_solution = None
 
-        if self._settings.solver1_second_solution:
-            self._1st = "first "
-            self._2nd = "second "
-        else:
-            self._1st = ""
-            self._2nd = ""
-
-        self._solving_time = 0
-
-        self._all_patterns_number = len(self._settings.all_patterns_list)
+        self._first = "first " if self._settings.solver1_second_solution else ""
 
         self._progress_title = ""
 
@@ -87,20 +85,20 @@ class MastermindSolver1:
 
         if self.check_possible_solution(self._current_possible_solution):
             print(
-                f"[Solver1] Previously found {self._1st}possible solution {self._current_possible_solution} "
-                f"still can be a {self._1st}solution. Not changed."
+                f"[Solver1] Previously found {self._first}possible solution {self._current_possible_solution} "
+                f"still can be a {self._first}solution. Not changed."
             )
         else:
             if self._settings.solver1_second_solution and self.check_possible_solution(self._second_possible_solution):
                 print(
-                    f"[Solver1] Previously found {self._2nd}possible solution {self._second_possible_solution} "
-                    f"still can be a solution. Saved as {self._1st}."
+                    f"[Solver1] Previously found second possible solution {self._second_possible_solution} "
+                    f"still can be a solution. Saved as first."
                 )
                 self._current_possible_solution = self._second_possible_solution
                 self._second_possible_solution = None
             else:
                 self._current_possible_solution = self._get_next(
-                    f"[Solver1] Searching for {self._1st}possible solution..."
+                    f"[Solver1] Searching for {self._first}possible solution..."
                 )
                 if self._current_possible_solution is None:  # no possible solution
                     self._second_possible_solution = None  # no second possible solution also
@@ -109,12 +107,12 @@ class MastermindSolver1:
         if self._settings.solver1_second_solution:
             if self.check_possible_solution(self._second_possible_solution):
                 print(
-                    f"[Solver1] Previously found {self._2nd}possible solution {self._second_possible_solution} "
-                    f"still can be a {self._2nd}solution. Not changed."
+                    f"[Solver1] Previously found second possible solution {self._second_possible_solution} "
+                    f"still can be a second solution. Not changed."
                 )
             else:
                 self._second_possible_solution = self._get_next(
-                    f"[Solver1] Searching for {self._2nd}possible solution..."
+                    f"[Solver1] Searching for second possible solution..."
                 )
                 if self._second_possible_solution is None:  # no second possible solution -> only one solution!
                     print(
@@ -137,7 +135,7 @@ class MastermindSolver1:
         """ (Solver1) Yields possible solution based on all previous turns """
 
         with Progress(
-            items_number=self._all_patterns_number,
+            items_number=self._settings.patterns_number,
             timing=self._settings.progress_timing,
             update_time_func=self.update_solving_time,
             auto_start_stop=False,
@@ -148,15 +146,15 @@ class MastermindSolver1:
                 title=self._progress_title,
             )
 
-            for index, pattern in enumerate(self._settings.all_patterns_list, 1):
+            for index, pattern in enumerate(self._all_patterns, 1):
 
                 if progress.item(self.check_possible_solution(pattern)):  # wrapped the long-taking operation
 
                     progress.stop(
                         finish=False,
                         summary=f"Found! It is {pattern}.\n"
-                                f"[Solver1] It's index is {index:,} of {self._all_patterns_number:,} "
-                                f"overall ({100 * index / self._all_patterns_number:.2f}%)."
+                                f"[Solver1] It's index is {index:,} of {self._settings.patterns_number:,} "
+                                f"overall ({100 * index / self._settings.patterns_number:.2f}%)."
                     )
                     yield pattern
                     progress.start(
@@ -164,14 +162,14 @@ class MastermindSolver1:
                     )
 
             # ensure `index` reached number of all patterns
-            assert index == self._all_patterns_number, "[Solver1] Incorrect pattern index value!"
+            assert index == self._settings.patterns_number, "[Solver1] Incorrect pattern index value!"
 
             # after yield the last pattern
             progress.stop(
                 finish=True,
                 summary=f"Finished.\n"
-                        f"[Solver1] Reached index {index:,} of {self._all_patterns_number:,} "
-                        f"overall ({100 * index / self._all_patterns_number:.2f}%)."
+                        f"[Solver1] Reached index {index:,} of {self._settings.patterns_number:,} "
+                        f"overall ({100 * index / self._settings.patterns_number:.2f}%)."
             )
 
             # no possible solution

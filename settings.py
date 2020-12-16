@@ -21,6 +21,7 @@ class Settings:
             pegs_number=None,
             turns_limit=None,
             solver_index=None,
+            pre_build_patterns=None,
             shuffle_before=None,
             shuffle_after=None,
             progress_timing=None,
@@ -34,6 +35,7 @@ class Settings:
         self._pegs_number = self._get_setting(Consts.PegsNumber, pegs_number)
         self._turns_limit = self._get_setting(Consts.TurnsLimitNumber, turns_limit)
         self._solver_index = self._get_setting(Consts.SolverIndex, solver_index)
+        self._pre_build_patterns = self._get_setting(Consts.PreBuildPatterns, pre_build_patterns)
         self._shuffle_before = self._get_setting(Consts.ShufflePatternsBeforeBuilding, shuffle_before)
         self._shuffle_after = self._get_setting(Consts.ShufflePatternsAfterBuilding, shuffle_after)
         self._progress_timing = self._get_setting(Consts.ProgressTiming, progress_timing)
@@ -56,15 +58,18 @@ class Settings:
             )
 
         self.Peg = components.peg_class(self)
-        self.Colors = components.colors_class(self)
+        self.Colors = components.colors_class(self)  # TODO: delete this class
         self.Pattern = components.pattern_class(self)
-        self.Patterns = components.patterns_class(self)
         self.Response = components.response_class(self)
         self.Turn = components.turn_class(self)
         self.Turns = components.turns_class(self)
 
         self._all_colors_list = self.Colors()
-        self._all_patterns_list = self.Patterns()
+
+        if self._pre_build_patterns:
+            self._all_patterns_list = self.Pattern.build_patterns()  # build all patterns list (once for several games)
+        else:
+            self._all_patterns_gen = self.Pattern.gen_patterns  # get reference for patterns generator (without call)
 
         print()
 
@@ -171,6 +176,12 @@ class Settings:
         return self._solver_index
 
     @property
+    def pre_build_patterns(self):
+        """ Returns 'pre build all possible patterns list' setting """
+
+        return self._pre_build_patterns
+
+    @property
     def shuffle_before(self):
         """ Returns 'patterns shuffle before building list' setting """
 
@@ -208,9 +219,15 @@ class Settings:
 
     @property
     def all_patterns_list(self):
-        """ Returns `Patterns` object containing list of all possible patterns """
+        """ Returns list of all possible patterns """
 
         return self._all_patterns_list
+
+    @property
+    def all_patterns_gen(self):
+        """ Returns generator of all possible patterns """
+
+        return self._all_patterns_gen
 
     @property
     def solvers(self):

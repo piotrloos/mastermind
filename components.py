@@ -11,9 +11,6 @@ from tools import Progress, shuffle
 def peg_class(settings):
     """ Function that creates and returns Peg class with given `settings` """
 
-    if settings:
-        pass  # TODO: use settings
-
     class Peg(int):
         """ Class for one pattern peg """
 
@@ -31,6 +28,12 @@ def peg_class(settings):
                 # TODO: input digits, lowercase or uppercase letters, or own list of pegs
             else:
                 return None
+
+        def inc(self):
+            if self.__int__() + 1 < settings.colors_number:
+                return Peg(self.__int__() + 1)  # TODO: return Peg from list of pegs
+            else:
+                raise OverflowError
 
     return Peg
 
@@ -140,30 +143,9 @@ def pattern_class(settings):
             # to calculate `white_pegs` it's needed to subtract `black_pegs` from `black_white_pegs`
             return settings.Response((black_pegs, black_white_pegs - black_pegs))
 
-    return Pattern
-
-
-def patterns_class(settings):
-    """ Function that creates and returns Patterns class with given `settings` """
-
-    class Patterns(list):
-        """ Class for list of all possible patterns (to be iterated on or to be filtered) """
-
-        def __init__(
-                self,
-                lst=None,
-        ):
-            """ Initializes `Patterns` class object """
-
-            if isinstance(lst, list):
-                super().__init__(lst)
-            else:
-                super().__init__(self._build())
-
-        # TODO: setting that builds list of patterns or not
         @staticmethod
-        def _build():
-            """ Builds list of all possible patterns """
+        def build_patterns():
+            """ Returns list of all possible patterns (when `pre_build_patterns` setting == True) """
 
             all_patterns_list = [()]  # initialize temporary list containing empty tuple
             all_colors_list = settings.all_colors_list[:]  # get local `all_colors_list` to be shuffled
@@ -219,13 +201,33 @@ def patterns_class(settings):
 
             return all_patterns_list
 
-        def print_patterns(self):
-            """ Prints all patterns """
+        @staticmethod
+        def gen_patterns():
+            """ Generator for all possible patterns in the game (when `pre_build_patterns` setting == False) """
 
-            for pattern in self:
-                print(pattern)
+            def inc(index=settings.pegs_number - 1):
+                if index < 0:
+                    return False
+                try:
+                    pattern[index] = pattern[index].inc()
+                    return True
+                except OverflowError:
+                    pattern[index] = settings.Peg(0)
+                    return inc(index - 1)
 
-    return Patterns
+                # if pattern[index] + 1 < max_value:
+                #     pattern[index] = Peg(pattern[index] + 1)
+                #     return True
+                # pattern[index] = Peg(0)
+                # return inc(index - 1)
+
+            pattern = [settings.Peg(0)] * settings.pegs_number
+
+            yield Pattern(pattern)
+            while inc():
+                yield Pattern(pattern)
+
+    return Pattern
 
 
 def response_class(settings):
