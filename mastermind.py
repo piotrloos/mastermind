@@ -41,12 +41,12 @@ class Mastermind(metaclass=ABCMeta):
 
         if self._game_status == 0:
             raise PermissionError(
-                "No access to the solution when game is active!"
+                "[Mastermind] No access to the solution when game is active!"
             )
         else:
             if self._solution is None:
                 raise ValueError(
-                    "No saved solution in this game!"
+                    "[Mastermind] No saved solution in this game!"
                 )
             else:
                 return self._solution

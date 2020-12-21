@@ -15,7 +15,7 @@ class Progress:
     def __init__(
             self,
             items_number,
-            title="Thinking...",
+            title="[Progress] Thinking...",
             summary="Done!",
             timing=True,
             update_time_func=None,
@@ -24,7 +24,7 @@ class Progress:
         """ Initializes Progress class object """
 
         if items_number < 1:
-            raise ValueError("The Progress process must last for one operation at least!")
+            raise ValueError("[Progress] The Progress process must last for one operation at least!")
 
         self._index = 0  # (int) index of current operation
         self._portion = items_number / 100  # (float) 1% of progress to be added to threshold
@@ -90,13 +90,13 @@ class Progress:
         """ Checks `finished` and `running` state and raises exception if needed """
 
         if self._finished:
-            raise RuntimeError("Progress process is finished!")
+            raise RuntimeError("[Progress] Progress process is finished!")
 
         if should_be_running and not self._running:
-            raise RuntimeError("Progress process is not running!")
+            raise RuntimeError("[Progress] Progress process is not running!")
 
         if not should_be_running and self._running:
-            raise RuntimeError("Progress process is already running!")
+            raise RuntimeError("[Progress] Progress process is already running!")
 
     def start(self, title=None):
         """ Starts/resumes printing Progress process and changes `title` text if given """

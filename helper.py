@@ -37,7 +37,7 @@ class MastermindHelper(Mastermind):
 
         print(
             f"You are CodeBreaker and somebody has prepared {self._settings.pegs_number}-peg pattern "
-            f"using {self._settings.colors_number} different colors: {self._settings.all_colors_list}."
+            f"using {self._settings.colors_number} different colors: {self._settings.all_colors_list_formatted}."
         )
 
         print(

@@ -6,6 +6,7 @@
 ########################################
 
 from tools import Progress, shuffle
+from random import randrange
 
 
 def peg_class(settings):
@@ -30,31 +31,16 @@ def peg_class(settings):
                 return None
 
         def inc(self):
+            """ Returns Peg object one value greater than current """
+
             if self.__int__() + 1 < settings.colors_number:
-                return Peg(self.__int__() + 1)  # TODO: return Peg from list of pegs
+                return Peg.all_colors_list[self.__int__() + 1]
             else:
                 raise OverflowError
 
+    Peg.all_colors_list = [Peg(color) for color in range(settings.colors_number)]
+
     return Peg
-
-
-def colors_class(settings):
-    """ Function that creates and returns Colors class with given `settings` """
-
-    class Colors(list):
-        """ Class for list of all peg colors """
-
-        def __init__(self):
-            """ Initializes `Colors` class object """
-
-            super().__init__([settings.Peg(color) for color in range(settings.colors_number)])
-
-        def __str__(self):
-            """ Formats `Colors` list to be printed """
-
-            return f"{{{','.join(peg.__str__() for peg in self)}}}"
-
-    return Colors
 
 
 def pattern_class(settings):
@@ -76,7 +62,7 @@ def pattern_class(settings):
                 isinstance(pattern_tuple, tuple)
                 and len(pattern_tuple) == settings.pegs_number
                 and all(
-                    pattern_peg in settings.all_colors_list
+                    pattern_peg in settings.Peg.all_colors_list
                     for pattern_peg in pattern_tuple
                 )
             )
@@ -104,7 +90,7 @@ def pattern_class(settings):
             """ Returns random pattern for generating the solution or giving a demo pattern """
 
             return Pattern(
-                settings.all_colors_list[__import__('random').randrange(settings.colors_number)]
+                settings.Peg.all_colors_list[randrange(settings.colors_number)]
                 for _ in range(settings.pegs_number)
             )
 
@@ -130,7 +116,7 @@ def pattern_class(settings):
 
             return sum(
                 min(self.count(color), other.count(color))
-                for color in settings.all_colors_list
+                for color in settings.Peg.all_colors_list
             )
 
         def calculate_response(self, other):
@@ -148,13 +134,18 @@ def pattern_class(settings):
             """ Returns list of all possible patterns (when `pre_build_patterns` setting == True) """
 
             all_patterns_list = [()]  # initialize temporary list containing empty tuple
-            all_colors_list = settings.all_colors_list[:]  # get local `all_colors_list` to be shuffled
+            all_colors_list = settings.Peg.all_colors_list[:]  # get local `all_colors_list` to be shuffled
 
             with Progress(
                 items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
-                title="Building patterns list...",
+                title="[Pattern] Building patterns list...",
                 timing=settings.progress_timing,
             ) as progress:
+
+                # TODO: use itertools
+                # from itertools import product
+                # all_patterns_list = list(map(lambda pattern: settings.Pattern(progress.item(pattern)),
+                #                              product(settings.Peg.all_colors_list, repeat=settings.pegs_number)))
 
                 # iterate for `pegs_number`-1 times
                 for _ in range(settings.pegs_number - 1):
@@ -191,7 +182,7 @@ def pattern_class(settings):
             if settings.shuffle_after:
                 with Progress(
                     items_number=len(all_patterns_list) - 1,
-                    title="Shuffling patterns list...",
+                    title="[Pattern] Shuffling patterns list...",
                     timing=settings.progress_timing,
                 ) as progress:
                     shuffle(

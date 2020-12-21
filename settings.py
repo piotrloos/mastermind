@@ -49,26 +49,29 @@ class Settings:
 
         for attribute in args:
             print(
-                f"Attribute `{attribute}` has not been recognized! Ignoring."
+                f"[Settings] Attribute `{attribute}` has not been recognized! Ignoring."
             )
 
         for key, value in kwargs.items():
             print(
-                f"Keyword `{key}` and it's value `{value}` has not been recognized! Ignoring."
+                f"[Settings] Keyword `{key}` and it's value `{value}` has not been recognized! Ignoring."
             )
 
         self.Peg = components.peg_class(self)
-        self.Colors = components.colors_class(self)  # TODO: delete this class
         self.Pattern = components.pattern_class(self)
         self.Response = components.response_class(self)
         self.Turn = components.turn_class(self)
         self.Turns = components.turns_class(self)
 
-        self._all_colors_list = self.Colors()
-
         if self._pre_build_patterns:
             self._all_patterns_list = self.Pattern.build_patterns()  # build all patterns list (once for several games)
         else:
+
+            # TODO: use itertools
+            # from itertools import product
+            # self._all_patterns_gen = map(lambda pattern: self.Pattern(pattern),
+            #                              product(self.Peg.all_colors_list, repeat=self._pegs_number))
+
             self._all_patterns_gen = self.Pattern.gen_patterns  # get reference for patterns generator (without call)
 
         print()
@@ -85,12 +88,12 @@ class Settings:
             values_to_print = f"from {setting.min_value} to {setting.max_value}"
         else:
             raise TypeError(
-                f"Setting type `{setting.type}` for `{setting.name}` is incorrect!"
+                f"[Settings] Setting type `{setting.type}` for `{setting.name}` is incorrect!"
             )
 
         if setting.default_value not in values_to_check:
             raise ValueError(
-                f"Default `{setting.name}` value ({setting.default_value}) is incorrect!"
+                f"[Settings] Default `{setting.name}` value ({setting.default_value}) is incorrect!"
             )
 
         parameter_flag = True
@@ -101,11 +104,11 @@ class Settings:
             if parameter_flag:
                 if value is not None:
                     print(
-                        f"Given `{setting.name}` value ({value}) as a parameter is incorrect!"
+                        f"[Settings] Given `{setting.name}` value ({value}) as a parameter is incorrect!"
                     )
             else:
                 print(
-                    f"Entered `{setting.name}` value ({value_str}) is incorrect!"
+                    f"[Settings] Entered `{setting.name}` value ({value_str}) is incorrect!"
                 )
 
             if not setting.ask_if_not_given:
@@ -116,23 +119,23 @@ class Settings:
             else:
                 parameter_flag = False
                 value_str = input(
-                    f"Enter `{setting.name}` value ({values_to_print}), "
+                    f"[Settings] Enter `{setting.name}` value ({values_to_print}), "
                     f"leave empty for default value ({setting.default_value}): "
                 ).strip()
 
                 if value_str == "":
                     print(
-                        f"Nothing entered. Taking default `{setting.name}` value ({setting.default_value})."
+                        f"[Settings] Nothing entered. Taking default `{setting.name}` value ({setting.default_value})."
                     )
                     value = setting.default_value
-                elif setting.type is bool and value_str.lower() in {"0", "false", "f", "no", "n", "-"}:
+                elif setting.type is bool and value_str.lower() in {"0", "false", "f", "no", "n", "x", "-"}:
                     print(
-                        f"Entered value `{value_str}` for `{setting.name}` recognized as `False`."
+                        f"[Settings] Entered value `{value_str}` for `{setting.name}` recognized as `False`."
                     )
                     value = 0
-                elif setting.type is bool and value_str.lower() in {"1", "true", "t", "yes", "y", "+"}:
+                elif setting.type is bool and value_str.lower() in {"1", "true", "t", "yes", "y", "v", "+"}:
                     print(
-                        f"Entered value `{value_str}` for `{setting.name}` recognized as `True`."
+                        f"[Settings] Entered value `{value_str}` for `{setting.name}` recognized as `True`."
                     )
                     value = 1
                 else:
@@ -212,10 +215,10 @@ class Settings:
         return self._solver2_random_pattern
 
     @property
-    def all_colors_list(self):
-        """ Returns `Colors` object containing list of pegs with all possible colors """
+    def all_colors_list_formatted(self):
+        """ Returns formatted list of all possible colors """
 
-        return self._all_colors_list
+        return f"{{{','.join(peg.__str__() for peg in self.Peg.all_colors_list)}}}"
 
     @property
     def all_patterns_list(self):
