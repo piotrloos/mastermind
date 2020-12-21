@@ -9,6 +9,7 @@ import components
 from consts import Consts
 from solver1 import MastermindSolver1
 from solver2 import MastermindSolver2
+from itertools import product
 
 
 class Settings:
@@ -21,6 +22,7 @@ class Settings:
             pegs_number=None,
             turns_limit=None,
             solver_index=None,
+            use_itertools=None,
             pre_build_patterns=None,
             shuffle_before=None,
             shuffle_after=None,
@@ -35,6 +37,7 @@ class Settings:
         self._pegs_number = self._get_setting(Consts.PegsNumber, pegs_number)
         self._turns_limit = self._get_setting(Consts.TurnsLimitNumber, turns_limit)
         self._solver_index = self._get_setting(Consts.SolverIndex, solver_index)
+        self._use_itertools = self._get_setting(Consts.UseItertools, use_itertools)
         self._pre_build_patterns = self._get_setting(Consts.PreBuildPatterns, pre_build_patterns)
         self._shuffle_before = self._get_setting(Consts.ShufflePatternsBeforeBuilding, shuffle_before)
         self._shuffle_after = self._get_setting(Consts.ShufflePatternsAfterBuilding, shuffle_after)
@@ -66,13 +69,13 @@ class Settings:
         if self._pre_build_patterns:
             self._all_patterns_list = self.Pattern.build_patterns()  # build all patterns list (once for several games)
         else:
-
-            # TODO: use itertools
-            # from itertools import product
-            # self._all_patterns_gen = map(lambda pattern: self.Pattern(pattern),
-            #                              product(self.Peg.all_colors_list, repeat=self._pegs_number))
-
-            self._all_patterns_gen = self.Pattern.gen_patterns  # get reference for patterns generator (without call)
+            if self._use_itertools:
+                # get `itertools.product` generator
+                self._all_patterns_gen = map(lambda pattern_tuple: self.Pattern(pattern_tuple),
+                                             product(self.Peg.all_colors_list, repeat=self._pegs_number))
+            else:
+                # get reference for my generator (without call)
+                self._all_patterns_gen = self.Pattern.gen_patterns
 
         print()
 
@@ -177,6 +180,12 @@ class Settings:
         """ Returns solver index """
 
         return self._solver_index
+
+    @property
+    def use_itertools(self):
+        """ Returns 'use built-in itertools product function to generate patterns """
+
+        return self._use_itertools
 
     @property
     def pre_build_patterns(self):

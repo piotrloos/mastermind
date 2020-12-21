@@ -43,6 +43,12 @@ class Consts(metaclass=ABCMeta):
         default_value = 1
         ask_if_not_given = False
 
+    class UseItertools(metaclass=ABCMeta):
+        type = bool
+        name = "use built-in itertools product function to generate patterns"
+        default_value = True
+        ask_if_not_given = False
+
     class PreBuildPatterns(metaclass=ABCMeta):
         type = bool
         name = "pre-build list of all possible patterns"

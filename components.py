@@ -6,6 +6,7 @@
 ########################################
 
 from tools import Progress, shuffle
+from itertools import product
 from random import randrange
 
 
@@ -133,50 +134,51 @@ def pattern_class(settings):
         def build_patterns():
             """ Returns list of all possible patterns (when `pre_build_patterns` setting == True) """
 
-            all_patterns_list = [()]  # initialize temporary list containing empty tuple
-            all_colors_list = settings.Peg.all_colors_list[:]  # get local `all_colors_list` to be shuffled
-
             with Progress(
                 items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
                 title="[Pattern] Building patterns list...",
                 timing=settings.progress_timing,
             ) as progress:
 
-                # TODO: use itertools
-                # from itertools import product
-                # all_patterns_list = list(map(lambda pattern: settings.Pattern(progress.item(pattern)),
-                #                              product(settings.Peg.all_colors_list, repeat=settings.pegs_number)))
+                if settings.use_itertools:
 
-                # iterate for `pegs_number`-1 times
-                for _ in range(settings.pegs_number - 1):
+                    all_patterns_list = list(map(lambda pattern_tuple: progress.item(settings.Pattern(pattern_tuple)),
+                                                 product(settings.Peg.all_colors_list, repeat=settings.pegs_number)))
+                else:
 
-                    # shuffle `all_colors_list` to build patterns from (on every iteration)
+                    all_patterns_list = [()]  # initialize temporary list containing empty tuple
+                    all_colors_list = settings.Peg.all_colors_list[:]  # get local `all_colors_list` to be shuffled
+
+                    # iterate for `pegs_number`-1 times
+                    for _ in range(settings.pegs_number - 1):
+
+                        # shuffle `all_colors_list` to build patterns from (on every iteration)
+                        if settings.shuffle_before:
+                            shuffle(
+                                all_colors_list,
+                            )
+
+                        # make temporary list of tuples (on every iteration)
+                        all_patterns_list = [
+                            progress.item((*pattern, new_peg))
+                            for pattern in all_patterns_list
+                            for new_peg in all_colors_list
+                        ]
+                        # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
+
+                    # shuffle `all_colors_list` to build Pattern objects from
                     if settings.shuffle_before:
                         shuffle(
                             all_colors_list,
                         )
 
-                    # make temporary list of tuples (on every iteration)
+                    # make final list of Pattern objects
                     all_patterns_list = [
-                        progress.item((*pattern, new_peg))
+                        progress.item(settings.Pattern((*pattern, new_peg)))
                         for pattern in all_patterns_list
                         for new_peg in all_colors_list
                     ]
-                    # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
-
-                # shuffle `all_colors_list` to build Pattern objects from
-                if settings.shuffle_before:
-                    shuffle(
-                        all_colors_list,
-                    )
-
-                # make final list of Pattern objects
-                all_patterns_list = [
-                    progress.item(settings.Pattern((*pattern, new_peg)))
-                    for pattern in all_patterns_list
-                    for new_peg in all_colors_list
-                ]
-                # new pattern is Pattern object a one peg bigger (unpacked "old" pegs + "new" one)
+                    # new pattern is Pattern object a one peg bigger (unpacked "old" pegs + "new" one)
 
             # shuffle generated patterns list (whole list at once)
             if settings.shuffle_after:

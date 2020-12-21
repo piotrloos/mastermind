@@ -26,6 +26,12 @@ class MastermindSolver2:
         if self._settings.pre_build_patterns:
             self._possible_solutions_list = self._settings.all_patterns_list.copy()  # get list for filtering (copy)
         else:
+            # prepare `all_patterns` list/generator for iteration
+            if self._settings.use_itertools:
+                all_patterns = iter(self._settings.all_patterns_gen)  # init `itertools.product` generator
+            else:
+                all_patterns = self._settings.all_patterns_gen()  # init my generator
+
             with Progress(
                 items_number=self._settings.patterns_number,
                 title="[Solver2] Building list of all patterns from patterns generator...",
@@ -35,7 +41,7 @@ class MastermindSolver2:
                 # build list from generator (once per game)
                 self._possible_solutions_list = [
                     progress.item(pattern)
-                    for pattern in self._settings.all_patterns_gen()
+                    for pattern in all_patterns
                 ]
 
         self._get_solution()
