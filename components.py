@@ -31,14 +31,6 @@ def peg_class(settings):
             else:
                 return None
 
-        def inc(self):
-            """ Returns Peg object one value greater than current """
-
-            if self.__int__() + 1 < settings.colors_number:
-                return Peg.all_colors_list[self.__int__() + 1]
-            else:
-                raise OverflowError
-
     Peg.all_colors_list = [Peg(color) for color in range(settings.colors_number)]
 
     return Peg
@@ -198,27 +190,33 @@ def pattern_class(settings):
         def gen_patterns():
             """ Generator for all possible patterns in the game (when `pre_build_patterns` setting == False) """
 
-            def inc(index=settings.pegs_number - 1):
-                if index < 0:
-                    return False
-                try:
-                    pattern[index] = pattern[index].inc()
-                    return True
-                except OverflowError:
-                    pattern[index] = settings.Peg(0)
-                    return inc(index - 1)
+            all_colors_list = settings.Peg.all_colors_list
+            colors_number = settings.colors_number
+            pegs_number = settings.pegs_number
 
-                # if pattern[index] + 1 < max_value:
-                #     pattern[index] = Peg(pattern[index] + 1)
-                #     return True
-                # pattern[index] = Peg(0)
-                # return inc(index - 1)
+            if colors_number > 0:
 
-            pattern = [settings.Peg(0)] * settings.pegs_number
-
-            yield Pattern(pattern)
-            while inc():
+                pattern = [all_colors_list[0]] * pegs_number  # get list of pegs with min values
+                peg_index = pegs_number - 1  # set peg_index to last peg
                 yield Pattern(pattern)
+
+                if pegs_number > 0:
+
+                    while True:  # infinite loop
+
+                        peg = pattern[peg_index]  # get current peg from pattern
+                        if peg < colors_number - 1:  # check if current peg has max value (=can be incremented?)
+
+                            pattern[peg_index] = all_colors_list[peg + 1]  # increment current peg
+                            peg_index = pegs_number - 1  # reset `peg_index` to last peg
+                            yield Pattern(pattern)
+
+                        else:  # current peg has max value -> need to carry one peg on the left
+
+                            pattern[peg_index] = all_colors_list[0]  # reset current peg to min value
+                            peg_index -= 1  # move `peg_index` to the left
+                            if peg_index < 0:
+                                break  # if `peg_index` reached first peg exit the loop
 
     return Pattern
 
