@@ -126,17 +126,24 @@ def pattern_class(settings):
         def build_patterns():
             """ Returns list of all possible patterns (when `pre_build_patterns` setting == True) """
 
-            with Progress(
-                items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
-                title="[Pattern] Building patterns list...",
-                timing=settings.progress_timing,
-            ) as progress:
+            if settings.use_itertools:
 
-                if settings.use_itertools:
+                with Progress(
+                    items_number=settings.patterns_number,
+                    title="[Pattern] Building patterns list (using itertools)...",
+                    timing=settings.progress_timing,
+                ) as progress:
 
+                    # TODO: include `shuffle_before` setting
                     all_patterns_list = list(map(lambda pattern_tuple: progress.item(settings.Pattern(pattern_tuple)),
                                                  product(settings.Peg.all_colors_list, repeat=settings.pegs_number)))
-                else:
+            else:
+
+                with Progress(
+                    items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
+                    title="[Pattern] Building patterns list (using my function)...",
+                    timing=settings.progress_timing,
+                ) as progress:
 
                     all_patterns_list = [()]  # initialize temporary list containing empty tuple
                     all_colors_list = settings.Peg.all_colors_list[:]  # get local `all_colors_list` to be shuffled
@@ -364,7 +371,7 @@ def turns_class(settings):
             """ Prints all turns """
 
             print(
-                f"{f'There is 1 turn' if self._turns_index == 1 else f' There are {self._turns_index} turns'} "
+                f"{f'There is 1 turn' if self._turns_index == 1 else f'There are {self._turns_index} turns'} "
                 f"(so far) in this game:"
             )
             for turn in self:

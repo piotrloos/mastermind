@@ -100,6 +100,7 @@ class MastermindHelper(Mastermind):
             pattern, response = self._settings.Response.decode_pattern_response(pattern_response_string)
             if pattern is None:
                 pattern = self._solver.current_possible_solution  # get `pattern` if user enters "=response" only
+                # TODO: bug! incorrect pattern -> current_pattern (instead of printing error)
             if response is None:
                 raise ValueError(
                     "[Helper] Given `pattern=response` is incorrect! Enter again."

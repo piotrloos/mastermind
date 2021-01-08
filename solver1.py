@@ -68,10 +68,15 @@ class MastermindSolver1:
         self._solving_time = exe_time  # Solver1 overwrites solving time from one Progress instance per game
 
     def check_possible_solution(self, possible_solution):
-        """ (Solver1) Checks if given possible solution can be a solution based on all previous turns """
+        """ (Solver1) Checks if given possible solution can be a solution based on all previous turns (and not None) """
 
-        if possible_solution is None:  # TODO: after fixing exhausted bug, this `if` should be deleted
+        if possible_solution is None:
             return False
+
+        return self._check_possible_solution_for_turns(possible_solution)
+
+    def _check_possible_solution_for_turns(self, possible_solution):
+        """ (Solver1) Checks if given possible solution can be a solution based on all previous turns """
 
         # TODO: try to speed up these calculations
         return all(
@@ -102,7 +107,7 @@ class MastermindSolver1:
                 self._second_possible_solution = None
             else:
                 self._current_possible_solution = self._get_next(
-                    f"[Solver1] Searching for {self._first}possible solution..."
+                    f"[Solver1] Scanning all patterns for {self._first} possible solution..."
                 )
                 if self._current_possible_solution is None:  # no possible solution
                     self._second_possible_solution = None  # no second possible solution also
@@ -116,7 +121,7 @@ class MastermindSolver1:
                 )
             else:
                 self._second_possible_solution = self._get_next(
-                    f"[Solver1] Searching for second possible solution..."
+                    f"[Solver1] Scanning all patterns for second possible solution..."
                 )
                 if self._second_possible_solution is None:  # no second possible solution -> only one solution!
                     print(
@@ -152,7 +157,7 @@ class MastermindSolver1:
 
             for index, pattern in enumerate(self._all_patterns, 1):
 
-                if progress.item(self.check_possible_solution(pattern)):  # wrapped the long-taking operation
+                if progress.item(self._check_possible_solution_for_turns(pattern)):  # wrapped the long-taking operation
 
                     progress.stop(
                         finish=False,
