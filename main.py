@@ -42,27 +42,24 @@ def main():
     else:
         del kwargs["mode"]  # if success delete from dict (not to be displayed furthermore)
 
-    settings = Settings(**kwargs)
-
-    if mode == "game":
-        MastermindGame(settings=settings)
+    if mode is None:
+        raise RuntimeError(
+            # f"{settings.color.error_on}"
+            f"You did not specify Mastermind mode!"
+            # f"{settings.color.error_off}"
+        )
+    elif mode == "game":
+        MastermindGame(settings=Settings(**kwargs))
     elif mode == "helper":
-        MastermindHelper(settings=settings)
+        MastermindHelper(settings=Settings(**kwargs))
     elif mode == "solver":
-        MastermindSolver(settings=settings)
+        MastermindSolver(settings=Settings(**kwargs))
     else:
-        if mode is None:
-            raise RuntimeError(
-                f"{settings.color.error_on}"
-                f"You did not specify Mastermind mode!"
-                f"{settings.color.error_off}"
-            )
-        else:
-            raise RuntimeError(
-                f"{settings.color.error_on}"
-                f"Given mode `{mode}` is incorrect!"
-                f"{settings.color.error_off}"
-            )
+        raise RuntimeError(
+            # f"{settings.color.error_on}"
+            f"Given mode `{mode}` is incorrect!"
+            # f"{settings.color.error_off}"
+        )
 
 
 if __name__ == "__main__":
