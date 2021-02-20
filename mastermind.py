@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # mastermind.py                        #
 # Main Mastermind base class file      #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 from abc import ABCMeta, abstractmethod
@@ -41,12 +41,16 @@ class Mastermind(metaclass=ABCMeta):
 
         if self._game_status == 0:
             raise PermissionError(
-                "[Mastermind] No access to the solution when game is active!"
+                f"{self._settings.color.error_on}"
+                f"[Mastermind] No access to the solution when game is active!"
+                f"{self._settings.color.error_off}"
             )
         else:
             if self._solution is None:
                 raise ValueError(
-                    "[Mastermind] No saved solution in this game!"
+                    f"{self._settings.color.error_on}"
+                    f"[Mastermind] No saved solution in this game!"
+                    f"{self._settings.color.error_off}"
                 )
             else:
                 return self._solution

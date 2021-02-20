@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # game.py                              #
 # Mastermind Game                      #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 from mastermind import Mastermind
@@ -28,7 +28,9 @@ class MastermindGame(Mastermind):
                 self._solution = self._settings.Pattern(solution)
             else:
                 raise ValueError(
-                    "Incorrect solution pattern."
+                    f"{self._settings.color.error_on}"
+                    f"Incorrect solution pattern."
+                    f"{self._settings.color.error_off}"
                 )
 
         self._game_intro()
@@ -39,26 +41,41 @@ class MastermindGame(Mastermind):
         """ Prints intro """
 
         print(
-            """
-            ###################################
-            #   Welcome to Mastermind Game!   #
-            ###################################
-            """
+            f"{self._settings.color.greeting_on}\n"
+            f"###################################\n"
+            f"#   Welcome to Mastermind Game!   #\n"
+            f"###################################\n"
+            f"{self._settings.color.greeting_off}"
         )
 
         print(
-            f"I am CodeMaker and I have prepared {self._settings.pegs_number}-peg pattern "
-            f"using {self._settings.colors_number} different colors: {self._settings.all_colors_list_formatted}."
+            f"I am CodeMaker and I have prepared "
+            f"{self._settings.color.number_on}"
+            f"{self._settings.pegs_number}-peg"
+            f"{self._settings.color.number_off}"
+            f" pattern using "
+            f"{self._settings.color.number_on}"
+            f"{self._settings.colors_number}"
+            f"{self._settings.color.number_off}"
+            f" different colors: "
+            f"{self._settings.all_colors_list_formatted}"
+            f"."
         )
 
         print(
-            f"You are CodeBreaker "
-            f"and you have {self._settings.turns_limit if self._settings.turns_limit else 'unlimited'} "
-            f"turn{'s' if self._settings.turns_limit != 1 else ''} to guess the solution pattern."
+            f"You are CodeBreaker and you have "
+            f"{self._settings.color.number_on}"
+            f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited'}"
+            f"{self._settings.color.number_off}"
+            f" turn{'s' if self._settings.turns_limit != 1 else ''} to guess the solution pattern."
         )
 
         print(
-            f"There are {self._settings.patterns_number:,} possible patterns in this game. "
+            f"There are "
+            f"{self._settings.color.number_on}"
+            f"{self._settings.patterns_number:,}"
+            f"{self._settings.color.number_off}"
+            f" possible patterns in this game. "
             f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
 
@@ -78,7 +95,14 @@ class MastermindGame(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            f"{self._turns.turns_index + 1:>3d}. Enter `pattern`: "
+            f"{self._settings.color.number_on}"
+            f"{self._turns.turns_index + 1:>3d}."
+            f"{self._settings.color.number_off}"
+            f" Enter "
+            f"{self._settings.color.attribute_on}"
+            f"pattern"
+            f"{self._settings.color.attribute_off}"
+            f": "
         )
 
     def _game_take_turn(self, pattern_string, pattern=None):
@@ -86,14 +110,22 @@ class MastermindGame(Mastermind):
 
         if self._game_status != 0:
             raise PermissionError(
-                "[Game] Game is ended! You can't take turn."
+                f"{self._settings.color.error_on}"
+                f"[Game] Game is ended! You can't take turn."
+                f"{self._settings.color.error_off}"
             )
 
         if pattern is None:
             pattern = self._settings.Pattern.decode_pattern(pattern_string)
             if pattern is None:
                 raise ValueError(
-                    "[Game] Given `pattern` is incorrect! Enter again."
+                    f"{self._settings.color.error_on}"
+                    f"[Game] Given "
+                    f"{self._settings.color.attribute_on}"
+                    f"pattern"
+                    f"{self._settings.color.attribute_off}"
+                    f" is incorrect! Enter again."
+                    f"{self._settings.color.error_off}"
                 )
 
         response = pattern.calculate_response(self._solution)
@@ -123,8 +155,11 @@ class MastermindGame(Mastermind):
 
         if self._game_status == 1:
             print(
-                f"You found the solution in {self._turns.turns_index} "
-                f"turn{'s' if self._turns.turns_index != 1 else ''}."
+                f"You found the solution in "
+                f"{self._settings.color.number_on}"
+                f"{self._turns.turns_index}"
+                f"{self._settings.color.number_off}"
+                f" turn{'s' if self._turns.turns_index != 1 else ''}."
             )
         elif self._game_status == 2:
             print(

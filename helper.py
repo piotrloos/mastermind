@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # helper.py                            #
 # Mastermind Helper                    #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 from mastermind import Mastermind
@@ -28,25 +28,41 @@ class MastermindHelper(Mastermind):
         """ Prints intro """
 
         print(
-            """
-            #####################################
-            #   Welcome to Mastermind Helper!   #
-            #####################################
-            """
+            f"{self._settings.color.greeting_on}\n"
+            f"#####################################\n"
+            f"#   Welcome to Mastermind Helper!   #\n"
+            f"#####################################\n"
+            f"{self._settings.color.greeting_off}"
         )
 
         print(
-            f"You are CodeBreaker and somebody has prepared {self._settings.pegs_number}-peg pattern "
-            f"using {self._settings.colors_number} different colors: {self._settings.all_colors_list_formatted}."
+            f"You are CodeBreaker and somebody has prepared "
+            f"{self._settings.color.number_on}"
+            f"{self._settings.pegs_number}-peg"
+            f"{self._settings.color.number_off}"
+            f" pattern using "
+            f"{self._settings.color.number_on}"
+            f"{self._settings.colors_number}"
+            f"{self._settings.color.number_off}"
+            f" different colors: "
+            f"{self._settings.all_colors_list_formatted}"
+            f"."
         )
 
         print(
-            f"I am Helper and I have {self._settings.turns_limit if self._settings.turns_limit else 'unlimited'} "
-            f"turn{'s' if self._settings.turns_limit != 1 else ''} to help you guess the solution pattern."
+            f"I am Helper and I have "
+            f"{self._settings.color.number_on}"
+            f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited'}"
+            f"{self._settings.color.number_off}"
+            f" turn{'s' if self._settings.turns_limit != 1 else ''} to help you guess the solution pattern."
         )
 
         print(
-            f"There are {self._settings.patterns_number:,} possible patterns in this game. "
+            f"There are "
+            f"{self._settings.color.number_on}"
+            f"{self._settings.patterns_number:,}"
+            f"{self._settings.color.number_off}"
+            f" possible patterns in this game. "
             f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
 
@@ -83,8 +99,14 @@ class MastermindHelper(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            f"{self._turns.turns_index + 1:>3d}. "
-            f"Enter `pattern=response` (empty pattern means {self._solver.current_possible_solution}): "
+            f"{self._settings.color.number_on}"
+            f"{self._turns.turns_index + 1:>3d}."
+            f"{self._settings.color.number_off}"
+            f" Enter "
+            f"{self._settings.color.attribute_on}"
+            f"pattern=response"
+            f"{self._settings.color.attribute_off}"
+            f" (empty pattern means {self._solver.current_possible_solution}): "
         )
 
     # TODO: refactor with `solver_take_turn`
@@ -93,7 +115,9 @@ class MastermindHelper(Mastermind):
 
         if self._game_status != 0:
             raise PermissionError(
-                "[Helper] Game is ended! You can't take turn."
+                f"{self._settings.color.error_on}"
+                f"[Helper] Game is ended! You can't take turn."
+                f"{self._settings.color.error_off}"
             )
 
         if pattern is None or response is None:
@@ -103,7 +127,13 @@ class MastermindHelper(Mastermind):
                 # TODO: bug! incorrect pattern -> current_pattern (instead of printing error)
             if response is None:
                 raise ValueError(
-                    "[Helper] Given `pattern=response` is incorrect! Enter again."
+                    f"{self._settings.color.error_on}"
+                    f"[Helper] Given "
+                    f"{self._settings.color.attribute_on}"
+                    f"pattern=response"
+                    f"{self._settings.color.attribute_off}"
+                    f" is incorrect! Enter again."
+                    f"{self._settings.color.error_off}"
                 )
 
         print()
@@ -144,7 +174,8 @@ class MastermindHelper(Mastermind):
 
         # TODO: print this before turn
         print(
-            f"[Helper] One of the possible solution is {self._solver.current_possible_solution}."
+            # f"[Helper] One of the possible solution is {self._solver.current_possible_solution}."
+            # TODO: temporary disabled
         )
         # TODO: print info if it's the same proposition as in previous turn or another (new pattern)
 
@@ -158,8 +189,11 @@ class MastermindHelper(Mastermind):
                 f"The solution is {self._solution}."
             )
             print(
-                f"We found the solution in {self._turns.turns_index} "
-                f"turn{'s' if self._turns.turns_index != 1 else ''}."
+                f"We found the solution in "
+                f"{self._settings.color.number_on}"
+                f"{self._turns.turns_index}"
+                f"{self._settings.color.number_off}"
+                f" turn{'s' if self._turns.turns_index != 1 else ''}."
             )
         elif self._game_status == 2:
             print(
@@ -172,7 +206,11 @@ class MastermindHelper(Mastermind):
 
         if self._settings.progress_timing:
             print(
-                f"Total solving time: {self._solving_time:.3f}s."
+                f"Total solving time: "
+                f"{self._settings.color.time_on}"
+                f"{self._solving_time:.3f}s"
+                f"{self._settings.color.time_off}"
+                f"."
             )
 
         print(

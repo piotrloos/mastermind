@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # solver2.py                           #
 # Mastermind Solver2                   #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 from tools import Progress
@@ -34,6 +34,7 @@ class MastermindSolver2:
 
             with Progress(
                 items_number=self._settings.patterns_number,
+                color=self._settings.color,
                 title="[Solver2] Building list of all patterns from patterns generator...",
                 timing=self._settings.progress_timing,
             ) as progress:
@@ -95,6 +96,7 @@ class MastermindSolver2:
 
         with Progress(
             items_number=patterns_old_number,
+            color=self._settings.color,
             title="[Solver2] Filtering patterns list...",
             timing=self._settings.progress_timing,
             update_time_func=self.update_solving_time,
@@ -115,8 +117,18 @@ class MastermindSolver2:
 
         print(
             f"[Solver2] Number of possible solutions is now "
-            f"{self._possible_solutions_number:,} of {patterns_old_number:,} "
-            f"(rejected {100 * (1 - self._possible_solutions_number / patterns_old_number):.2f}% of patterns)."
+            f"{self._settings.color.number_on}"
+            f"{self._possible_solutions_number:,}"
+            f"{self._settings.color.number_off}"
+            f" of "
+            f"{self._settings.color.number_on}"
+            f"{patterns_old_number:,}"
+            f"{self._settings.color.number_off}"
+            f" (rejected "
+            f"{self._settings.color.number_on}"
+            f"{100 * (1 - self._possible_solutions_number / patterns_old_number):.2f}%"
+            f"{self._settings.color.number_off}"
+            f" of patterns)."
         )
 
         if self._possible_solutions_number == 1:

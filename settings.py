@@ -2,11 +2,12 @@
 # My version of famous game Mastermind #
 # settings.py                          #
 # Mastermind settings file             #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 import components
 from consts import Consts
+from colors import Color, NoColor
 from solver1 import MastermindSolver1
 from solver2 import MastermindSolver2
 from itertools import product
@@ -29,6 +30,7 @@ class Settings:
             progress_timing=None,
             solver1_second_solution=None,
             solver2_random_pattern=None,
+            colored_prints=None,
             **kwargs,
     ):
         """ Initializes `Settings` class object """
@@ -44,6 +46,12 @@ class Settings:
         self._progress_timing = self._get_setting(Consts.ProgressTiming, progress_timing)
         self._solver1_second_solution = self._get_setting(Consts.Solver1SecondSolution, solver1_second_solution)
         self._solver2_random_pattern = self._get_setting(Consts.Solver2RandomPattern, solver2_random_pattern)
+        self._colored_prints = self._get_setting(Consts.ColoredPrints, colored_prints)
+
+        if self._colored_prints:
+            self.color = Color()
+        else:
+            self.color = NoColor()
 
         self._solvers = {
             1: MastermindSolver1,  # patterns checking generator Solver
@@ -52,12 +60,28 @@ class Settings:
 
         for attribute in args:
             print(
-                f"[Settings] Attribute `{attribute}` has not been recognized! Ignoring."
+                f"{self.color.error_on}"
+                f"[Settings] Attribute "
+                f"{self.color.attribute_on}"
+                f"{attribute}"
+                f"{self.color.attribute_off}"
+                f" has not been recognized! Ignoring."
+                f"{self.color.error_off}"
             )
 
         for key, value in kwargs.items():
             print(
-                f"[Settings] Keyword `{key}` and it's value `{value}` has not been recognized! Ignoring."
+                f"{self.color.error_on}"
+                f"[Settings] Keyword "
+                f"{self.color.attribute_on}"
+                f"{key}"
+                f"{self.color.attribute_off}"
+                f" and it's value "
+                f"{self.color.attribute_on}"
+                f"{value}"
+                f"{self.color.attribute_off}"
+                f" has not been recognized! Ignoring."
+                f"{self.color.error_off}"
             )
 
         self.Peg = components.peg_class(self)
@@ -222,6 +246,12 @@ class Settings:
         """ Returns `solver2_random_pattern` setting (only for Solver2) """
 
         return self._solver2_random_pattern
+
+    @property
+    def colored_prints(self):
+        """ Returns `colored_prints` setting """
+
+        return self._colored_prints
 
     @property
     def all_colors_list_formatted(self):

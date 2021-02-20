@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # main.py                              #
 # Mastermind main file                 #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 import sys
@@ -42,20 +42,26 @@ def main():
     else:
         del kwargs["mode"]  # if success delete from dict (not to be displayed furthermore)
 
+    settings = Settings(**kwargs)
+
     if mode == "game":
-        MastermindGame(settings=Settings(**kwargs))
+        MastermindGame(settings=settings)
     elif mode == "helper":
-        MastermindHelper(settings=Settings(**kwargs))
+        MastermindHelper(settings=settings)
     elif mode == "solver":
-        MastermindSolver(settings=Settings(**kwargs))
+        MastermindSolver(settings=settings)
     else:
         if mode is None:
             raise RuntimeError(
-                "You did not specify Mastermind mode!"
+                f"{settings.color.error_on}"
+                f"You did not specify Mastermind mode!"
+                f"{settings.color.error_off}"
             )
         else:
             raise RuntimeError(
+                f"{settings.color.error_on}"
                 f"Given mode `{mode}` is incorrect!"
+                f"{settings.color.error_off}"
             )
 
 

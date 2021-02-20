@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # components.py                        #
 # Mastermind components file           #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 from tools import Progress, shuffle
@@ -19,7 +19,12 @@ def peg_class(settings):
         def __str__(self):
             """ Formats `peg` to be printed """
 
-            return f"({chr(self.__int__() + 97)})"
+            content = chr(self.__int__() + 97)
+
+            if settings.colored_prints:
+                return f"\033\133{(self.__int__() + 101)}m {content} \033\13349m"
+            else:
+                return f"({content})"
 
         @classmethod
         def decode_peg(cls, peg_char):
@@ -45,7 +50,12 @@ def pattern_class(settings):
         def __str__(self):
             """ Formats `pattern` to be printed """
 
-            return f"[{''.join(peg.__str__() for peg in self)}]"
+            content = ''.join(peg.__str__() for peg in self)
+
+            if settings.colored_prints:
+                return f"\033\1331;51;38;5;255;255;255m{content}\033\133m"
+            else:
+                return f"[{content}]"
 
         @classmethod
         def validate_pattern(cls, pattern_tuple):
@@ -130,6 +140,7 @@ def pattern_class(settings):
 
                 with Progress(
                     items_number=settings.patterns_number,
+                    color=settings.color,
                     title="[Pattern] Building patterns list (using itertools)...",
                     timing=settings.progress_timing,
                 ) as progress:
@@ -141,6 +152,7 @@ def pattern_class(settings):
 
                 with Progress(
                     items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
+                    color=settings.color,
                     title="[Pattern] Building patterns list (using my function)...",
                     timing=settings.progress_timing,
                 ) as progress:
@@ -183,6 +195,7 @@ def pattern_class(settings):
             if settings.shuffle_after:
                 with Progress(
                     items_number=len(all_patterns_list) - 1,
+                    color=settings.color,
                     title="[Pattern] Shuffling patterns list...",
                     timing=settings.progress_timing,
                 ) as progress:

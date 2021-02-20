@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # tools.py                             #
 # Utility functions for Mastermind     #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 from random import randrange
@@ -15,25 +15,47 @@ class Progress:
     def __init__(
             self,
             items_number,
-            title="[Progress] Thinking...",
-            summary="Done!",
+            color,
+            title=None,
+            summary=None,
             timing=True,
             update_time_func=None,
             auto_start_stop=True,
     ):
         """ Initializes Progress class object """
 
+        self._color = color
+
+        if title is None:
+            self._title = (  # default title
+                f"{self._color.progress_title_on}"
+                f"[Progress] Thinking..."
+                f"{self._color.progress_title_off}"
+            )
+        else:
+            self._title = str(title)  # (str) Progress process title to be displayed
+
+        if summary is None:
+            self._summary = (  # default summary
+                f"{self._color.progress_summary_on}"
+                f"Done!"
+                f"{self._color.progress_summary_off}"
+            )
+        else:
+            self._summary = str(summary)  # (str) Progress process summary to be displayed (after finishing)
+
         if items_number < 1:
-            raise ValueError("[Progress] The Progress process must last for one operation at least!")
+            raise ValueError(
+                f"{self._color.error_on}"
+                f"[Progress] The Progress process must last for one operation at least!"
+                f"{self._color.error_off}"
+            )
 
         self._index = 0  # (int) index of current operation
         self._portion = items_number / 100  # (float) 1% of progress to be added to threshold
         self._inv = 100 / items_number  # (float) inversion of portion (to be * instead of /) to get the progress value
         self._threshold = self._portion  # (float) current threshold (start with 1%)
         self._threshold_int = int(round(self._threshold))  # (int) round the threshold to be compared with index
-
-        self._title = str(title)  # (str) Progress process title to be displayed (if given)
-        self._summary = str(summary)  # (str) Progress process summary to be displayed (after finishing)
 
         self._timing = bool(timing)  # (bool) flag whether Progress process should be timed
         self._total_time = 0  # (float) total time in seconds
@@ -69,34 +91,55 @@ class Progress:
         """ Prints `title` and `value` """
 
         self._print(
-            f"\r{self._title} {int(round(self._index * self._inv)):3d}%"  # start from the beginning of line
+            f"\r"  # start from the beginning of line
+            f"{self._title} "
+            f"{self._color.progress_value_on}"
+            f"{int(round(self._index * self._inv)):3d}%"
+            f"{self._color.progress_value_off}"
         )
 
     def _print_value(self):
         """ Prints `value` """
 
         self._print(
-            f"\b\b\b\b{int(round(self._index * self._inv)):3d}%"  # 4 backspaces and the new value (in the same place)
+            f"\b\b\b\b"  # 4 backspaces and the new value (in the same place)
+            f"{self._color.progress_value_on}"
+            f"{int(round(self._index * self._inv)):3d}%"
+            f"{self._color.progress_value_off}"
         )
 
     def _print_summary(self):
         """ Prints `summary` in place of `value` """
 
         self._print(
-            f"\b\b\b\b{self._summary}\n"  # 4 backspaces and the summary (in the same place), go to the new line
+            f"\b\b\b\b"  # 4 backspaces and the summary (in the same place)
+            f"{self._summary}"
+            f"\n"  # finish `progress` and go to the new line
         )
 
     def _check_state(self, should_be_running):
         """ Checks `finished` and `running` state and raises exception if needed """
 
         if self._finished:
-            raise RuntimeError("[Progress] Progress process is finished!")
+            raise RuntimeError(
+                f"{self._color.error_on}"
+                f"[Progress] Progress process is finished!"
+                f"{self._color.error_off}"
+            )
 
         if should_be_running and not self._running:
-            raise RuntimeError("[Progress] Progress process is not running!")
+            raise RuntimeError(
+                f"{self._color.error_on}"
+                f"[Progress] Progress process is not running!"
+                f"{self._color.error_off}"
+            )
 
         if not should_be_running and self._running:
-            raise RuntimeError("[Progress] Progress process is already running!")
+            raise RuntimeError(
+                f"{self._color.error_on}"
+                f"[Progress] Progress process is already running!"
+                f"{self._color.error_off}"
+            )
 
     def start(self, title=None):
         """ Starts/resumes printing Progress process and changes `title` text if given """
@@ -125,12 +168,36 @@ class Progress:
             self._summary = str(summary)
 
         if self._timing:
+
             partial_time = time() - self._start_time
             self._total_time += partial_time
 
-            # TODO: 3 different states, clean it up
             self._summary += (
-                f" (partial time: {partial_time:.3f}s{'' if not finish else f', total time: {self._total_time:.3f}s'})"
+                f" ("
+            )
+
+            if self._total_time != 0 or not finish:  # check if it is partial execution
+                self._summary += (
+                    f"partial "
+                )
+
+            self._summary += (
+                f"time: "
+                f"{self._color.time_on}"
+                f"{partial_time:.3f}s"
+                f"{self._color.time_off}"
+            )
+
+            if self._total_time != 0 and finish:  # check if it is last execution
+                self._summary += (
+                    f", total time: "
+                    f"{self._color.time_on}"
+                    f"{self._total_time:.3f}s"
+                    f"{self._color.time_off}"
+                )
+
+            self._summary += (
+                f")"
             )
 
             if self._update_time_func is not None:

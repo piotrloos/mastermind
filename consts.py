@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # consts.py                            #
 # CONSTs for mastermind                #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 from abc import ABCMeta
@@ -83,4 +83,10 @@ class Consts(metaclass=ABCMeta):
         type = bool
         name = "enable Solver2 random pattern setting"
         default_value = False
+        ask_if_not_given = False
+
+    class ColoredPrints(metaclass=ABCMeta):
+        type = bool
+        name = "enable printing in color"
+        default_value = True
         ask_if_not_given = False

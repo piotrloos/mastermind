@@ -2,7 +2,7 @@
 # My version of famous game Mastermind #
 # solver1.py                           #
 # Mastermind Solver1                   #
-#             Piotr Loos (c) 2019-2020 #
+#             Piotr Loos (c) 2019-2021 #
 ########################################
 
 from tools import Progress
@@ -47,7 +47,9 @@ class MastermindSolver1:
         """ (Solver1) Returns number of possible solutions """
 
         raise NotImplementedError(
-            "It is impossible to calculate number of possible solutions in Solver1!"
+            f"{self._settings.color.error_on}"
+            f"It is impossible to calculate number of possible solutions in Solver1!"
+            f"{self._settings.color.error_off}"
         )
 
     @property
@@ -145,6 +147,7 @@ class MastermindSolver1:
 
         with Progress(
             items_number=self._settings.patterns_number,
+            color=self._settings.color,
             timing=self._settings.progress_timing,
             update_time_func=self.update_solving_time,
             auto_start_stop=False,
@@ -161,9 +164,23 @@ class MastermindSolver1:
 
                     progress.stop(
                         finish=False,
-                        summary=f"Found! It is {pattern}.\n"
-                                f"[Solver1] It's index is {index:,} of {self._settings.patterns_number:,} "
-                                f"overall ({100 * index / self._settings.patterns_number:.2f}%)."
+                        summary=f"{self._settings.color.progress_summary_on}"
+                                f"Found!"
+                                f"{self._settings.color.progress_summary_off}"
+                                f" It is {pattern}.\n"
+                                f"[Solver1] It's index is "
+                                f"{self._settings.color.number_on}"
+                                f"{index:,}"
+                                f"{self._settings.color.number_off}"
+                                f" of "
+                                f"{self._settings.color.number_on}"
+                                f"{self._settings.patterns_number:,}"
+                                f"{self._settings.color.number_off}"
+                                f" overall ("
+                                f"{self._settings.color.number_on}"
+                                f"{100 * index / self._settings.patterns_number:.2f}%"
+                                f"{self._settings.color.number_off}"
+                                f")."
                     )
                     yield pattern
                     progress.start(
@@ -171,14 +188,32 @@ class MastermindSolver1:
                     )
 
             # ensure `index` reached number of all patterns
-            assert index == self._settings.patterns_number, "[Solver1] Incorrect pattern index value!"
+            assert index == self._settings.patterns_number, (
+                f"{self._settings.color.error_on}"
+                f"[Solver1] Incorrect pattern index value!"
+                f"{self._settings.color.error_off}"
+            )
 
             # after yield the last pattern
             progress.stop(
                 finish=True,
-                summary=f"Finished.\n"
-                        f"[Solver1] Reached index {index:,} of {self._settings.patterns_number:,} "
-                        f"overall ({100 * index / self._settings.patterns_number:.2f}%)."
+                summary=f"{self._settings.color.progress_summary_on}"
+                        f"Finished."
+                        f"{self._settings.color.progress_summary_off}"
+                        f"\n"
+                        f"[Solver1] Reached index "
+                        f"{self._settings.color.number_on}"
+                        f"{index:,}"
+                        f"{self._settings.color.number_off}"
+                        f" of "
+                        f"{self._settings.color.number_on}"
+                        f"{self._settings.patterns_number:,}"
+                        f"{self._settings.color.number_off}"
+                        f" overall ("
+                        f"{self._settings.color.number_on}"
+                        f"{100 * index / self._settings.patterns_number:.2f}%"
+                        f"{self._settings.color.number_off}"
+                        f")."
             )
 
             # no possible solution

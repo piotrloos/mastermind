@@ -7,7 +7,6 @@
 # TODO: stworzenie pliku `readme.md`
 
 # TODO: możliwość wyłączenia Progressu
-# TODO: formatowanie patternów (Colorama) + parametr
 # TODO: sys.getsizeof() dla listy patternów
 # TODO: typy zmiennych w deklaracjach funkcji (type hints)
 # TODO: porządek w nazwach metod i pól (__name)
