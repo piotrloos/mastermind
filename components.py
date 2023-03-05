@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# components.py                        #
-# Mastermind components file           #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# components.py                            #
+# Mastermind components file               #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 from tools import Progress, shuffle
 from itertools import product
@@ -19,10 +19,29 @@ def peg_class(settings):
         def __str__(self):
             """ Formats `peg` to be printed """
 
-            content = chr(self.__int__() + 97)
+            # content = chr(self.__int__() + 97)
+            content = self.__int__() + 1  # TODO: create setting for this
 
             if settings.colored_prints:
-                return f"\033\133{(self.__int__() + 101)}m {content} \033\13349m"
+
+                # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+
+                colors_list = [
+                    '31m',   # red
+                    '93m',   # yellow
+                    '32m',   # green
+                    '34m',   # blue
+                    '33m',   # orange
+                    '35m',   # magenta
+                    '90m',   # gray
+                    '96m',   # cyan
+                    '92m',   # bright green
+                    '95m',   # bright magenta
+                ]  # TODO: move it to settings
+                return f"\033\133" \
+                       f"{colors_list[self.__int__()]}" \
+                       f"({content})" \
+                       f"\033\13339m"
             else:
                 return f"({content})"
 
@@ -31,7 +50,9 @@ def peg_class(settings):
             """ Returns Peg object converted from formatted `peg_char` """
 
             if len(peg_char) == 1:
-                return Peg(ord(peg_char) - 97)
+                # return Peg(ord(peg_char) - 97)
+                return Peg(int(peg_char) - 1)  # TODO: create setting for this
+
                 # TODO: input digits, lowercase or uppercase letters, or own list of pegs
             else:
                 return None
@@ -53,7 +74,7 @@ def pattern_class(settings):
             content = ''.join(peg.__str__() for peg in self)
 
             if settings.colored_prints:
-                return f"\033\1331;51;38;5;255;255;255m{content}\033\133m"
+                return f"\033\1331;51;38;5;255;255;255m{content}\033\133m"  # bold, framed, white fg
             else:
                 return f"[{content}]"
 
@@ -145,7 +166,7 @@ def pattern_class(settings):
                     timing=settings.progress_timing,
                 ) as progress:
 
-                    # TODO: include `shuffle_before` setting
+                    # TODO: include `shuffle_colors_before_build` setting
                     all_patterns_list = list(map(lambda pattern_tuple: progress.item(settings.Pattern(pattern_tuple)),
                                                  product(settings.Peg.all_colors_list, repeat=settings.pegs_number)))
             else:
@@ -164,7 +185,7 @@ def pattern_class(settings):
                     for _ in range(settings.pegs_number - 1):
 
                         # shuffle `all_colors_list` to build patterns from (on every iteration)
-                        if settings.shuffle_before:
+                        if settings.shuffle_colors_before_build:
                             shuffle(
                                 all_colors_list,
                             )
@@ -178,7 +199,7 @@ def pattern_class(settings):
                         # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
 
                     # shuffle `all_colors_list` to build Pattern objects from
-                    if settings.shuffle_before:
+                    if settings.shuffle_colors_before_build:
                         shuffle(
                             all_colors_list,
                         )
@@ -192,7 +213,7 @@ def pattern_class(settings):
                     # new pattern is Pattern object a one peg bigger (unpacked "old" pegs + "new" one)
 
             # shuffle generated patterns list (whole list at once)
-            if settings.shuffle_after:
+            if settings.shuffle_patterns_after_build:
                 with Progress(
                     items_number=len(all_patterns_list) - 1,
                     color=settings.color,
@@ -360,20 +381,20 @@ def turn_class(settings):
     return Turn
 
 
-def turns_class(settings):
-    """ Function that creates and returns Turns class with given `settings` """
+def turns_list_class(settings):
+    """ Function that creates and returns TurnsList class with given `settings` """
 
-    class Turns(list):
+    class TurnsList(list):
         """ CLass for list of all turns in the game """
 
         def __init__(self):
-            """ Initializes `Turns` class object """
+            """ Initializes `TurnsList` class object """
 
             super().__init__()
             self._turns_index = 0
 
         def add_turn(self, pattern, response):
-            """ Adds current turn to `Turns` """
+            """ Adds current turn to `TurnsList` """
 
             self._turns_index += 1
             turn = settings.Turn((self._turns_index, pattern, response))
@@ -396,4 +417,4 @@ def turns_class(settings):
 
             return self._turns_index
 
-    return Turns
+    return TurnsList

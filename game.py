@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# game.py                              #
-# Mastermind Game                      #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# game.py                                  #
+# Mastermind Game                          #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 from mastermind import Mastermind
 
@@ -63,11 +63,11 @@ class MastermindGame(Mastermind):
         )
 
         print(
-            f"You are CodeBreaker and you have "
+            f"You are CodeBreaker, you don't know my pattern and you have "
             f"{self._settings.color.number_on}"
-            f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited'}"
+            f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited number of'}"
             f"{self._settings.color.number_off}"
-            f" turn{'s' if self._settings.turns_limit != 1 else ''} to guess the solution pattern."
+            f" turn{'s' if self._settings.turns_limit != 1 else ''} to find out the solution."
         )
 
         print(
@@ -75,7 +75,10 @@ class MastermindGame(Mastermind):
             f"{self._settings.color.number_on}"
             f"{self._settings.patterns_number:,}"
             f"{self._settings.color.number_off}"
-            f" possible patterns in this game. "
+            f" possible patterns in this game."
+        )
+
+        print(
             f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
 
@@ -96,7 +99,7 @@ class MastermindGame(Mastermind):
 
         return (
             f"{self._settings.color.number_on}"
-            f"{self._turns.turns_index + 1:>3d}."
+            f"{self._turns_list.turns_index + 1:>3d}."
             f"{self._settings.color.number_off}"
             f" Enter "
             f"{self._settings.color.attribute_on}"
@@ -134,8 +137,8 @@ class MastermindGame(Mastermind):
         # TODO: use Solver1 `check_possible_solution` method here
         #  to print info if given pattern could be the solution (like in Helper)
 
-        self._turns.add_turn(pattern, response)
-        self._turns.print_turns()
+        self._turns_list.add_turn(pattern, response)
+        self._turns_list.print_turns()
 
         # check game end
 
@@ -144,7 +147,7 @@ class MastermindGame(Mastermind):
             self._game_status = 1  # solution is found
             return
 
-        if self._settings.turns_limit and self._turns.turns_index >= self._settings.turns_limit:
+        if self._settings.turns_limit and self._turns_list.turns_index >= self._settings.turns_limit:
             self._game_status = 2  # reached turns limit
             return
 
@@ -155,11 +158,11 @@ class MastermindGame(Mastermind):
 
         if self._game_status == 1:
             print(
-                f"You found the solution in "
+                f"You found my pattern in "
                 f"{self._settings.color.number_on}"
-                f"{self._turns.turns_index}"
+                f"{self._turns_list.turns_index}"
                 f"{self._settings.color.number_off}"
-                f" turn{'s' if self._turns.turns_index != 1 else ''}."
+                f" turn{'s' if self._turns_list.turns_index != 1 else ''}."
             )
         elif self._game_status == 2:
             print(

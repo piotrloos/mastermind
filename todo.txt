@@ -46,4 +46,6 @@
 # TODO: możliwość gry komputera samego ze sobą
 # TODO: testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
 # TODO: testy, testy, testy...
+# TODO: komunikat o czyszczeniu pamięci na koniec gry
+# TODO: nie pokazywać partial time przy operacjach jednorazowych, total time -> time
 # TODO: Solver3 - python-constraint

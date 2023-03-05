@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# consts.py                            #
-# CONSTs for mastermind                #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# consts.py                                #
+# Constants for mastermind                 #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 from abc import ABCMeta
 
@@ -15,7 +15,7 @@ class Consts(metaclass=ABCMeta):
         type = int
         name = "number of colors"
         min_value = 2
-        max_value = 12
+        max_value = 9
         default_value = 6
         ask_if_not_given = True     # if False - take default value without asking user
 
@@ -29,15 +29,15 @@ class Consts(metaclass=ABCMeta):
 
     class TurnsLimitNumber(metaclass=ABCMeta):
         type = int
-        name = "number of turns limit"
+        name = "number of turns_list limit"
         min_value = 0
         max_value = 32
         default_value = 12
         ask_if_not_given = False
 
-    class SolverIndex(metaclass=ABCMeta):
+    class SolverChoice(metaclass=ABCMeta):
         type = int
-        name = "solver index"
+        name = "solver choice - #1: patterns checking generator Solver, #2: patterns list filtering Solver"
         min_value = 1
         max_value = 2
         default_value = 1
@@ -55,15 +55,15 @@ class Consts(metaclass=ABCMeta):
         default_value = False
         ask_if_not_given = False
 
-    class ShufflePatternsBeforeBuilding(metaclass=ABCMeta):
+    class ShuffleColorsBeforeBuild(metaclass=ABCMeta):
         type = bool
-        name = "shuffle patterns before building list"
+        name = "shuffle colors before patterns list building"
         default_value = False
         ask_if_not_given = False
 
-    class ShufflePatternsAfterBuilding(metaclass=ABCMeta):
+    class ShufflePatternsAfterBuild(metaclass=ABCMeta):
         type = bool
-        name = "shuffle patterns after building list"
+        name = "shuffle patterns after patterns list building"
         default_value = False
         ask_if_not_given = False
 
@@ -73,20 +73,20 @@ class Consts(metaclass=ABCMeta):
         default_value = True
         ask_if_not_given = False
 
-    class Solver1SecondSolution(metaclass=ABCMeta):
+    class Solver1CalcSecondSolution(metaclass=ABCMeta):
         type = bool
-        name = "enable Solver1 second solution setting"
+        name = "calculate second solution for Solver1"
         default_value = True
         ask_if_not_given = False
 
-    class Solver2RandomPattern(metaclass=ABCMeta):
+    class Solver2TakeRandomPattern(metaclass=ABCMeta):
         type = bool
-        name = "enable Solver2 random pattern setting"
+        name = "take random pattern for Solver2"
         default_value = False
         ask_if_not_given = False
 
     class ColoredPrints(metaclass=ABCMeta):
         type = bool
-        name = "enable printing in color"
-        default_value = True
+        name = "enable terminal printing in color"
+        default_value = False
         ask_if_not_given = False

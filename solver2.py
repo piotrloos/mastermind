@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# solver2.py                           #
-# Mastermind Solver2                   #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# solver2.py                               #
+# Mastermind Solver2                       #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 from tools import Progress
 from random import randrange
@@ -53,7 +53,7 @@ class MastermindSolver2:
         self._possible_solutions_number = len(self._possible_solutions_list)
 
         if self._possible_solutions_number:
-            if self._settings.solver2_random_pattern:
+            if self._settings.solver2_take_random_pattern:
                 index = randrange(self._possible_solutions_number)
             else:
                 index = 0
@@ -135,5 +135,16 @@ class MastermindSolver2:
             print(
                 f"[Solver2] Now I know that {self._current_possible_solution} is the only possible solution!"
             )
+        elif self._possible_solutions_number != 0 and self._possible_solutions_number <= 10:
+            # TODO: move this value 10 to settings
+            print(
+                f"[Solver2] There are no more than "
+                f"{self._settings.color.number_on}"
+                f"10"
+                f"{self._settings.color.number_off}"
+                f" possible solutions. Here is the list:"
+            )
+            for pattern in self._possible_solutions_list:
+                print(pattern)
 
         return self._current_possible_solution

@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# tools.py                             #
-# Utility functions for Mastermind     #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# tools.py                                 #
+# Utility functions for Mastermind         #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 from random import randrange
 from time import time

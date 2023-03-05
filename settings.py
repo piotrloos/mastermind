@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# settings.py                          #
-# Mastermind settings file             #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# settings.py                              #
+# Mastermind settings file                 #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 import components
 from consts import Consts
@@ -22,14 +22,14 @@ class Settings:
             colors_number=None,
             pegs_number=None,
             turns_limit=None,
-            solver_index=None,
+            solver_choice=None,
             use_itertools=None,
             pre_build_patterns=None,
-            shuffle_before=None,
-            shuffle_after=None,
+            shuffle_colors_before_build=None,
+            shuffle_patterns_after_build=None,
             progress_timing=None,
-            solver1_second_solution=None,
-            solver2_random_pattern=None,
+            solver1_calc_second_solution=None,
+            solver2_take_random_pattern=None,
             colored_prints=None,
             **kwargs,
     ):
@@ -38,14 +38,14 @@ class Settings:
         self._colors_number = self._get_setting(Consts.ColorsNumber, colors_number)
         self._pegs_number = self._get_setting(Consts.PegsNumber, pegs_number)
         self._turns_limit = self._get_setting(Consts.TurnsLimitNumber, turns_limit)
-        self._solver_index = self._get_setting(Consts.SolverIndex, solver_index)
+        self._solver_choice = self._get_setting(Consts.SolverChoice, solver_choice)
         self._use_itertools = self._get_setting(Consts.UseItertools, use_itertools)
         self._pre_build_patterns = self._get_setting(Consts.PreBuildPatterns, pre_build_patterns)
-        self._shuffle_before = self._get_setting(Consts.ShufflePatternsBeforeBuilding, shuffle_before)
-        self._shuffle_after = self._get_setting(Consts.ShufflePatternsAfterBuilding, shuffle_after)
+        self._shuffle_colors_before_build = self._get_setting(Consts.ShuffleColorsBeforeBuild, shuffle_colors_before_build)
+        self._shuffle_patterns_after_build = self._get_setting(Consts.ShufflePatternsAfterBuild, shuffle_patterns_after_build)
         self._progress_timing = self._get_setting(Consts.ProgressTiming, progress_timing)
-        self._solver1_second_solution = self._get_setting(Consts.Solver1SecondSolution, solver1_second_solution)
-        self._solver2_random_pattern = self._get_setting(Consts.Solver2RandomPattern, solver2_random_pattern)
+        self._solver1_calc_second_solution = self._get_setting(Consts.Solver1CalcSecondSolution, solver1_calc_second_solution)
+        self._solver2_take_random_pattern = self._get_setting(Consts.Solver2TakeRandomPattern, solver2_take_random_pattern)
         self._colored_prints = self._get_setting(Consts.ColoredPrints, colored_prints)
 
         if self._colored_prints:
@@ -88,7 +88,7 @@ class Settings:
         self.Pattern = components.pattern_class(self)
         self.Response = components.response_class(self)
         self.Turn = components.turn_class(self)
-        self.Turns = components.turns_class(self)
+        self.TurnsList = components.turns_list_class(self)
 
         if self._pre_build_patterns:
             self._all_patterns_list = self.Pattern.build_patterns()  # build all patterns list (once for several games)
@@ -200,10 +200,10 @@ class Settings:
         return self._turns_limit
 
     @property
-    def solver_index(self):
-        """ Returns solver index """
+    def solver_choice(self):
+        """ Returns solver choice """
 
-        return self._solver_index
+        return self._solver_choice
 
     @property
     def use_itertools(self):
@@ -213,21 +213,21 @@ class Settings:
 
     @property
     def pre_build_patterns(self):
-        """ Returns 'pre build all possible patterns list' setting """
+        """ Returns 'pre-build all possible patterns list' setting """
 
         return self._pre_build_patterns
 
     @property
-    def shuffle_before(self):
-        """ Returns 'patterns shuffle before building list' setting """
+    def shuffle_colors_before_build(self):
+        """ Returns 'shuffle colors before building list' setting """
 
-        return self._shuffle_before
+        return self._shuffle_colors_before_build
 
     @property
-    def shuffle_after(self):
-        """ Returns 'patterns shuffle after building list' setting """
+    def shuffle_patterns_after_build(self):
+        """ Returns 'shuffle patterns after building list' setting """
 
-        return self._shuffle_after
+        return self._shuffle_patterns_after_build
 
     @property
     def progress_timing(self):
@@ -236,16 +236,16 @@ class Settings:
         return self._progress_timing
 
     @property
-    def solver1_second_solution(self):
-        """ Returns `solver1_second_solution` setting (only for Solver1) """
+    def solver1_calc_second_solution(self):
+        """ Returns `solver1_calc_second_solution` setting (only for Solver1) """
 
-        return self._solver1_second_solution
+        return self._solver1_calc_second_solution
 
     @property
-    def solver2_random_pattern(self):
-        """ Returns `solver2_random_pattern` setting (only for Solver2) """
+    def solver2_take_random_pattern(self):
+        """ Returns `solver2_take_random_pattern` setting (only for Solver2) """
 
-        return self._solver2_random_pattern
+        return self._solver2_take_random_pattern
 
     @property
     def colored_prints(self):

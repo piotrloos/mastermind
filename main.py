@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# main.py                              #
-# Mastermind main file                 #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# main.py                                  #
+# Mastermind main file                     #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 import sys
 from settings import Settings
@@ -45,7 +45,8 @@ def main():
     if mode is None:
         raise RuntimeError(
             # f"{settings.color.error_on}"
-            f"You did not specify Mastermind mode!"
+            f"You did not specify Mastermind mode!\n"
+            f"Try to run Mastermind with parameter mode=game, mode=helper or mode=solver."
             # f"{settings.color.error_off}"
         )
     elif mode == "game":

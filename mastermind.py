@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# mastermind.py                        #
-# Main Mastermind base class file      #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# mastermind.py                            #
+# Main Mastermind base class file          #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 from abc import ABCMeta, abstractmethod
 from settings import Settings
@@ -26,13 +26,13 @@ class Mastermind(metaclass=ABCMeta):
         else:
             self._settings = Settings(*args, **kwargs)
 
-        self._turns = self._settings.Turns()  # initialize list of turns
+        self._turns_list = self._settings.TurnsList()  # initialize list of turns
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
 
-        self._solver = self._settings.solvers[self._settings.solver_index](  # instantiate Solver class
+        self._solver = self._settings.solvers[self._settings.solver_choice](  # instantiate Solver class
             self._settings,
-            self._turns,
+            self._turns_list,
         )
 
     @property

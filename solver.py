@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# solver.py                            #
-# Mastermind Solver                    #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# solver.py                                #
+# Mastermind Solver                        #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 from mastermind import Mastermind
 
@@ -50,11 +50,11 @@ class MastermindSolver(Mastermind):
         )
 
         print(
-            f"I am CodeBreaker and I have "
+            f"I am CodeBreaker, I don't know your pattern and I have "
             f"{self._settings.color.number_on}"
-            f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited'}"
+            f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited number of'}"
             f"{self._settings.color.number_off}"
-            f" turn{'s' if self._settings.turns_limit != 1 else ''} to guess the solution pattern."
+            f" turn{'s' if self._settings.turns_limit != 1 else ''} to find out the solution."
         )
 
         print(
@@ -62,15 +62,18 @@ class MastermindSolver(Mastermind):
             f"{self._settings.color.number_on}"
             f"{self._settings.patterns_number:,}"
             f"{self._settings.color.number_off}"
-            f" possible patterns in this game. "
+            f" possible patterns in this game."
+        )
+
+        print(
             f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
 
         print(
             f"Settings:\n"
-            f"solver_index = {self._settings.solver_index}\n"
-            f"shuffle_before = {self._settings.shuffle_before}\n"
-            f"shuffle_after = {self._settings.shuffle_after}\n"
+            f"solver_choice = {self._settings.solver_choice}\n"
+            f"shuffle_colors_before_build = {self._settings.shuffle_colors_before_build}\n"
+            f"shuffle_patterns_after_build = {self._settings.shuffle_patterns_after_build}\n"
         )
 
     def _solver_loop(self):
@@ -100,7 +103,7 @@ class MastermindSolver(Mastermind):
 
         return (
             f"{self._settings.color.number_on}"
-            f"{self._turns.turns_index + 1:>3d}."
+            f"{self._turns_list.turns_index + 1:>3d}."
             f"{self._settings.color.number_off}"
             f" Enter "
             f"{self._settings.color.attribute_on}"
@@ -136,8 +139,8 @@ class MastermindSolver(Mastermind):
         print()
         pattern = self._solver.current_possible_solution
 
-        turn = self._turns.add_turn(pattern, response)
-        self._turns.print_turns()
+        turn = self._turns_list.add_turn(pattern, response)
+        self._turns_list.print_turns()
 
         # check game end
 
@@ -147,7 +150,7 @@ class MastermindSolver(Mastermind):
             self._game_status = 1  # solution is found
             return
 
-        if self._settings.turns_limit and self._turns.turns_index >= self._settings.turns_limit:
+        if self._settings.turns_limit and self._turns_list.turns_index >= self._settings.turns_limit:
             self._game_status = 2  # reached turns limit
             return
 
@@ -168,11 +171,11 @@ class MastermindSolver(Mastermind):
                 f"The solution is {self._solution}."
             )
             print(
-                f"I found the solution in "
+                f"I found your pattern in "
                 f"{self._settings.color.number_on}"
-                f"{self._turns.turns_index}"
+                f"{self._turns_list.turns_index}"
                 f"{self._settings.color.number_off}"
-                f" turn{'s' if self._turns.turns_index != 1 else ''}."
+                f" turn{'s' if self._turns_list.turns_index != 1 else ''}."
             )
         elif self._game_status == 2:
             print(

@@ -1,29 +1,31 @@
-########################################
-# My version of famous game Mastermind #
-# colors.py                            #
-# Mastermind terminal colors' settings #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# colors.py                                #
+# Mastermind terminal colors' settings     #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 
 class Color:
 
-    greeting_on = "\033\1331;95m"
-    greeting_off = "\033\13322;39m"
-    error_on = "\033\1331;4;91m"
-    error_off = "\033\13322;24;39m"
-    number_on = "\033\1331;94m"
-    number_off = "\033\13322;39m"
-    attribute_on = "\033\1333m"
-    attribute_off = "\033\13323m"
-    time_on = "\033\1331;96m"
-    time_off = "\033\13322;39m"
-    progress_title_on = "\033\1331;94m"
-    progress_title_off = "\033\13322;39m"
-    progress_value_on = "\033\1331;93m"
-    progress_value_off = "\033\13322;39m"
-    progress_summary_on = "\033\1331;92m"
-    progress_summary_off = "\033\13322;39m"
+    # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+
+    greeting_on = "\033\1331;95m"               # bold on, pink fg
+    greeting_off = "\033\13322;39m"             # bold off, reset fg
+    error_on = "\033\1331;4;91m"                # bold on, underline on, red fg
+    error_off = "\033\13322;24;39m"             # bold off, underline off, reset fg
+    number_on = "\033\1331;94m"                 # bold on, blue fg
+    number_off = "\033\13322;39m"               # bold off, reset fg
+    attribute_on = "\033\1333m"                 # italic on
+    attribute_off = "\033\13323m"               # italic off
+    time_on = "\033\1331;96m"                   # bold on, cyan fg
+    time_off = "\033\13322;39m"                 # bold off, reset fg
+    progress_title_on = "\033\1331;94m"         # bold on, blue fg
+    progress_title_off = "\033\13322;39m"       # bold off, reset fg
+    progress_value_on = "\033\1331;93m"         # bold on, yellow fg
+    progress_value_off = "\033\13322;39m"       # bold off, reset fg
+    progress_summary_on = "\033\1331;92m"       # bold on, green fg
+    progress_summary_off = "\033\13322;39m"     # bold off, reset fg
 
 
 class NoColor:

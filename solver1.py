@@ -1,9 +1,9 @@
-########################################
-# My version of famous game Mastermind #
-# solver1.py                           #
-# Mastermind Solver1                   #
-#             Piotr Loos (c) 2019-2021 #
-########################################
+############################################
+# My version of the famous Mastermind game #
+# solver1.py                               #
+# Mastermind Solver1                       #
+#           Piotr Loos (c) 2019-2021, 2023 #
+############################################
 
 from tools import Progress
 
@@ -14,18 +14,18 @@ class MastermindSolver1:
     def __init__(
             self,
             settings,
-            turns,
+            turns_list,
     ):
         """ (Solver1) Initializes `MastermindSolver1` class object """
 
         self._settings = settings
-        self._turns = turns
+        self._turns_list = turns_list
 
         self._solving_time = 0
 
         # prepare `all_patterns` list/generator for iteration
         if self._settings.pre_build_patterns:
-            self._all_patterns = self._settings.all_patterns_list  # get list (reference)
+            self._all_patterns = self._settings.all_patterns_list  # get list (by reference)
         else:
             if self._settings.use_itertools:
                 self._all_patterns = iter(self._settings.all_patterns_gen)  # init `itertools.product` generator
@@ -36,7 +36,7 @@ class MastermindSolver1:
         self._current_possible_solution = None
         self._second_possible_solution = None
 
-        self._first = "first " if self._settings.solver1_second_solution else ""
+        self._first = "first " if self._settings.solver1_calc_second_solution else ""
 
         self._progress_title = ""
 
@@ -85,7 +85,7 @@ class MastermindSolver1:
             possible_solution.calculate_black_pegs(turn.pattern) == turn.response.black_pegs
             and
             possible_solution.calculate_black_white_pegs(turn.pattern) == turn.response.black_white_pegs
-            for turn in self._turns
+            for turn in self._turns_list
         )
 
     def calculate_possible_solution(self, *_):
@@ -100,7 +100,7 @@ class MastermindSolver1:
                 f"still can be a {self._first}solution. Not changed."
             )
         else:
-            if self._settings.solver1_second_solution and self.check_possible_solution(self._second_possible_solution):
+            if self._settings.solver1_calc_second_solution and self.check_possible_solution(self._second_possible_solution):
                 print(
                     f"[Solver1] Previously found second possible solution {self._second_possible_solution} "
                     f"still can be a solution. Saved as first."
@@ -115,7 +115,7 @@ class MastermindSolver1:
                     self._second_possible_solution = None  # no second possible solution also
                     return self._current_possible_solution  # (=None)
 
-        if self._settings.solver1_second_solution:
+        if self._settings.solver1_calc_second_solution:
             if self.check_possible_solution(self._second_possible_solution):
                 print(
                     f"[Solver1] Previously found second possible solution {self._second_possible_solution} "
