@@ -1,12 +1,18 @@
 # do zrobienia w najbliższym czasie:
 
+# TODO: stworzenie pliku `readme.md`
+
+# TODO: możliwość wyłączenia Progressu
+# TODO: nie pokazywać partial time przy operacjach jednorazowych, total time -> time
+# TODO: formatowanie czasu w minutach, sekundach, milisekundach
+# TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
+# TODO: komunikat o czyszczeniu pamięci na koniec gry
+# TODO: ustawienie na wyłączenie printowania tablicy ruchów
+
 # TODO: exhausted generator bug
 # TODO: parametr mode przy uruchamianiu Mastermind a nie Game/Helper/Solver
 # TODO: refactor podobnych metod w Game/Helper/Solver
 
-# TODO: stworzenie pliku `readme.md`
-
-# TODO: możliwość wyłączenia Progressu
 # TODO: sys.getsizeof() dla listy patternów
 # TODO: typy zmiennych w deklaracjach funkcji (type hints)
 # TODO: porządek w nazwach metod i pól (__name)
@@ -34,7 +40,6 @@
 
 # TODO: Solver1 - liczenie liczby możliwych patternów generatora (kopiowanie generatora wraz ze stanem)
 # TODO: Solver2 - tworzenie tablicy dwuwymiarowej trójstanowej (must be, can be, can't be) dla każdej pozycji i dla każdego koloru
-# TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
 # TODO: przyjmowanie własnej listy Pegów
 # TODO: opcje: allow_duplicates, allow_blanks
 # TODO: Solver1 - przyspieszenie generatora:
@@ -46,6 +51,4 @@
 # TODO: możliwość gry komputera samego ze sobą
 # TODO: testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
 # TODO: testy, testy, testy...
-# TODO: komunikat o czyszczeniu pamięci na koniec gry
-# TODO: nie pokazywać partial time przy operacjach jednorazowych, total time -> time
 # TODO: Solver3 - python-constraint

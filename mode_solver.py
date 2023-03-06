@@ -1,11 +1,11 @@
 ############################################
 # My version of the famous Mastermind game #
-# solver.py                                #
+# mode_solver.py                           #
 # Mastermind Solver                        #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-from mastermind import Mastermind
+from class_mastermind import Mastermind
 
 
 class MastermindSolver(Mastermind):
@@ -66,14 +66,16 @@ class MastermindSolver(Mastermind):
         )
 
         print(
-            f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
+            f"Example pattern is {self._settings.Pattern.get_random_pattern()}.\n"
         )
 
         print(
             f"Settings:\n"
-            f"solver_choice = {self._settings.solver_choice}\n"
+            f"chosen_solver = {self._settings.chosen_solver}\n"
             f"shuffle_colors_before_build = {self._settings.shuffle_colors_before_build}\n"
             f"shuffle_patterns_after_build = {self._settings.shuffle_patterns_after_build}\n"
+            f"solver1_calc_2nd_solution = {self._settings.solver1_calc_2nd_solution}\n"
+            f"solver2_take_random_pattern = {self._settings.solver2_take_random_pattern}\n"
         )
 
     def _solver_loop(self):

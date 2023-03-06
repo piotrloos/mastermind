@@ -1,11 +1,11 @@
 ############################################
 # My version of the famous Mastermind game #
-# game.py                                  #
+# mode_game.py                             #
 # Mastermind Game                          #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-from mastermind import Mastermind
+from class_mastermind import Mastermind
 
 
 class MastermindGame(Mastermind):
@@ -79,10 +79,8 @@ class MastermindGame(Mastermind):
         )
 
         print(
-            f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
+            f"Example pattern is {self._settings.Pattern.get_random_pattern()}.\n"
         )
-
-        print()
 
     def _game_loop(self):
         """ Main `Game` loop """

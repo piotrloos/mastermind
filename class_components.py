@@ -1,11 +1,11 @@
 ############################################
 # My version of the famous Mastermind game #
-# components.py                            #
+# class_components.py                      #
 # Mastermind components file               #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-from tools import Progress, shuffle
+from class_tools import Progress, shuffle
 from itertools import product
 from random import randrange
 
@@ -180,6 +180,8 @@ def pattern_class(settings):
 
                     all_patterns_list = [()]  # initialize temporary list containing empty tuple
                     all_colors_list = settings.Peg.all_colors_list[:]  # get local `all_colors_list` to be shuffled
+
+                    # TODO: let's shuffle colors once before build (new setting)
 
                     # iterate for `pegs_number`-1 times
                     for _ in range(settings.pegs_number - 1):

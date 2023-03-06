@@ -1,11 +1,11 @@
 ############################################
 # My version of the famous Mastermind game #
-# solver1.py                               #
+# class_solver1.py                         #
 # Mastermind Solver1                       #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-from tools import Progress
+from class_tools import Progress
 
 
 class MastermindSolver1:
@@ -34,13 +34,13 @@ class MastermindSolver1:
 
         self._generator = self._solution_generator()
         self._current_possible_solution = None
-        self._second_possible_solution = None
+        self._2nd_possible_solution = None
 
-        self._first = "first " if self._settings.solver1_calc_second_solution else ""
+        self._1st_string = "1st " if self._settings.solver1_calc_2nd_solution else ""
 
         self._progress_title = ""
 
-        self.calculate_possible_solution()  # get first possible solution
+        self.calculate_possible_solution()  # get 1st possible solution
 
     @property
     def possible_solutions_number(self):
@@ -96,36 +96,36 @@ class MastermindSolver1:
 
         if self.check_possible_solution(self._current_possible_solution):
             print(
-                f"[Solver1] Previously found {self._first}possible solution {self._current_possible_solution} "
-                f"still can be a {self._first}solution. Not changed."
+                f"[Solver1] Previously found {self._1st_string}possible solution {self._current_possible_solution} "
+                f"still can be a {self._1st_string}solution. Not changed."
             )
         else:
-            if self._settings.solver1_calc_second_solution and self.check_possible_solution(self._second_possible_solution):
+            if self._settings.solver1_calc_2nd_solution and self.check_possible_solution(self._2nd_possible_solution):
                 print(
-                    f"[Solver1] Previously found second possible solution {self._second_possible_solution} "
-                    f"still can be a solution. Saved as first."
+                    f"[Solver1] Previously found 2nd possible solution {self._2nd_possible_solution} "
+                    f"still can be a solution. Saved as 1st."
                 )
-                self._current_possible_solution = self._second_possible_solution
-                self._second_possible_solution = None
+                self._current_possible_solution = self._2nd_possible_solution
+                self._2nd_possible_solution = None
             else:
                 self._current_possible_solution = self._get_next(
-                    f"[Solver1] Scanning all patterns for {self._first} possible solution..."
+                    f"[Solver1] Scanning all patterns for {self._1st_string}possible solution..."
                 )
                 if self._current_possible_solution is None:  # no possible solution
-                    self._second_possible_solution = None  # no second possible solution also
-                    return self._current_possible_solution  # (=None)
+                    self._2nd_possible_solution = None  # no 2nd possible solution also
+                    return None
 
-        if self._settings.solver1_calc_second_solution:
-            if self.check_possible_solution(self._second_possible_solution):
+        if self._settings.solver1_calc_2nd_solution:
+            if self.check_possible_solution(self._2nd_possible_solution):
                 print(
-                    f"[Solver1] Previously found second possible solution {self._second_possible_solution} "
-                    f"still can be a second solution. Not changed."
+                    f"[Solver1] Previously found 2nd possible solution {self._2nd_possible_solution} "
+                    f"still can be a 2nd solution. Not changed."
                 )
             else:
-                self._second_possible_solution = self._get_next(
-                    f"[Solver1] Scanning all patterns for second possible solution..."
+                self._2nd_possible_solution = self._get_next(
+                    f"[Solver1] Scanning all patterns for 2nd possible solution..."
                 )
-                if self._second_possible_solution is None:  # no second possible solution -> only one solution!
+                if self._2nd_possible_solution is None:  # no 2nd possible solution -> only one solution!
                     print(
                         f"[Solver1] Now I know that {self._current_possible_solution} is the only possible solution!"
                     )

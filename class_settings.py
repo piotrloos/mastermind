@@ -1,15 +1,15 @@
 ############################################
 # My version of the famous Mastermind game #
-# settings.py                              #
+# class_settings.py                        #
 # Mastermind settings file                 #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-import components
-from consts import Consts
-from colors import Color, NoColor
-from solver1 import MastermindSolver1
-from solver2 import MastermindSolver2
+from class_components import peg_class, pattern_class, response_class, turn_class, turns_list_class
+from class_consts import Consts
+from class_colors import Color, NoColor
+from class_solver1 import MastermindSolver1
+from class_solver2 import MastermindSolver2
 from itertools import product
 
 
@@ -22,13 +22,13 @@ class Settings:
             colors_number=None,
             pegs_number=None,
             turns_limit=None,
-            solver_choice=None,
+            chosen_solver=None,
             use_itertools=None,
             pre_build_patterns=None,
             shuffle_colors_before_build=None,
             shuffle_patterns_after_build=None,
             progress_timing=None,
-            solver1_calc_second_solution=None,
+            solver1_calc_2nd_solution=None,
             solver2_take_random_pattern=None,
             colored_prints=None,
             **kwargs,
@@ -38,13 +38,13 @@ class Settings:
         self._colors_number = self._get_setting(Consts.ColorsNumber, colors_number)
         self._pegs_number = self._get_setting(Consts.PegsNumber, pegs_number)
         self._turns_limit = self._get_setting(Consts.TurnsLimitNumber, turns_limit)
-        self._solver_choice = self._get_setting(Consts.SolverChoice, solver_choice)
+        self._chosen_solver = self._get_setting(Consts.ChosenSolver, chosen_solver)
         self._use_itertools = self._get_setting(Consts.UseItertools, use_itertools)
         self._pre_build_patterns = self._get_setting(Consts.PreBuildPatterns, pre_build_patterns)
         self._shuffle_colors_before_build = self._get_setting(Consts.ShuffleColorsBeforeBuild, shuffle_colors_before_build)
         self._shuffle_patterns_after_build = self._get_setting(Consts.ShufflePatternsAfterBuild, shuffle_patterns_after_build)
         self._progress_timing = self._get_setting(Consts.ProgressTiming, progress_timing)
-        self._solver1_calc_second_solution = self._get_setting(Consts.Solver1CalcSecondSolution, solver1_calc_second_solution)
+        self._solver1_calc_2nd_solution = self._get_setting(Consts.Solver1Calc2ndSolution, solver1_calc_2nd_solution)
         self._solver2_take_random_pattern = self._get_setting(Consts.Solver2TakeRandomPattern, solver2_take_random_pattern)
         self._colored_prints = self._get_setting(Consts.ColoredPrints, colored_prints)
 
@@ -84,11 +84,11 @@ class Settings:
                 f"{self.color.error_off}"
             )
 
-        self.Peg = components.peg_class(self)
-        self.Pattern = components.pattern_class(self)
-        self.Response = components.response_class(self)
-        self.Turn = components.turn_class(self)
-        self.TurnsList = components.turns_list_class(self)
+        self.Peg = peg_class(self)
+        self.Pattern = pattern_class(self)
+        self.Response = response_class(self)
+        self.Turn = turn_class(self)
+        self.TurnsList = turns_list_class(self)
 
         if self._pre_build_patterns:
             self._all_patterns_list = self.Pattern.build_patterns()  # build all patterns list (once for several games)
@@ -200,10 +200,10 @@ class Settings:
         return self._turns_limit
 
     @property
-    def solver_choice(self):
-        """ Returns solver choice """
+    def chosen_solver(self):
+        """ Returns chosen solver number """
 
-        return self._solver_choice
+        return self._chosen_solver
 
     @property
     def use_itertools(self):
@@ -236,10 +236,10 @@ class Settings:
         return self._progress_timing
 
     @property
-    def solver1_calc_second_solution(self):
-        """ Returns `solver1_calc_second_solution` setting (only for Solver1) """
+    def solver1_calc_2nd_solution(self):
+        """ Returns `solver1_calc_2nd_solution` setting (only for Solver1) """
 
-        return self._solver1_calc_second_solution
+        return self._solver1_calc_2nd_solution
 
     @property
     def solver2_take_random_pattern(self):

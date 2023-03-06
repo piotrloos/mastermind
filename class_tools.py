@@ -1,6 +1,6 @@
 ############################################
 # My version of the famous Mastermind game #
-# tools.py                                 #
+# class_tools.py                           #
 # Utility functions for Mastermind         #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################

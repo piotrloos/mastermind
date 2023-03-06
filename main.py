@@ -6,10 +6,10 @@
 ############################################
 
 import sys
-from settings import Settings
-from game import MastermindGame
-from helper import MastermindHelper
-from solver import MastermindSolver
+from class_settings import Settings
+from mode_game import MastermindGame
+from mode_helper import MastermindHelper
+from mode_solver import MastermindSolver
 
 
 def main():

@@ -1,11 +1,11 @@
 ############################################
 # My version of the famous Mastermind game #
-# solver2.py                               #
+# class_solver2.py                         #
 # Mastermind Solver2                       #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-from tools import Progress
+from class_tools import Progress
 from random import randrange
 
 

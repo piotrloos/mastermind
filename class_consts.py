@@ -1,6 +1,6 @@
 ############################################
 # My version of the famous Mastermind game #
-# consts.py                                #
+# class_consts.py                          #
 # Constants for mastermind                 #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
@@ -35,9 +35,9 @@ class Consts(metaclass=ABCMeta):
         default_value = 12
         ask_if_not_given = False
 
-    class SolverChoice(metaclass=ABCMeta):
+    class ChosenSolver(metaclass=ABCMeta):
         type = int
-        name = "solver choice - #1: patterns checking generator Solver, #2: patterns list filtering Solver"
+        name = "chosen Solver number - #1: patterns checking generator Solver, #2: patterns list filtering Solver"
         min_value = 1
         max_value = 2
         default_value = 1
@@ -73,9 +73,9 @@ class Consts(metaclass=ABCMeta):
         default_value = True
         ask_if_not_given = False
 
-    class Solver1CalcSecondSolution(metaclass=ABCMeta):
+    class Solver1Calc2ndSolution(metaclass=ABCMeta):
         type = bool
-        name = "calculate second solution for Solver1"
+        name = "calculate 2nd solution for Solver1"
         default_value = True
         ask_if_not_given = False
 
