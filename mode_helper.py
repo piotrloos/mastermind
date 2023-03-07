@@ -153,7 +153,9 @@ class MastermindHelper(Mastermind):
             )
 
         turn = self._turns_list.add_turn(pattern, response)
-        self._turns_list.print_turns()
+
+        if self._settings.print_turns_list:
+            self._turns_list.print_turns_list()
 
         # check game end
 

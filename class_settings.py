@@ -31,6 +31,7 @@ class Settings:
             solver1_calc_2nd_solution=None,
             solver2_take_random_pattern=None,
             colored_prints=None,
+            print_turns_list=None,
             **kwargs,
     ):
         """ Initializes `Settings` class object """
@@ -47,6 +48,7 @@ class Settings:
         self._solver1_calc_2nd_solution = self._get_setting(Consts.Solver1Calc2ndSolution, solver1_calc_2nd_solution)
         self._solver2_take_random_pattern = self._get_setting(Consts.Solver2TakeRandomPattern, solver2_take_random_pattern)
         self._colored_prints = self._get_setting(Consts.ColoredPrints, colored_prints)
+        self._print_turns_list = self._get_setting(Consts.PrintTurnsList, print_turns_list)
 
         if self._colored_prints:
             self.color = Color()
@@ -252,6 +254,12 @@ class Settings:
         """ Returns `colored_prints` setting """
 
         return self._colored_prints
+
+    @property
+    def print_turns_list(self):
+        """ Return `print_turns_list` setting """
+
+        return self._print_turns_list
 
     @property
     def all_colors_list_formatted(self):

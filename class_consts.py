@@ -90,3 +90,9 @@ class Consts(metaclass=ABCMeta):
         name = "enable terminal printing in color"
         default_value = False
         ask_if_not_given = False
+
+    class PrintTurnsList(metaclass=ABCMeta):
+        type = bool
+        name = "enable turns list printing after each turn"
+        default_value = True
+        ask_if_not_given = False

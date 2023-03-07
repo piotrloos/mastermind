@@ -403,7 +403,7 @@ def turns_list_class(settings):
             self.append(turn)
             return turn
 
-        def print_turns(self):
+        def print_turns_list(self):
             """ Prints all turns """
 
             print(
