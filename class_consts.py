@@ -61,6 +61,12 @@ class Consts(metaclass=ABCMeta):
         default_value = False
         ask_if_not_given = False
 
+    class ShuffleColorsDuringBuild(metaclass=ABCMeta):
+        type = bool
+        name = "shuffle colors during patterns list building"
+        default_value = False
+        ask_if_not_given = False
+
     class ShufflePatternsAfterBuild(metaclass=ABCMeta):
         type = bool
         name = "shuffle patterns after patterns list building"

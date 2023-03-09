@@ -7,7 +7,6 @@
 # TODO: formatowanie czasu w minutach, sekundach, milisekundach
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
 # TODO: komunikat o czyszczeniu pamięci na koniec gry
-# TODO: ustawienie na wyłączenie printowania tablicy ruchów
 
 # TODO: exhausted generator bug
 # TODO: parametr mode przy uruchamianiu Mastermind a nie Game/Helper/Solver

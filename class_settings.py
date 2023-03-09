@@ -26,6 +26,7 @@ class Settings:
             use_itertools=None,
             pre_build_patterns=None,
             shuffle_colors_before_build=None,
+            shuffle_colors_during_build=None,
             shuffle_patterns_after_build=None,
             progress_timing=None,
             solver1_calc_2nd_solution=None,
@@ -43,6 +44,7 @@ class Settings:
         self._use_itertools = self._get_setting(Consts.UseItertools, use_itertools)
         self._pre_build_patterns = self._get_setting(Consts.PreBuildPatterns, pre_build_patterns)
         self._shuffle_colors_before_build = self._get_setting(Consts.ShuffleColorsBeforeBuild, shuffle_colors_before_build)
+        self._shuffle_colors_during_build = self._get_setting(Consts.ShuffleColorsDuringBuild, shuffle_colors_during_build)
         self._shuffle_patterns_after_build = self._get_setting(Consts.ShufflePatternsAfterBuild, shuffle_patterns_after_build)
         self._progress_timing = self._get_setting(Consts.ProgressTiming, progress_timing)
         self._solver1_calc_2nd_solution = self._get_setting(Consts.Solver1Calc2ndSolution, solver1_calc_2nd_solution)
@@ -95,6 +97,7 @@ class Settings:
         if self._pre_build_patterns:
             self._all_patterns_list = self.Pattern.build_patterns()  # build all patterns list (once for several games)
         else:
+            # TODO: try to use `shuffle_colors_before_build` and `shuffle_colors_during_build` settings (if possible)
             if self._use_itertools:
                 # get `itertools.product` generator
                 self._all_patterns_gen = map(lambda pattern_tuple: self.Pattern(pattern_tuple),
@@ -224,6 +227,12 @@ class Settings:
         """ Returns 'shuffle colors before building list' setting """
 
         return self._shuffle_colors_before_build
+
+    @property
+    def shuffle_colors_during_build(self):
+        """ Returns 'shuffle colors during building list' setting """
+
+        return self._shuffle_colors_during_build
 
     @property
     def shuffle_patterns_after_build(self):

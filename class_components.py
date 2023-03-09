@@ -157,42 +157,43 @@ def pattern_class(settings):
         def build_patterns():
             """ Returns list of all possible patterns (when `pre_build_patterns` setting == True) """
 
+            all_colors_list = settings.Peg.all_colors_list[:]  # get `all_colors_list` to be shuffled (copy)
+
+            # shuffle `all_colors_list` to build patterns from (before build)
+            if settings.shuffle_colors_before_build:
+                shuffle(
+                    all_colors_list,  # small list
+                    progress=None,  # without progress shown (quick operation)
+                )
+
+            # choose imported itertools.product function or my own function
             if settings.use_itertools:
 
                 with Progress(
                     items_number=settings.patterns_number,
                     color=settings.color,
-                    title="[Pattern] Building patterns list (using itertools)...",
+                    title="[Patterns] Building patterns list (using itertools)...",
                     timing=settings.progress_timing,
                 ) as progress:
 
-                    # TODO: include `shuffle_colors_before_build` setting
+                    # TODO: use `shuffle_colors_during_build` setting (if possible)
                     all_patterns_list = list(map(lambda pattern_tuple: progress.item(settings.Pattern(pattern_tuple)),
-                                                 product(settings.Peg.all_colors_list, repeat=settings.pegs_number)))
+                                                 product(all_colors_list, repeat=settings.pegs_number)))
             else:
 
                 with Progress(
                     items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
                     color=settings.color,
-                    title="[Pattern] Building patterns list (using my function)...",
+                    title="[Patterns] Building patterns list (using my own function)...",
                     timing=settings.progress_timing,
                 ) as progress:
 
-                    all_patterns_list = [()]  # initialize temporary list containing empty tuple
-                    all_colors_list = settings.Peg.all_colors_list[:]  # get local `all_colors_list` to be shuffled
-
-                    # TODO: let's shuffle colors once before build (new setting)
+                    all_patterns_list = [()]  # initialize temporary list to be built (containing empty tuple)
 
                     # iterate for `pegs_number`-1 times
                     for _ in range(settings.pegs_number - 1):
 
-                        # shuffle `all_colors_list` to build patterns from (on every iteration)
-                        if settings.shuffle_colors_before_build:
-                            shuffle(
-                                all_colors_list,
-                            )
-
-                        # make temporary list of tuples (on every iteration)
+                        # make temporary list of tuples
                         all_patterns_list = [
                             progress.item((*pattern, new_peg))
                             for pattern in all_patterns_list
@@ -200,31 +201,32 @@ def pattern_class(settings):
                         ]
                         # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
 
-                    # shuffle `all_colors_list` to build Pattern objects from
-                    if settings.shuffle_colors_before_build:
-                        shuffle(
-                            all_colors_list,
-                        )
+                        # shuffle `all_colors_list` to build pattern from (during build)
+                        if settings.shuffle_colors_during_build:
+                            shuffle(
+                                all_colors_list,  # small list
+                                progress=None,  # without progress shown (quick operation)
+                            )
 
                     # make final list of Pattern objects
                     all_patterns_list = [
-                        progress.item(settings.Pattern((*pattern, new_peg)))
+                        progress.item(settings.Pattern((*pattern, new_peg)))  # create final Pattern objects
                         for pattern in all_patterns_list
                         for new_peg in all_colors_list
                     ]
                     # new pattern is Pattern object a one peg bigger (unpacked "old" pegs + "new" one)
 
-            # shuffle generated patterns list (whole list at once)
+            # shuffle generated patterns list (whole list at once) - regardless of the chosen method
             if settings.shuffle_patterns_after_build:
                 with Progress(
                     items_number=len(all_patterns_list) - 1,
                     color=settings.color,
-                    title="[Pattern] Shuffling patterns list...",
+                    title="[Patterns] Shuffling patterns list...",
                     timing=settings.progress_timing,
                 ) as progress:
                     shuffle(
-                        all_patterns_list,
-                        progress=progress,
+                        all_patterns_list,  # big list
+                        progress=progress,  # with progress shown (potentially slow operation)
                     )
 
             return all_patterns_list
@@ -243,9 +245,13 @@ def pattern_class(settings):
                 peg_index = pegs_number - 1  # set peg_index to last peg
                 yield Pattern(pattern)
 
+                # TODO: use `shuffle_colors_before_build` and `shuffle_colors_during_build` settings
+
                 if pegs_number > 0:
 
                     while True:  # infinite loop
+
+                        # TODO: big jumps on most significant pegs (without changing least significant values)
 
                         peg = pattern[peg_index]  # get current peg from pattern
                         if peg < colors_number - 1:  # check if current peg has max value (=can be incremented?)
