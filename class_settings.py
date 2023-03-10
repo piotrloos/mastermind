@@ -37,20 +37,62 @@ class Settings:
     ):
         """ Initializes `Settings` class object """
 
-        self._colors_number = self._get_setting(Consts.ColorsNumber, colors_number)
-        self._pegs_number = self._get_setting(Consts.PegsNumber, pegs_number)
-        self._turns_limit = self._get_setting(Consts.TurnsLimitNumber, turns_limit)
-        self._chosen_solver = self._get_setting(Consts.ChosenSolver, chosen_solver)
-        self._use_itertools = self._get_setting(Consts.UseItertools, use_itertools)
-        self._pre_build_patterns = self._get_setting(Consts.PreBuildPatterns, pre_build_patterns)
-        self._shuffle_colors_before_build = self._get_setting(Consts.ShuffleColorsBeforeBuild, shuffle_colors_before_build)
-        self._shuffle_colors_during_build = self._get_setting(Consts.ShuffleColorsDuringBuild, shuffle_colors_during_build)
-        self._shuffle_patterns_after_build = self._get_setting(Consts.ShufflePatternsAfterBuild, shuffle_patterns_after_build)
-        self._progress_timing = self._get_setting(Consts.ProgressTiming, progress_timing)
-        self._solver1_calc_2nd_solution = self._get_setting(Consts.Solver1Calc2ndSolution, solver1_calc_2nd_solution)
-        self._solver2_take_random_pattern = self._get_setting(Consts.Solver2TakeRandomPattern, solver2_take_random_pattern)
-        self._colored_prints = self._get_setting(Consts.ColoredPrints, colored_prints)
-        self._print_turns_list = self._get_setting(Consts.PrintTurnsList, print_turns_list)
+        self._colors_number = self._get_setting(
+            Consts.ColorsNumber,
+            colors_number,
+        )
+        self._pegs_number = self._get_setting(
+            Consts.PegsNumber,
+            pegs_number,
+        )
+        self._turns_limit = self._get_setting(
+            Consts.TurnsLimitNumber,
+            turns_limit,
+        )
+        self._chosen_solver = self._get_setting(
+            Consts.ChosenSolver,
+            chosen_solver,
+        )
+        self._use_itertools = self._get_setting(
+            Consts.UseItertools,
+            use_itertools,
+        )
+        self._pre_build_patterns = self._get_setting(
+            Consts.PreBuildPatterns,
+            pre_build_patterns,
+        )
+        self._shuffle_colors_before_build = self._get_setting(
+            Consts.ShuffleColorsBeforeBuild,
+            shuffle_colors_before_build,
+        )
+        self._shuffle_colors_during_build = self._get_setting(
+            Consts.ShuffleColorsDuringBuild,
+            shuffle_colors_during_build,
+        )
+        self._shuffle_patterns_after_build = self._get_setting(
+            Consts.ShufflePatternsAfterBuild,
+            shuffle_patterns_after_build,
+        )
+        self._progress_timing = self._get_setting(
+            Consts.ProgressTiming,
+            progress_timing,
+        )
+        self._solver1_calc_2nd_solution = self._get_setting(
+            Consts.Solver1Calc2ndSolution,
+            solver1_calc_2nd_solution,
+        )
+        self._solver2_take_random_pattern = self._get_setting(
+            Consts.Solver2TakeRandomPattern,
+            solver2_take_random_pattern,
+        )
+        self._colored_prints = self._get_setting(
+            Consts.ColoredPrints,
+            colored_prints,
+        )
+        self._print_turns_list = self._get_setting(
+            Consts.PrintTurnsList,
+            print_turns_list,
+        )
 
         if self._colored_prints:
             self.color = Color()
@@ -100,8 +142,13 @@ class Settings:
             # TODO: try to use `shuffle_colors_before_build` and `shuffle_colors_during_build` settings (if possible)
             if self._use_itertools:
                 # get `itertools.product` generator
-                self._all_patterns_gen = map(lambda pattern_tuple: self.Pattern(pattern_tuple),
-                                             product(self.Peg.all_colors_list, repeat=self._pegs_number))
+                self._all_patterns_gen = map(
+                    lambda pattern_tuple: self.Pattern(pattern_tuple),
+                    product(
+                        self.Peg.all_colors_list[1:],  # without blank Peg
+                        repeat=self._pegs_number,
+                    )
+                )
             else:
                 # get reference for my generator (without call)
                 self._all_patterns_gen = self.Pattern.gen_patterns
@@ -274,7 +321,7 @@ class Settings:
     def all_colors_list_formatted(self):
         """ Returns formatted list of all possible colors """
 
-        return f"{{{','.join(peg.__str__() for peg in self.Peg.all_colors_list)}}}"
+        return f"{{{','.join(peg.__str__() for peg in self.Peg.all_colors_list[1:])}}}"  # without blank Peg
 
     @property
     def all_patterns_list(self):

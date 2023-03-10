@@ -16,32 +16,46 @@ def peg_class(settings):
     class Peg(int):
         """ Class for one pattern peg """
 
+        def __init__(self, color_value):
+            """ Checks if just created Peg is in color range """
+
+            # TODO: include `allow_blanks` setting
+            if color_value not in range(0, settings.colors_number + 1):  # including blank Peg
+                raise ValueError(
+                    f"{settings.color.error_on}"
+                    f"Tried to create Peg outside the color range!"
+                    f"{settings.color.error_off}"
+                )
+
         def __str__(self):
             """ Formats `peg` to be printed """
 
             # content = chr(self.__int__() + 97)
-            content = self.__int__() + 1  # TODO: create setting for this
+            content = self.__int__()  # TODO: create setting for this
 
             if settings.colored_prints:
 
                 # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 
                 colors_list = [
-                    '31m',   # red
-                    '93m',   # yellow
-                    '32m',   # green
-                    '34m',   # blue
-                    '33m',   # orange
-                    '35m',   # magenta
-                    '90m',   # gray
-                    '96m',   # cyan
-                    '92m',   # bright green
-                    '95m',   # bright magenta
+                    '30',   # black (blank Peg)
+                    '31',   # red
+                    '93',   # yellow
+                    '32',   # green
+                    '34',   # blue
+                    '33',   # orange
+                    '35',   # magenta
+                    '90',   # gray
+                    '96',   # cyan
+                    '92',   # bright green
+                    '95',   # bright magenta
                 ]  # TODO: move it to settings
-                return f"\033\133" \
-                       f"{colors_list[self.__int__()]}" \
-                       f"({content})" \
-                       f"\033\13339m"
+                return (
+                    f"\033\1331;"
+                    f"{colors_list[content]}m"
+                    f"({content})"
+                    f"\033\13322;39m"
+                )
             else:
                 return f"({content})"
 
@@ -49,15 +63,16 @@ def peg_class(settings):
         def decode_peg(cls, peg_char):
             """ Returns Peg object converted from formatted `peg_char` """
 
-            if len(peg_char) == 1:
-                # return Peg(ord(peg_char) - 97)
-                return Peg(int(peg_char) - 1)  # TODO: create setting for this
-
+            # TODO: include `allow_blanks` setting
+            if len(peg_char) == 1 and int(peg_char) in range(1, settings.colors_number + 1):
+                # return Peg(ord(peg_char) - 97)  # TODO: create setting for this
+                return Peg.all_colors_list[int(peg_char)]  # without blank Peg
+                # TODO: raise an exception if given peg_char is invalid
                 # TODO: input digits, lowercase or uppercase letters, or own list of pegs
             else:
                 return None
 
-    Peg.all_colors_list = [Peg(color) for color in range(settings.colors_number)]
+    Peg.all_colors_list = [Peg(color) for color in range(0, settings.colors_number + 1)]  # including blank Peg
 
     return Peg
 
@@ -74,7 +89,7 @@ def pattern_class(settings):
             content = ''.join(peg.__str__() for peg in self)
 
             if settings.colored_prints:
-                return f"\033\1331;51;38;5;255;255;255m{content}\033\133m"  # bold, framed, white fg
+                return f"\033\13351m{content}\033\13354m"  # framed pegs
             else:
                 return f"[{content}]"
 
@@ -86,7 +101,7 @@ def pattern_class(settings):
                 isinstance(pattern_tuple, tuple)
                 and len(pattern_tuple) == settings.pegs_number
                 and all(
-                    pattern_peg in settings.Peg.all_colors_list
+                    pattern_peg in settings.Peg.all_colors_list[1:]  # without blank Peg
                     for pattern_peg in pattern_tuple
                 )
             )
@@ -113,18 +128,14 @@ def pattern_class(settings):
         def get_random_pattern():
             """ Returns random pattern for generating the solution or giving a demo pattern """
 
+            # TODO: include `allow_blanks` setting
             return Pattern(
-                settings.Peg.all_colors_list[randrange(settings.colors_number)]
+                settings.Peg.all_colors_list[randrange(1, settings.colors_number + 1)]  # without blank Peg
                 for _ in range(settings.pegs_number)
             )
 
         def calculate_black_pegs(self, other):
             """ Returns `black_pegs` number (how many pegs are in proper color and in proper location) """
-
-            # return sum(
-            #     int(self[index] == other[index])
-            #     for index in range(settings.pegs_number)
-            # )
 
             return sum(
                 int(pattern1_peg == pattern2_peg)
@@ -134,13 +145,9 @@ def pattern_class(settings):
         def calculate_black_white_pegs(self, other):
             """ Returns `black_white_pegs` number (how many pegs are in proper color regardless to location) """
 
-            # if not hasattr(self, '_color_dict'):
-            #     self._color_dict = {color: self.count(color) for color in settings.all_colors_list}
-            #     print(self._color_dict)
-
             return sum(
                 min(self.count(color), other.count(color))
-                for color in settings.Peg.all_colors_list
+                for color in settings.Peg.all_colors_list[1:]  # without blank Peg
             )
 
         def calculate_response(self, other):
@@ -157,12 +164,12 @@ def pattern_class(settings):
         def build_patterns():
             """ Returns list of all possible patterns (when `pre_build_patterns` setting == True) """
 
-            all_colors_list = settings.Peg.all_colors_list[:]  # get `all_colors_list` to be shuffled (copy)
+            colors_list = settings.Peg.all_colors_list[1:]  # get `colors_list` to be shuffled (copy) without blank Peg
 
-            # shuffle `all_colors_list` to build patterns from (before build)
+            # shuffle `colors_list` to build patterns from (before build)
             if settings.shuffle_colors_before_build:
                 shuffle(
-                    all_colors_list,  # small list
+                    colors_list,  # small list
                     progress=None,  # without progress shown (quick operation)
                 )
 
@@ -178,7 +185,7 @@ def pattern_class(settings):
 
                     # TODO: use `shuffle_colors_during_build` setting (if possible)
                     all_patterns_list = list(map(lambda pattern_tuple: progress.item(settings.Pattern(pattern_tuple)),
-                                                 product(all_colors_list, repeat=settings.pegs_number)))
+                                                 product(colors_list, repeat=settings.pegs_number)))
             else:
 
                 with Progress(
@@ -197,14 +204,14 @@ def pattern_class(settings):
                         all_patterns_list = [
                             progress.item((*pattern, new_peg))
                             for pattern in all_patterns_list
-                            for new_peg in all_colors_list
+                            for new_peg in colors_list
                         ]
                         # new pattern is tuple a one peg bigger (unpacked "old" pegs + "new" one)
 
-                        # shuffle `all_colors_list` to build pattern from (during build)
+                        # shuffle `colors_list` to build pattern from (during build)
                         if settings.shuffle_colors_during_build:
                             shuffle(
-                                all_colors_list,  # small list
+                                colors_list,  # small list
                                 progress=None,  # without progress shown (quick operation)
                             )
 
@@ -212,7 +219,7 @@ def pattern_class(settings):
                     all_patterns_list = [
                         progress.item(settings.Pattern((*pattern, new_peg)))  # create final Pattern objects
                         for pattern in all_patterns_list
-                        for new_peg in all_colors_list
+                        for new_peg in colors_list
                     ]
                     # new pattern is Pattern object a one peg bigger (unpacked "old" pegs + "new" one)
 
@@ -235,13 +242,13 @@ def pattern_class(settings):
         def gen_patterns():
             """ Generator for all possible patterns in the game (when `pre_build_patterns` setting == False) """
 
-            all_colors_list = settings.Peg.all_colors_list
+            colors_list = settings.Peg.all_colors_list[1:]  # without blank Peg
             colors_number = settings.colors_number
             pegs_number = settings.pegs_number
 
             if colors_number > 0:
 
-                pattern = [all_colors_list[0]] * pegs_number  # get list of pegs with min values
+                pattern = [colors_list[0]] * pegs_number  # get list of pegs with min values
                 peg_index = pegs_number - 1  # set peg_index to last peg
                 yield Pattern(pattern)
 
@@ -256,13 +263,13 @@ def pattern_class(settings):
                         peg = pattern[peg_index]  # get current peg from pattern
                         if peg < colors_number - 1:  # check if current peg has max value (=can be incremented?)
 
-                            pattern[peg_index] = all_colors_list[peg + 1]  # increment current peg
+                            pattern[peg_index] = colors_list[peg + 1]  # increment current peg
                             peg_index = pegs_number - 1  # reset `peg_index` to last peg
                             yield Pattern(pattern)
 
                         else:  # current peg has max value -> need to carry one peg on the left
 
-                            pattern[peg_index] = all_colors_list[0]  # reset current peg to min value
+                            pattern[peg_index] = colors_list[0]  # reset current peg to min value
                             peg_index -= 1  # move `peg_index` to the left
                             if peg_index < 0:
                                 break  # if `peg_index` reached first peg exit the loop
