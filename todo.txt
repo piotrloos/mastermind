@@ -1,24 +1,22 @@
-# do zrobienia w najbliższym czasie:
+# do zrobienia w tym sprincie:
 
 # TODO: stworzenie pliku `readme.md`
+# TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
+# TODO: parametr mode przy uruchamianiu Mastermind a nie Game/Helper/Solver
+# TODO: mozliwość restartu gry na tych samych ustawieniach (bez generowania patternów)
+# TODO: testy, testy, testy...
+
+# w następnej kolejności:
 
 # TODO: możliwość wyłączenia Progressu
-# TODO: nie pokazywać partial time przy operacjach jednorazowych, total time -> time
 # TODO: formatowanie czasu w minutach, sekundach, milisekundach
-# TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
 # TODO: komunikat o czyszczeniu pamięci na koniec gry
-
 # TODO: exhausted generator bug
-# TODO: parametr mode przy uruchamianiu Mastermind a nie Game/Helper/Solver
 # TODO: refactor podobnych metod w Game/Helper/Solver
-
 # TODO: sys.getsizeof() dla listy patternów
 # TODO: typy zmiennych w deklaracjach funkcji (type hints)
 # TODO: porządek w nazwach metod i pól (__name)
-
-# optymalizacja
-
-# TODO: optymalizacja grupowego filtrowania patternów (Solver1 i Solver2)
+# TODO: opcje: allow_duplicates, allow_blanks
 
 # polecenia "shella":
 
@@ -39,8 +37,8 @@
 
 # TODO: Solver1 - liczenie liczby możliwych patternów generatora (kopiowanie generatora wraz ze stanem)
 # TODO: Solver2 - tworzenie tablicy dwuwymiarowej trójstanowej (must be, can be, can't be) dla każdej pozycji i dla każdego koloru
+# TODO: optymalizacja grupowego filtrowania patternów (Solver1 i Solver2)
 # TODO: przyjmowanie własnej listy Pegów
-# TODO: opcje: allow_duplicates, allow_blanks
 # TODO: Solver1 - przyspieszenie generatora:
 # TODO:     ocena ważności wyniku i sprawdzanie all() po ważności
 # TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
@@ -49,5 +47,5 @@
 # TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
 # TODO: możliwość gry komputera samego ze sobą
 # TODO: testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
-# TODO: testy, testy, testy...
 # TODO: Solver3 - python-constraint
+# TODO: Solver4 - mój algorytm rozwiązywania

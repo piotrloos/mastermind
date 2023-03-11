@@ -165,18 +165,29 @@ class Progress:
             self._finished = True
 
         if summary is not None:
-            self._summary = str(summary)
+            self._summary = str(summary)  # change `summary` text if given
 
         if self._timing:
 
-            partial_time = time() - self._start_time
-            self._total_time += partial_time
+            was_paused = self._total_time != 0  # set the flag if there was some time saved already
+
+            partial_time = time() - self._start_time  # calculate time for last partial operation
+            self._total_time += partial_time  # update total time
+
+            if self._update_time_func is not None:
+                if not callable(self._update_time_func):
+                    raise RuntimeError(
+                        f"{self._color.error_on}"
+                        f"[Progress] Given invalid `update_time_func` Solver function!"
+                        f"{self._color.error_off}"
+                    )
+                self._update_time_func(self._total_time)  # send total time to Solver
 
             self._summary += (
                 f" ("
             )
 
-            if self._total_time != 0 or not finish:  # check if it is partial execution
+            if was_paused or not finish:  # check if it is partial operation
                 self._summary += (
                     f"partial "
                 )
@@ -184,24 +195,21 @@ class Progress:
             self._summary += (
                 f"time: "
                 f"{self._color.time_on}"
-                f"{partial_time:.3f}s"
+                f"{partial_time:.3f}s"  # time in milliseconds
                 f"{self._color.time_off}"
             )
 
-            if self._total_time != 0 and finish:  # check if it is last execution
+            if was_paused and finish:  # check if it was last execution of partial operation
                 self._summary += (
                     f", total time: "
                     f"{self._color.time_on}"
-                    f"{self._total_time:.3f}s"
+                    f"{self._total_time:.3f}s"  # time in milliseconds
                     f"{self._color.time_off}"
                 )
 
             self._summary += (
                 f")"
             )
-
-            if self._update_time_func is not None:
-                self._update_time_func(self._total_time)
 
         self._print_summary()
 
