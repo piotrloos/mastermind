@@ -71,12 +71,36 @@ class MastermindHelper(Mastermind):
 
         print(
             f"Settings:\n"
-            f"chosen_solver = {self._settings.chosen_solver}\n"
-            f"shuffle_colors_before_build = {self._settings.shuffle_colors_before_build}\n"
-            f"shuffle_colors_during_build = {self._settings.shuffle_colors_during_build}\n"
-            f"shuffle_patterns_after_build = {self._settings.shuffle_patterns_after_build}\n"
-            f"solver1_calc_2nd_solution = {self._settings.solver1_calc_2nd_solution}\n"
-            f"solver2_take_random_pattern = {self._settings.solver2_take_random_pattern}\n"
+
+            f"chosen_solver = "
+            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.chosen_solver}"
+            f"{self._settings.color.setting_value_off}\n"
+
+            f"shuffle_colors_before_build = "
+            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.shuffle_colors_before_build}"
+            f"{self._settings.color.setting_value_off}\n"
+
+            f"shuffle_colors_during_build = "
+            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.shuffle_colors_during_build}"
+            f"{self._settings.color.setting_value_off}\n"
+
+            f"shuffle_patterns_after_build = "
+            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.shuffle_patterns_after_build}"
+            f"{self._settings.color.setting_value_off}\n"
+
+            f"solver1_calc_2nd_solution = "
+            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.solver1_calc_2nd_solution}"
+            f"{self._settings.color.setting_value_off}\n"
+
+            f"solver2_take_random_pattern = "
+            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.solver2_take_random_pattern}"
+            f"{self._settings.color.setting_value_off}\n"
         )
 
     def _helper_loop(self):

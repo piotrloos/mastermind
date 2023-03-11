@@ -26,6 +26,8 @@ class Color:
     progress_value_off = "\033\13322;39m"       # bold off, reset fg
     progress_summary_on = "\033\1331;92m"       # bold on, green fg
     progress_summary_off = "\033\13322;39m"     # bold off, reset fg
+    setting_value_on = "\033\1331;33m"          # bold on, orange fg
+    setting_value_off = "\033\13322;39m"        # bold off, reset fg
 
 
 class NoColor:
@@ -46,3 +48,5 @@ class NoColor:
     progress_value_off = ""
     progress_summary_on = ""
     progress_summary_off = ""
+    setting_value_on = ""
+    setting_value_off = ""
