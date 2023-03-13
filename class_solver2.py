@@ -131,20 +131,20 @@ class MastermindSolver2:
             f" of patterns)."
         )
 
-        if self._possible_solutions_number == 1:
-            print(
-                f"[Solver2] Now I know that {self._current_possible_solution} is the only possible solution!"
-            )
-        elif self._possible_solutions_number != 0 and self._possible_solutions_number <= 10:
-            # TODO: move this value 10 to settings
-            print(
-                f"[Solver2] There are no more than "
-                f"{self._settings.color.number_on}"
-                f"10"
-                f"{self._settings.color.number_off}"
-                f" possible solutions. Here is the list:"
-            )
-            for pattern in self._possible_solutions_list:
-                print(pattern)
+        if 1 <= self._possible_solutions_number <= self._settings.solver2_print_possible_solutions_threshold:
+            if self._possible_solutions_number == 1:
+                print(
+                    f"[Solver2] Now I know pattern {self._current_possible_solution} is the only possible solution!"
+                )
+            else:
+                print(
+                    f"[Solver2] Since there are only "
+                    f"{self._settings.color.number_on}"
+                    f"{self._possible_solutions_number}"
+                    f"{self._settings.color.number_off}"
+                    f" possible solutions here is a list of them:"
+                )
+                for pattern in self._possible_solutions_list:
+                    print(pattern)
 
         return self._current_possible_solution

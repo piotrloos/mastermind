@@ -17,7 +17,7 @@ class Consts(metaclass=ABCMeta):
         min_value = 2
         max_value = 9
         default_value = 6
-        ask_if_not_given = True     # if False - take default value without asking user
+        ask_if_not_given = True
 
     class PegsNumber(metaclass=ABCMeta):
         type = int
@@ -89,6 +89,14 @@ class Consts(metaclass=ABCMeta):
         type = bool
         name = "take random pattern for Solver2"
         default_value = False
+        ask_if_not_given = False
+
+    class Solver2PrintPossibleSolutionsThreshold(metaclass=ABCMeta):
+        type = int
+        name = "threshold for printing remaining possible solutions for Solver2 (0 = disabled)"
+        min_value = 0
+        max_value = 100
+        default_value = 10
         ask_if_not_given = False
 
     class ColoredPrints(metaclass=ABCMeta):

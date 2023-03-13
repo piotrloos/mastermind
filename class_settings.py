@@ -31,6 +31,7 @@ class Settings:
             progress_timing=None,
             solver1_calc_2nd_solution=None,
             solver2_take_random_pattern=None,
+            solver2_print_possible_solutions_threshold=None,
             colored_prints=None,
             print_turns_list=None,
             **kwargs,
@@ -84,6 +85,10 @@ class Settings:
         self._solver2_take_random_pattern = self._get_setting(
             Consts.Solver2TakeRandomPattern,
             solver2_take_random_pattern,
+        )
+        self._solver2_print_possible_solutions_threshold = self._get_setting(
+            Consts.Solver2PrintPossibleSolutionsThreshold,
+            solver2_print_possible_solutions_threshold,
         )
         self._colored_prints = self._get_setting(
             Consts.ColoredPrints,
@@ -306,6 +311,12 @@ class Settings:
         return self._solver2_take_random_pattern
 
     @property
+    def solver2_print_possible_solutions_threshold(self):
+        """ Returns `solver2_print_possible_solutions_threshold` setting (only for Solver2) """
+
+        return self._solver2_print_possible_solutions_threshold
+
+    @property
     def colored_prints(self):
         """ Returns `colored_prints` setting """
 
@@ -313,7 +324,7 @@ class Settings:
 
     @property
     def print_turns_list(self):
-        """ Return `print_turns_list` setting """
+        """ Returns `print_turns_list` setting """
 
         return self._print_turns_list
 

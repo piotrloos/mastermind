@@ -101,6 +101,11 @@ class MastermindHelper(Mastermind):
             f"{self._settings.color.setting_value_on}"
             f"{self._settings.solver2_take_random_pattern}"
             f"{self._settings.color.setting_value_off}\n"
+
+            f"solver2_print_possible_solutions_threshold = "
+            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.solver2_print_possible_solutions_threshold}"
+            f"{self._settings.color.setting_value_off}\n"
         )
 
     def _helper_loop(self):
