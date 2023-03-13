@@ -30,7 +30,7 @@ class Mastermind(metaclass=ABCMeta):
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
 
-        self._solver = self._settings.solvers[self._settings.chosen_solver](  # instantiate Solver class
+        self._solver = self._settings.solver_class(  # instantiate Solver class
             self._settings,
             self._turns_list,
         )

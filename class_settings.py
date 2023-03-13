@@ -47,7 +47,7 @@ class Settings:
             pegs_number,
         )
         self._turns_limit = self._get_setting(
-            Consts.TurnsLimitNumber,
+            Consts.TurnsLimit,
             turns_limit,
         )
         self._chosen_solver = self._get_setting(
@@ -104,7 +104,7 @@ class Settings:
         else:
             self.color = NoColor()
 
-        self._solvers = {
+        self._solvers_dict = {
             1: MastermindSolver1,  # patterns checking generator Solver
             2: MastermindSolver2,  # patterns list filtering Solver
         }
@@ -146,10 +146,9 @@ class Settings:
         else:
             # TODO: try to use `shuffle_colors_before_build` and `shuffle_colors_during_build` settings (if possible)
             if self._use_itertools:
-                # get `itertools.product` generator
                 self._all_patterns_gen = map(
                     lambda pattern_tuple: self.Pattern(pattern_tuple),
-                    product(
+                    product(  # get `itertools.product` generator
                         self.Peg.all_colors_list[1:],  # without blank Peg
                         repeat=self._pegs_number,
                     )
@@ -160,9 +159,9 @@ class Settings:
 
         print()
 
-    @staticmethod
-    def _get_setting(setting, value):
-        """ Returns validated value (given as a parameter or inputted by user) for setting """
+    @classmethod
+    def _get_setting(cls, setting, value):
+        """ Returns validated value (given as a parameter or inputted by user) for setting and creates the property """
 
         if setting.type is bool:
             values_to_check = {0, 1}
@@ -203,8 +202,8 @@ class Settings:
             else:
                 parameter_flag = False
                 value_str = input(
-                    f"[Settings] Enter `{setting.name}` value ({values_to_print}), "
-                    f"leave empty for default value ({setting.default_value}): "
+                    f"[Settings] Enter `{setting.name}` ({setting.desc}) one value {values_to_print}, "
+                    f"or leave empty for default value ({setting.default_value}): "
                 ).strip()
 
                 if value_str == "":
@@ -228,21 +227,11 @@ class Settings:
                     except ValueError:
                         value = value_str
 
-        # TODO: create property for setting
+        # add new property with getter function returning setting value and disabled setter and deleter
+        # for example let Settings.pegs_number return 4 value
+        setattr(cls, setting.name, property(fget=lambda _cls: value, fset=None, fdel=None))
 
         return setting.type(value)
-
-    @property
-    def colors_number(self):
-        """ Returns number of colors """
-
-        return self._colors_number
-
-    @property
-    def pegs_number(self):
-        """ Returns number of pegs """
-
-        return self._pegs_number
 
     @property
     def patterns_number(self):
@@ -251,82 +240,10 @@ class Settings:
         return self._colors_number ** self._pegs_number
 
     @property
-    def turns_limit(self):
-        """ Returns turns limit number """
+    def solver_class(self):
+        """ Returns chosen Solver class """
 
-        return self._turns_limit
-
-    @property
-    def chosen_solver(self):
-        """ Returns chosen solver number """
-
-        return self._chosen_solver
-
-    @property
-    def use_itertools(self):
-        """ Returns 'use built-in itertools product function to generate patterns """
-
-        return self._use_itertools
-
-    @property
-    def pre_build_patterns(self):
-        """ Returns 'pre-build all possible patterns list' setting """
-
-        return self._pre_build_patterns
-
-    @property
-    def shuffle_colors_before_build(self):
-        """ Returns 'shuffle colors before building list' setting """
-
-        return self._shuffle_colors_before_build
-
-    @property
-    def shuffle_colors_during_build(self):
-        """ Returns 'shuffle colors during building list' setting """
-
-        return self._shuffle_colors_during_build
-
-    @property
-    def shuffle_patterns_after_build(self):
-        """ Returns 'shuffle patterns after building list' setting """
-
-        return self._shuffle_patterns_after_build
-
-    @property
-    def progress_timing(self):
-        """ Returns `progress_timing` setting """
-
-        return self._progress_timing
-
-    @property
-    def solver1_calc_2nd_solution(self):
-        """ Returns `solver1_calc_2nd_solution` setting (only for Solver1) """
-
-        return self._solver1_calc_2nd_solution
-
-    @property
-    def solver2_take_random_pattern(self):
-        """ Returns `solver2_take_random_pattern` setting (only for Solver2) """
-
-        return self._solver2_take_random_pattern
-
-    @property
-    def solver2_print_possible_solutions_threshold(self):
-        """ Returns `solver2_print_possible_solutions_threshold` setting (only for Solver2) """
-
-        return self._solver2_print_possible_solutions_threshold
-
-    @property
-    def colored_prints(self):
-        """ Returns `colored_prints` setting """
-
-        return self._colored_prints
-
-    @property
-    def print_turns_list(self):
-        """ Returns `print_turns_list` setting """
-
-        return self._print_turns_list
+        return self._solvers_dict[self._chosen_solver]
 
     @property
     def all_colors_list_formatted(self):
@@ -345,9 +262,3 @@ class Settings:
         """ Returns generator of all possible patterns """
 
         return self._all_patterns_gen
-
-    @property
-    def solvers(self):
-        """ Returns dict containing all defined solvers (in Consts) """
-
-        return self._solvers
