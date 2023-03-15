@@ -11,6 +11,8 @@ from class_mastermind import Mastermind
 class MastermindHelper(Mastermind):
     """ Contains Mastermind Helper mode, inherits from Mastermind class """
 
+    # TODO: refactor MastermindGame, MastermindHelper, MastermindSolver into one class
+
     def __init__(
             self,
             *args,
@@ -28,19 +30,18 @@ class MastermindHelper(Mastermind):
         """ Prints intro """
 
         print(
-            f"{self._settings.color.greeting_on}\n"
+            f"{self._settings.color.greeting_on}"
             f"#####################################\n"
             f"#   Welcome to Mastermind Helper!   #\n"
             f"#####################################\n"
             f"{self._settings.color.greeting_off}"
         )
-
         print(
             f"You are CodeBreaker and somebody has prepared "
             f"{self._settings.color.number_on}"
-            f"{self._settings.pegs_number}-peg"
+            f"{self._settings.pegs_number}"
             f"{self._settings.color.number_off}"
-            f" pattern using "
+            f"-peg pattern using "
             f"{self._settings.color.number_on}"
             f"{self._settings.colors_number}"
             f"{self._settings.color.number_off}"
@@ -48,64 +49,70 @@ class MastermindHelper(Mastermind):
             f"{self._settings.all_colors_list_formatted}"
             f"."
         )
-
         print(
             f"I am Helper, I don't know somebody's pattern and I have "
             f"{self._settings.color.number_on}"
             f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited number of'}"
             f"{self._settings.color.number_off}"
-            f" turn{'s' if self._settings.turns_limit != 1 else ''} to help you find out the solution."
+            f" turn{'s' if self._settings.turns_limit != 1 else ''} to help you guess the solution."
         )
-
         print(
             f"There are "
             f"{self._settings.color.number_on}"
-            f"{self._settings.patterns_number:,}"
+            f"{self._settings.patterns_number:,}"  # divide number by comma every 3 digits
             f"{self._settings.color.number_off}"
-            f" possible patterns in this game."
+            f" possible patterns in this game. "
+            f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
-
+        print()
         print(
-            f"Example pattern is {self._settings.Pattern.get_random_pattern()}.\n"
+            f"Settings:"
         )
-
         print(
-            f"Settings:\n"
-
             f"chosen_solver = "
             f"{self._settings.color.setting_value_on}"
             f"{self._settings.chosen_solver}"
-            f"{self._settings.color.setting_value_off}\n"
-
+            f"{self._settings.color.setting_value_off}"
+        )
+        print(
             f"shuffle_colors_before_build = "
             f"{self._settings.color.setting_value_on}"
             f"{self._settings.shuffle_colors_before_build}"
-            f"{self._settings.color.setting_value_off}\n"
-
+            f"{self._settings.color.setting_value_off}"
+        )
+        print(
             f"shuffle_colors_during_build = "
             f"{self._settings.color.setting_value_on}"
             f"{self._settings.shuffle_colors_during_build}"
-            f"{self._settings.color.setting_value_off}\n"
-
+            f"{self._settings.color.setting_value_off}"
+        )
+        print(
             f"shuffle_patterns_after_build = "
             f"{self._settings.color.setting_value_on}"
             f"{self._settings.shuffle_patterns_after_build}"
-            f"{self._settings.color.setting_value_off}\n"
-
+            f"{self._settings.color.setting_value_off}"
+        )
+        print(
             f"solver1_calc_2nd_solution = "
             f"{self._settings.color.setting_value_on}"
             f"{self._settings.solver1_calc_2nd_solution}"
-            f"{self._settings.color.setting_value_off}\n"
-
+            f"{self._settings.color.setting_value_off}"
+        )
+        print(
             f"solver2_take_random_pattern = "
             f"{self._settings.color.setting_value_on}"
             f"{self._settings.solver2_take_random_pattern}"
-            f"{self._settings.color.setting_value_off}\n"
-
+            f"{self._settings.color.setting_value_off}"
+        )
+        print(
             f"solver2_print_possible_solutions_threshold = "
             f"{self._settings.color.setting_value_on}"
             f"{self._settings.solver2_print_possible_solutions_threshold}"
-            f"{self._settings.color.setting_value_off}\n"
+            f"{self._settings.color.setting_value_off}"
+        )
+        print()
+        print(
+            "Let's play!"
         )
 
     def _helper_loop(self):
@@ -134,6 +141,7 @@ class MastermindHelper(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
+            f"\n"
             f"{self._settings.color.number_on}"
             f"{self._turns_list.turns_index + 1:>3d}."
             f"{self._settings.color.number_off}"

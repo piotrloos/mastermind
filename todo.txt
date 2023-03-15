@@ -2,6 +2,7 @@
 
 # TODO: stworzenie pliku `readme.md`
 # TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
+# TODO: błędne inputy powinny rzucać wyjątkiem
 # TODO: parametr mode przy uruchamianiu Mastermind a nie Game/Helper/Solver
 # TODO: mozliwość restartu gry na tych samych ustawieniach (bez generowania patternów)
 # TODO: testy, testy, testy...
@@ -17,6 +18,7 @@
 # TODO: typy zmiennych w deklaracjach funkcji (type hints)
 # TODO: porządek w nazwach metod i pól (__name)
 # TODO: opcje: allow_duplicates, allow_blanks
+# TODO: mierzenie czasu myślenia przez człowieka
 
 # polecenia "shella":
 

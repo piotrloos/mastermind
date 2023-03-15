@@ -11,6 +11,8 @@ from class_mastermind import Mastermind
 class MastermindGame(Mastermind):
     """ Contains Mastermind Game mode, inherits from Mastermind class """
 
+    # TODO: refactor MastermindGame, MastermindHelper, MastermindSolver into one class
+
     def __init__(
             self,
             *args,
@@ -41,19 +43,18 @@ class MastermindGame(Mastermind):
         """ Prints intro """
 
         print(
-            f"{self._settings.color.greeting_on}\n"
+            f"{self._settings.color.greeting_on}"
             f"###################################\n"
             f"#   Welcome to Mastermind Game!   #\n"
             f"###################################\n"
             f"{self._settings.color.greeting_off}"
         )
-
         print(
             f"I am CodeMaker and I have prepared "
             f"{self._settings.color.number_on}"
-            f"{self._settings.pegs_number}-peg"
+            f"{self._settings.pegs_number}"
             f"{self._settings.color.number_off}"
-            f" pattern using "
+            f"-peg pattern using "
             f"{self._settings.color.number_on}"
             f"{self._settings.colors_number}"
             f"{self._settings.color.number_off}"
@@ -61,25 +62,24 @@ class MastermindGame(Mastermind):
             f"{self._settings.all_colors_list_formatted}"
             f"."
         )
-
         print(
             f"You are CodeBreaker, you don't know my pattern and you have "
             f"{self._settings.color.number_on}"
             f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited number of'}"
             f"{self._settings.color.number_off}"
-            f" turn{'s' if self._settings.turns_limit != 1 else ''} to find out the solution."
+            f" turn{'s' if self._settings.turns_limit != 1 else ''} to guess the solution."
         )
-
         print(
             f"There are "
             f"{self._settings.color.number_on}"
-            f"{self._settings.patterns_number:,}"
+            f"{self._settings.patterns_number:,}"  # divide number by comma every 3 digits
             f"{self._settings.color.number_off}"
-            f" possible patterns in this game."
+            f" possible patterns in this game. "
+            f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
-
+        print()
         print(
-            f"Example pattern is {self._settings.Pattern.get_random_pattern()}.\n"
+            "Let's play!"
         )
 
     def _game_loop(self):
@@ -96,6 +96,7 @@ class MastermindGame(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
+            f"\n"
             f"{self._settings.color.number_on}"
             f"{self._turns_list.turns_index + 1:>3d}."
             f"{self._settings.color.number_off}"

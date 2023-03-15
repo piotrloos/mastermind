@@ -20,6 +20,8 @@ class Color:
     attribute_off = "\033\13323m"               # italic off
     time_on = "\033\1331;96m"                   # bold on, cyan fg
     time_off = "\033\13322;39m"                 # bold off, reset fg
+    response_on = "\033\1331;97m"               # bold on, white fg
+    response_off = "\033\13322;39m"             # bold off, reset fg
     progress_title_on = "\033\1331;94m"         # bold on, blue fg
     progress_title_off = "\033\13322;39m"       # bold off, reset fg
     progress_value_on = "\033\1331;93m"         # bold on, yellow fg
@@ -40,6 +42,8 @@ class NoColor:
     number_off = ""
     time_on = ""
     time_off = ""
+    response_on = ""
+    response_off = ""
     attribute_on = "`"
     attribute_off = "`"
     progress_title_on = ""

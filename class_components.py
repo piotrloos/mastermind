@@ -258,7 +258,7 @@ def pattern_class(settings):
 
                     while True:  # infinite loop
 
-                        # TODO: big jumps on most significant pegs (without changing least significant values)
+                        # TODO: big jumps on the most significant pegs (without changing the least significant values)
 
                         peg = pattern[peg_index]  # get current peg from pattern
                         if peg < colors_number - 1:  # check if current peg has max value (=can be incremented?)
@@ -286,15 +286,19 @@ def response_class(settings):
         def __str__(self):
             """ Formats `response` to be printed """
 
+            # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+
             return (
-                "[{blacks}{whites}{dots}] ({black_number}, {white_number})"
+                f"{settings.color.response_on}" +
+                "{blacks}{whites}{dots} ({black_number}, {white_number})"
                 .format(
-                    blacks="●" * self[0],
-                    whites="○" * self[1],
-                    dots="∙" * (settings.pegs_number - self[0] - self[1]),
-                    black_number=self[0],
-                    white_number=self[1],
-                )
+                    blacks="●" * self.black_pegs,
+                    whites="○" * self.white_pegs,
+                    dots="∙" * (settings.pegs_number - self.black_white_pegs),
+                    black_number=self.black_pegs,
+                    white_number=self.white_pegs,
+                ) +
+                f"{settings.color.response_off}"
             )
 
         @property
@@ -425,6 +429,7 @@ def turns_list_class(settings):
             )
             for turn in self:
                 print(turn)
+            print()
 
         @property
         def turns_index(self):

@@ -108,7 +108,11 @@ class MastermindSolver1:
                 self._current_possible_solution = self._2nd_possible_solution
                 self._2nd_possible_solution = None
             else:
-                # TODO: add here a text like "2nd possible solution can't be a solution"
+                # TODO: temporary disabled due to printing this before game - fix it
+                # print(
+                #     f"[Solver1] Previously found 2nd possible solution {self._2nd_possible_solution} "
+                #     f"can no longer be a solution."
+                # )
                 self._current_possible_solution = self._get_next(
                     f"[Solver1] Scanning all patterns for {self._1st_string}possible solution..."
                 )

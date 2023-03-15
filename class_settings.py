@@ -215,12 +215,12 @@ class Settings:
                     print(
                         f"[Settings] Entered value `{value_str}` for `{setting.name}` recognized as `False`."
                     )
-                    value = 0
+                    value = False
                 elif setting.type is bool and value_str.lower() in {"1", "true", "t", "yes", "y", "v", "+"}:
                     print(
                         f"[Settings] Entered value `{value_str}` for `{setting.name}` recognized as `True`."
                     )
-                    value = 1
+                    value = True
                 else:
                     try:
                         value = int(value_str)
