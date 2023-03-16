@@ -149,8 +149,8 @@ class MastermindSolver(Mastermind):
         )
 
     # TODO: refactor with `helper_take_turn`
-    def _solver_take_turn(self, response_string, response=None):
-        """ Takes turn as CodeBreaker (with `response` or `response_string` from CodeMaker) """
+    def _solver_take_turn(self, user_response_string, computer_response=None):
+        """ Takes a turn as the CodeBreaker (with `user_response_string` or `computer_response` from CodeMaker) """
 
         if self._game_status != 0:
             raise PermissionError(
@@ -159,9 +159,22 @@ class MastermindSolver(Mastermind):
                 f"{self._settings.color.error_off}"
             )
 
-        if response is None:
-            response = self._settings.Response.decode_response(response_string)
-            if response is None:
+        if computer_response is not None:  # computer is playing
+
+            if type(computer_response) is not self._settings.Response:
+                raise RuntimeError(
+                    f"{self._settings.color.error_on}"
+                    f"[Solver] Given computer response is not the Response class object!"
+                    f"{self._settings.color.error_off}"
+                )
+            else:
+                response = computer_response
+
+        else:  # user is playing
+
+            try:
+                response = self._settings.Response.decode_response(user_response_string)
+            except ValueError:
                 raise ValueError(
                     f"{self._settings.color.error_on}"
                     f"[Solver] You gave me incorrect response! Enter again."

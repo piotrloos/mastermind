@@ -149,8 +149,8 @@ class MastermindHelper(Mastermind):
         )
 
     # TODO: refactor with `solver_take_turn`
-    def _helper_take_turn(self, pattern_response_string, pattern=None, response=None):
-        """ Takes turn in Helper mode (with `pattern` and `response` from human) """
+    def _helper_take_turn(self, user_pattern_response_string, computer_pattern=None, computer_response=None):
+        """ Takes a turn in Helper mode (with `pattern` and `response` from user) """
 
         if self._game_status != 0:
             raise PermissionError(
@@ -159,12 +159,29 @@ class MastermindHelper(Mastermind):
                 f"{self._settings.color.error_off}"
             )
 
-        if pattern is None or response is None:
-            pattern, response = self._settings.Response.decode_pattern_response(pattern_response_string)
-            if pattern is None:
-                pattern = self._solver.current_possible_solution  # get `pattern` if user enters "=response" only
-                # TODO: bug! incorrect pattern -> current_pattern (instead of printing error)
-            if response is None:
+        if computer_pattern is not None or computer_response is not None:  # computer is playing
+
+            if type(computer_pattern) is not self._settings.Pattern:
+                raise RuntimeError(
+                    f"{self._settings.color.error_on}"
+                    f"[Helper] Given computer pattern is not the Pattern class object!"
+                    f"{self._settings.color.error_off}"
+                )
+            elif type(computer_response) is not self._settings.Response:
+                raise RuntimeError(
+                    f"{self._settings.color.error_on}"
+                    f"[Helper] Given computer response is not the Response class object!"
+                    f"{self._settings.color.error_off}"
+                )
+            else:
+                pattern = computer_pattern
+                response = computer_response
+
+        else:  # user is playing
+
+            try:
+                pattern, response = self._settings.Response.decode_pattern_response(user_pattern_response_string)
+            except ValueError:
                 raise ValueError(
                     f"{self._settings.color.error_on}"
                     f"[Helper] You gave me incorrect pattern=response! Enter again."

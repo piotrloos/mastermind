@@ -21,9 +21,9 @@ def peg_class(settings):
 
             # TODO: include `allow_blanks` setting
             if color_value not in range(0, settings.colors_number + 1):  # including blank Peg
-                raise ValueError(
+                raise RuntimeError(
                     f"{settings.color.error_on}"
-                    f"Tried to create Peg outside the color range!"
+                    f"[Peg] Tried to create Peg outside the color range!"
                     f"{settings.color.error_off}"
                 )
 
@@ -108,6 +108,7 @@ def pattern_class(settings):
         def validate_pattern(cls, pattern_tuple):
             """ Checks if given `pattern_tuple` is formally correct """
 
+            # TODO: include `allow_blanks` setting
             return (
                 isinstance(pattern_tuple, tuple)
                 and len(pattern_tuple) == settings.pegs_number
@@ -118,22 +119,22 @@ def pattern_class(settings):
             )
 
         @classmethod
-        def decode_pattern(cls, pattern_string):
-            """ Returns Pattern object converted from formatted `pattern_string` """
+        def decode_pattern(cls, user_pattern):
+            """ Returns Pattern object converted from formatted `user_pattern` """
 
             try:
+                # clean the string and divide into pegs
                 pattern_tuple = tuple(
                     settings.Peg.decode_peg(peg_char)
-                    for peg_char in pattern_string.replace(" ", "").replace(",", "")
-                    # clean string and divide into pegs
+                    for peg_char in user_pattern.replace(" ", "").replace(",", "")
                 )
-            except (TypeError, ValueError, IndexError):
-                return None
+            except (TypeError, ValueError, IndexError):  # possible exceptions during decoding
+                raise ValueError
 
             if cls.validate_pattern(pattern_tuple):
                 return Pattern(pattern_tuple)
             else:
-                return None
+                raise ValueError
 
         @staticmethod
         def get_random_pattern():
@@ -141,34 +142,38 @@ def pattern_class(settings):
 
             # TODO: include `allow_blanks` setting
             return Pattern(
-                settings.Peg.all_colors_list[randrange(1, settings.colors_number + 1)]  # without blank Peg
-                for _ in range(settings.pegs_number)
+                tuple(
+                    settings.Peg.all_colors_list[randrange(1, settings.colors_number + 1)]  # without blank Peg
+                    for _ in range(settings.pegs_number)
+                )
             )
 
-        def calculate_black_pegs(self, other):
+        def calculate_black_pegs(self, other_pattern):
             """ Returns `black_pegs` number (how many pegs are in proper color and in proper location) """
 
+            # TODO: include `allow_blanks` setting
             return sum(
-                int(pattern1_peg == pattern2_peg)
-                for pattern1_peg, pattern2_peg in zip(self, other)
+                int(this_pattern_peg == other_pattern_peg)  # 0 (different pegs) or 1 (same peg)
+                for this_pattern_peg, other_pattern_peg in zip(self, other_pattern)  # compare peg by peg
             )
 
-        def calculate_black_white_pegs(self, other):
+        def calculate_black_white_pegs(self, other_pattern):
             """ Returns `black_white_pegs` number (how many pegs are in proper color regardless to location) """
 
+            # TODO: include `allow_blanks` setting
             return sum(
-                min(self.count(color), other.count(color))
+                min(self.count(color), other_pattern.count(color))  # common number (minimum) of current color
                 for color in settings.Peg.all_colors_list[1:]  # without blank Peg
             )
 
-        def calculate_response(self, other):
+        def calculate_response(self, other_pattern):
             """ Returns calculated Response object for given pattern related to other pattern """
 
-            black_pegs = self.calculate_black_pegs(other)
-            black_white_pegs = self.calculate_black_white_pegs(other)
+            black_pegs = self.calculate_black_pegs(other_pattern)
+            black_white_pegs = self.calculate_black_white_pegs(other_pattern)
 
             # `white_pegs` defines how many pegs are in proper color and wrong location
-            # to calculate `white_pegs` it's needed to subtract `black_pegs` from `black_white_pegs`
+            # to calculate `white_pegs` just subtract `black_pegs` from `black_white_pegs`
             return settings.Response((black_pegs, black_white_pegs - black_pegs))
 
         @staticmethod
@@ -195,11 +200,17 @@ def pattern_class(settings):
                 ) as progress:
 
                     # TODO: use `shuffle_colors_during_build` setting (if possible)
-                    all_patterns_list = list(map(lambda pattern_tuple: progress.item(settings.Pattern(pattern_tuple)),
-                                                 product(colors_list, repeat=settings.pegs_number)))
+                    all_patterns_list = list(
+                        map(
+                            # create Pattern objects using map function
+                            lambda pattern_tuple: progress.item(settings.Pattern(pattern_tuple)),
+                            product(colors_list, repeat=settings.pegs_number)
+                        )
+                    )
             else:
 
                 with Progress(
+                    # number of items is the sum of successive powers of `colors_number`
                     items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
                     color=settings.color,
                     title="[Patterns] Building patterns list (using my own function)...",
@@ -254,16 +265,18 @@ def pattern_class(settings):
             """ Generator for all possible patterns in the game (when `pre_build_patterns` setting == False) """
 
             colors_list = settings.Peg.all_colors_list[1:]  # without blank Peg
+            # TODO: use `shuffle_colors_before_build` setting here
+
             colors_number = settings.colors_number
             pegs_number = settings.pegs_number
 
             if colors_number > 0:
 
-                pattern = [colors_list[0]] * pegs_number  # get list of pegs with min values
-                peg_index = pegs_number - 1  # set peg_index to last peg
-                yield Pattern(pattern)
+                pattern_list = [colors_list[0]] * pegs_number  # get list of pegs with min values
+                peg_index = pegs_number - 1  # set `peg_index` to last peg
+                yield Pattern(tuple(pattern_list))  # yield the first patter
 
-                # TODO: use `shuffle_colors_before_build` and `shuffle_colors_during_build` settings
+                # TODO: try to use `shuffle_colors_during_build` setting here
 
                 if pegs_number > 0:
 
@@ -271,16 +284,16 @@ def pattern_class(settings):
 
                         # TODO: big jumps on the most significant pegs (without changing the least significant values)
 
-                        peg = pattern[peg_index]  # get current peg from pattern
+                        peg = pattern_list[peg_index]  # get current peg from pattern_list
                         if peg < colors_number - 1:  # check if current peg has max value (=can be incremented?)
 
-                            pattern[peg_index] = colors_list[peg + 1]  # increment current peg
+                            pattern_list[peg_index] = colors_list[peg + 1]  # increment current peg
                             peg_index = pegs_number - 1  # reset `peg_index` to last peg
-                            yield Pattern(pattern)
+                            yield Pattern(tuple(pattern_list))  # yield current pattern
 
                         else:  # current peg has max value -> need to carry one peg on the left
 
-                            pattern[peg_index] = colors_list[0]  # reset current peg to min value
+                            pattern_list[peg_index] = colors_list[0]  # reset current peg to min value
                             peg_index -= 1  # move `peg_index` to the left
                             if peg_index < 0:
                                 break  # if `peg_index` reached first peg exit the loop
@@ -336,40 +349,61 @@ def response_class(settings):
 
             return (
                 isinstance(response_tuple, tuple)
-                and len(response_tuple) == 2
+                and len(response_tuple) == 2  # (black pegs number, white pegs number)
                 and all(
                     response_peg in range(0, settings.pegs_number + 1)
-                    for response_peg in {response_tuple[0], response_tuple[1], response_tuple[0] + response_tuple[1]}
-                    # number of both black and white pegs (and sum of them also) should be between 0 and number of pegs
+                    for response_peg in {
+                        response_tuple[0],  # black pegs number
+                        response_tuple[1],  # white pegs number
+                        response_tuple[0] + response_tuple[1],  # sum of black and white pegs
+                    }
+                    # all above numbers should be between 0 and `pegs_number`
                 )
             )
 
         @classmethod
-        def decode_response(cls, response_string):
-            """ Returns Response object converted from formatted `response_string` """
+        def decode_response(cls, user_response):
+            """ Returns Response object converted from `user_response` """
 
             try:
+                # clean the string and divide to black_pegs and white_pegs
                 response_tuple = tuple(
-                    int(response_peg)
-                    for response_peg in response_string.strip().split(' ', maxsplit=1)  # only one divide
+                    int(response_peg.strip())
+                    for response_peg in user_response.strip().split(
+                        sep=',',  # divide at comma
+                        maxsplit=1,  # only one divide
+                    )
                 )
-            except (TypeError, ValueError):
-                return None
+            except (TypeError, ValueError):  # possible exceptions during decoding
+                raise ValueError
 
             if cls.validate_response(response_tuple):
                 return Response(response_tuple)
             else:
-                return None
+                raise ValueError
 
         @classmethod
-        def decode_pattern_response(cls, pattern_response_string):
-            """ Returns Pattern and Response objects converted from formatted `pattern_response_string` """
+        def decode_pattern_response(cls, user_pattern_response):
+            """ Returns Pattern and Response objects converted from `user_pattern_response` """
 
             try:
-                pattern, response = pattern_response_string.strip().split('=', maxsplit=1)  # only one divide at "="
-            except (TypeError, ValueError):
-                return None, None
-            return settings.Pattern.decode_pattern(pattern), settings.Response.decode_response(response)
+                user_pattern, user_response = user_pattern_response.strip().split(
+                    sep='=',  # divide at equal sign
+                    maxsplit=1,  # only one divide
+                )
+            except (TypeError, ValueError):  # possible exceptions during decoding
+                raise ValueError
+
+            if user_pattern.strip() == "":
+                return (
+                    None,
+                    settings.Response.decode_response(user_response),
+                )
+            else:
+                return (
+                    settings.Pattern.decode_pattern(user_pattern),
+                    settings.Response.decode_response(user_response),
+                )
 
     return Response
 
