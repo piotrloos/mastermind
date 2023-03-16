@@ -81,6 +81,7 @@ class MastermindGame(Mastermind):
         print(
             "Let's play!"
         )
+        print()
 
     def _game_loop(self):
         """ Main `Game` loop """
@@ -96,15 +97,10 @@ class MastermindGame(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            f"\n"
             f"{self._settings.color.number_on}"
-            f"{self._turns_list.turns_index + 1:>3d}."
+            f"{self._turns_list.turns_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
             f"{self._settings.color.number_off}"
-            f" Enter "
-            f"{self._settings.color.attribute_on}"
-            f"pattern"
-            f"{self._settings.color.attribute_off}"
-            f": "
+            f" Enter pattern (your guess): "
         )
 
     def _game_take_turn(self, pattern_string, pattern=None):
@@ -122,13 +118,10 @@ class MastermindGame(Mastermind):
             if pattern is None:
                 raise ValueError(
                     f"{self._settings.color.error_on}"
-                    f"[Game] Given "
-                    f"{self._settings.color.attribute_on}"
-                    f"pattern"
-                    f"{self._settings.color.attribute_off}"
-                    f" is incorrect! Enter again."
+                    f"[Game] You gave me incorrect pattern! Enter again."
                     f"{self._settings.color.error_off}"
                 )
+            # TODO: suggest the user example pattern to enter
 
         response = pattern.calculate_response(self._solution)
 
@@ -141,25 +134,26 @@ class MastermindGame(Mastermind):
         if self._settings.print_turns_list:
             self._turns_list.print_turns_list()
 
-        # check game end
+        # check game end criteria
 
         # check if all response pegs are black
         if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
             self._game_status = 1  # solution is found
             return
 
+        # check if the CodeBreaker reached turns limit
         if self._settings.turns_limit and self._turns_list.turns_index >= self._settings.turns_limit:
             self._game_status = 2  # reached turns limit
             return
 
+        # otherwise game is still active
+
     def _game_outro(self):
         """ Prints outro """
 
-        print()
-
         if self._game_status == 1:
             print(
-                f"You found my pattern in "
+                f"You found my solution in "
                 f"{self._settings.color.number_on}"
                 f"{self._turns_list.turns_index}"
                 f"{self._settings.color.number_off}"
@@ -169,11 +163,9 @@ class MastermindGame(Mastermind):
             print(
                 "You reached turns limit. Game over!"
             )
-
         print(
             f"The solution was {self._solution}."
         )
-
         print(
             "Thanks for playing!"
         )

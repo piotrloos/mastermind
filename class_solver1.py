@@ -135,6 +135,7 @@ class MastermindSolver1:
                         f"[Solver1] Now I know that {self._current_possible_solution} is the only possible solution!"
                     )
 
+        print()
         return self._current_possible_solution
 
     def _get_next(self, progress_title):

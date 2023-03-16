@@ -114,6 +114,7 @@ class MastermindSolver(Mastermind):
         print(
             "Let's play!"
         )
+        print()
 
     def _solver_loop(self):
         """ Main `Solver` loop """
@@ -141,15 +142,10 @@ class MastermindSolver(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            f"\n"
             f"{self._settings.color.number_on}"
-            f"{self._turns_list.turns_index + 1:>3d}."
+            f"{self._turns_list.turns_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
             f"{self._settings.color.number_off}"
-            f" Enter "
-            f"{self._settings.color.attribute_on}"
-            f"response"
-            f"{self._settings.color.attribute_off}"
-            f" for pattern {self._solver.current_possible_solution}: "
+            f" Enter response for pattern {self._solver.current_possible_solution}: "
         )
 
     # TODO: refactor with `helper_take_turn`
@@ -168,23 +164,20 @@ class MastermindSolver(Mastermind):
             if response is None:
                 raise ValueError(
                     f"{self._settings.color.error_on}"
-                    f"[Solver] Given "
-                    f"{self._settings.color.attribute_on}"
-                    f"response"
-                    f"{self._settings.color.attribute_off}"
-                    f" is incorrect! Enter again."
+                    f"[Solver] You gave me incorrect response! Enter again."
                     f"{self._settings.color.error_off}"
                 )
+            # TODO: suggest the user example response to enter
 
-        print()
         pattern = self._solver.current_possible_solution
+        print()
 
         turn = self._turns_list.add_turn(pattern, response)
 
         if self._settings.print_turns_list:
             self._turns_list.print_turns_list()
 
-        # check game end
+        # check game end criteria
 
         # check if all response pegs are black
         if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
@@ -192,28 +185,28 @@ class MastermindSolver(Mastermind):
             self._game_status = 1  # solution is found
             return
 
+        # check if the CodeBreaker reached turns limit
         if self._settings.turns_limit and self._turns_list.turns_index >= self._settings.turns_limit:
             self._game_status = 2  # reached turns limit
             return
 
+        # try to find the next possible solution
         # TODO: extract running calc function
         if self._solver.calculate_possible_solution(turn) is None:
             self._game_status = 3  # no possible solution found
             return
 
-        # game is still active
+        # otherwise game is still active
 
     def _solver_outro(self):
         """ Prints outro """
-
-        print()
 
         if self._game_status == 1:
             print(
                 f"The solution is {self._solution}."
             )
             print(
-                f"I found your pattern in "
+                f"I found your solution in "
                 f"{self._settings.color.number_on}"
                 f"{self._turns_list.turns_index}"
                 f"{self._settings.color.number_off}"

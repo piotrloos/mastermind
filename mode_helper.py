@@ -114,6 +114,7 @@ class MastermindHelper(Mastermind):
         print(
             "Let's play!"
         )
+        print()
 
     def _helper_loop(self):
         """ Main `Helper` loop """
@@ -141,15 +142,10 @@ class MastermindHelper(Mastermind):
         """ Returns formatted prompt for `input` function """
 
         return (
-            f"\n"
             f"{self._settings.color.number_on}"
-            f"{self._turns_list.turns_index + 1:>3d}."
+            f"{self._turns_list.turns_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
             f"{self._settings.color.number_off}"
-            f" Enter "
-            f"{self._settings.color.attribute_on}"
-            f"pattern=response"
-            f"{self._settings.color.attribute_off}"
-            f" (empty pattern means {self._solver.current_possible_solution}): "
+            f" Enter pattern=response (empty pattern means {self._solver.current_possible_solution}): "
         )
 
     # TODO: refactor with `solver_take_turn`
@@ -171,15 +167,15 @@ class MastermindHelper(Mastermind):
             if response is None:
                 raise ValueError(
                     f"{self._settings.color.error_on}"
-                    f"[Helper] Given "
-                    f"{self._settings.color.attribute_on}"
-                    f"pattern=response"
-                    f"{self._settings.color.attribute_off}"
-                    f" is incorrect! Enter again."
+                    f"[Helper] You gave me incorrect pattern=response! Enter again."
                     f"{self._settings.color.error_off}"
                 )
+            # TODO: suggest the user example pattern=response to enter
+            if pattern is None:
+                pattern = self._solver.current_possible_solution  # get `pattern` if user enters "=response" only
 
         print()
+
         if self._solver.check_possible_solution(pattern):
             print(
                 "[Helper] Nice try. Given pattern could be the solution."
@@ -195,7 +191,7 @@ class MastermindHelper(Mastermind):
         if self._settings.print_turns_list:
             self._turns_list.print_turns_list()
 
-        # check game end
+        # check game end criteria
 
         # check if all response pegs are black
         if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
@@ -206,35 +202,35 @@ class MastermindHelper(Mastermind):
                 self._game_status = 3  # no possible solution found
             return
 
+        # check if the CodeBreaker reached turns limit
         if self._settings.turns_limit and self._turns_list.turns_index >= self._settings.turns_limit:
             self._game_status = 2  # reached turns limit
             return
 
+        # try to find the next possible solution
         # TODO: extract running calc function
         if self._solver.calculate_possible_solution(turn) is None:
             self._game_status = 3  # no possible solution found
             return
 
-        # game is still active
+        # otherwise game is still active
 
-        # TODO: print this before turn
-        print(
-            # f"[Helper] One of the possible solution is {self._solver.current_possible_solution}."
-            # TODO: temporary disabled
-        )
+        # TODO: print this before turn - temporary disabled
+        # print(
+        #     f"[Helper] One of the possible solution is {self._solver.current_possible_solution}."
+        # )
+
         # TODO: print info if it's the same proposition as in previous turn or another (new pattern)
 
     def _helper_outro(self):
         """ Prints outro """
-
-        print()
 
         if self._game_status == 1:
             print(
                 f"The solution is {self._solution}."
             )
             print(
-                f"I found somebody's pattern for you in "
+                f"I found somebody's solution for you in "
                 f"{self._settings.color.number_on}"
                 f"{self._turns_list.turns_index}"
                 f"{self._settings.color.number_off}"
@@ -242,7 +238,7 @@ class MastermindHelper(Mastermind):
             )
         elif self._game_status == 2:
             print(
-                "I reached turns limit. Game over!"
+                "We reached turns limit. Game over!"
             )
         elif self._game_status == 3:
             print(

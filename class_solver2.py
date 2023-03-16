@@ -147,4 +147,5 @@ class MastermindSolver2:
                 for pattern in self._possible_solutions_list:
                     print(pattern)
 
+        print()
         return self._current_possible_solution

@@ -88,10 +88,21 @@ def pattern_class(settings):
 
             content = ''.join(peg.__str__() for peg in self)
 
+            # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+
+            # TODO: move colors to class_colors
             if settings.colored_prints:
-                return f"\033\13351m{content}\033\13354m"  # framed pegs
+                return (
+                    f"\033\13351m"  # enable framed pegs
+                    f"{content}"
+                    f"\033\13354m"  # disable framed pegs
+                )
             else:
-                return f"[{content}]"
+                return (
+                    f"["
+                    f"{content}"
+                    f"]"
+                )
 
         @classmethod
         def validate_pattern(cls, pattern_tuple):
@@ -421,11 +432,12 @@ def turns_list_class(settings):
             return turn
 
         def print_turns_list(self):
-            """ Prints all turns """
+            """ Prints all turns as a list """
 
             print(
-                f"{f'There is 1 turn' if self._turns_index == 1 else f'There are {self._turns_index} turns'} "
-                f"(so far) in this game:"
+                f"There "
+                f"is 1 turn" if self._turns_index == 1 else f"are {self._turns_index} turns"
+                f" (so far) in this game:"
             )
             for turn in self:
                 print(turn)
