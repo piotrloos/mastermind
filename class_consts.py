@@ -16,7 +16,7 @@ class Consts(metaclass=ABCMeta):
         name = "colors_number"
         desc = "set number of different pegs colors"
         min_value = 2
-        max_value = 9
+        max_value = 24
         default_value = 6
         ask_if_not_given = True
 
@@ -25,7 +25,7 @@ class Consts(metaclass=ABCMeta):
         name = "pegs_number"
         desc = "set number of pegs in every pattern"
         min_value = 2
-        max_value = 10
+        max_value = 16
         default_value = 4
         ask_if_not_given = True
 
@@ -36,6 +36,13 @@ class Consts(metaclass=ABCMeta):
         min_value = 0
         max_value = 32
         default_value = 12
+        ask_if_not_given = False
+
+    class UseDigitsForColors(metaclass=ABCMeta):
+        type = bool
+        name = "use_digits_for_colors"
+        desc = "True = uses digits from 1-10 (digit 0 means 10) and then letters, False = uses only letters"
+        default_value = True
         ask_if_not_given = False
 
     class ChosenSolver(metaclass=ABCMeta):

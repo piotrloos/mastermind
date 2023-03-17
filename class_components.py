@@ -13,66 +13,87 @@ from random import randrange
 def peg_class(settings):
     """ Function that creates and returns Peg class with given `settings` """
 
+    # build list of peg chars
+    peg_chars_list = ['.']  # first char '.' as blank peg
+
+    if settings.use_digits_for_colors:
+        peg_chars_list += list(
+            [str(i) for i in range(1, 10)]  # char from '1' to '9'
+            + ['0']  # char '0' as 10-th char
+        )
+
+    peg_chars_list += [chr(i) for i in range(ord('a'), ord('z') + 1)]  # chars from 'a' to 'z'
+    peg_chars_list = peg_chars_list[:(settings.colors_number + 1)]  # save first `colors_number` elements (+ blank peg)
+
     class Peg(int):
         """ Class for one pattern peg """
 
-        def __init__(self, color_value):
-            """ Checks if just created Peg is in color range """
+        def __init__(self, peg_value):
+            """ Checks if just created peg has valid value """
 
             # TODO: include `allow_blanks` setting
-            if color_value not in range(0, settings.colors_number + 1):  # including blank Peg
+            if peg_value not in range(0, settings.colors_number + 1):  # with blank peg
                 raise RuntimeError(
                     f"{settings.color.error_on}"
-                    f"[Peg] Tried to create Peg outside the color range!"
+                    f"[Peg] Tried to create peg with invalid value!"
                     f"{settings.color.error_off}"
                 )
 
         def __str__(self):
             """ Formats `peg` to be printed """
 
-            # content = chr(self.__int__() + 97)
-            content = self.__int__()  # TODO: create setting for this
+            peg_value = self.__int__()
 
             if settings.colored_prints:
 
                 # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 
-                colors_list = [
-                    '30',   # black (blank Peg)
-                    '31',   # red
-                    '93',   # yellow
-                    '32',   # green
-                    '34',   # blue
-                    '33',   # orange
-                    '35',   # magenta
-                    '90',   # gray
-                    '96',   # cyan
-                    '92',   # bright green
-                    '95',   # bright magenta
-                ]  # TODO: move it to settings
+                if peg_value == 0:
+                    peg_color_code = '30'  # 0 black (blank peg)
+                else:
+                    # TODO: move color definitions to class_colors
+                    peg_color_code_list = [
+                        '95',   # 0 bright magenta
+                        '31',   # 1 red
+                        '93',   # 2 yellow
+                        '32',   # 3 green
+                        '34',   # 4 blue
+                        '33',   # 5 orange
+                        '35',   # 6 magenta
+                        '90',   # 7 gray
+                        '96',   # 8 cyan
+                        '92',   # 9 bright green
+                    ]
+                    peg_color_code = peg_color_code_list[peg_value % 10]  # cyclic 10 colors above
+
                 return (
-                    f"\033\1331;"
-                    f"{colors_list[content]}m"
-                    f"({content})"
-                    f"\033\13322;39m"
+                    f"\033\1331;{peg_color_code}m"  # bold on, color fg
+                    f"({peg_chars_list[peg_value]})"
+                    f"\033\13322;39m"  # bold off, reset fg
                 )
             else:
-                return f"({content})"
+                return (
+                    f"({peg_chars_list[peg_value]})"
+                )
 
         @classmethod
         def decode_peg(cls, peg_char):
-            """ Returns Peg object converted from formatted `peg_char` """
+            """ Returns Peg object converted from entered `peg_char` by the user """
 
             # TODO: include `allow_blanks` setting
-            if len(peg_char) == 1 and int(peg_char) in range(1, settings.colors_number + 1):
-                # return Peg(ord(peg_char) - 97)  # TODO: create setting for this
-                return Peg.all_colors_list[int(peg_char)]  # without blank Peg
-                # TODO: raise an exception if given peg_char is invalid
-                # TODO: input digits, lowercase or uppercase letters, or own list of pegs
-            else:
-                return None
+            if len(peg_char) == 1:  # just one char
+                try:
+                    # find given char on the list
+                    peg_value = peg_chars_list.index(peg_char.lower())  # accepted both lowercase and uppercase letters
+                except IndexError:
+                    raise ValueError
 
-    Peg.all_colors_list = [Peg(color) for color in range(0, settings.colors_number + 1)]  # including blank Peg
+                return Peg.all_pegs_list[peg_value]  # with blank peg
+
+            else:
+                raise ValueError
+
+    Peg.all_pegs_list = list(Peg(peg_value) for peg_value in range(0, settings.colors_number + 1))  # with blank peg
 
     return Peg
 
@@ -113,7 +134,7 @@ def pattern_class(settings):
                 isinstance(pattern_tuple, tuple)
                 and len(pattern_tuple) == settings.pegs_number
                 and all(
-                    pattern_peg in settings.Peg.all_colors_list[1:]  # without blank Peg
+                    pattern_peg in settings.Peg.all_pegs_list[1:]  # without blank peg
                     for pattern_peg in pattern_tuple
                 )
             )
@@ -143,7 +164,7 @@ def pattern_class(settings):
             # TODO: include `allow_blanks` setting
             return Pattern(
                 tuple(
-                    settings.Peg.all_colors_list[randrange(1, settings.colors_number + 1)]  # without blank Peg
+                    settings.Peg.all_pegs_list[randrange(1, settings.colors_number + 1)]  # without blank peg
                     for _ in range(settings.pegs_number)
                 )
             )
@@ -163,7 +184,7 @@ def pattern_class(settings):
             # TODO: include `allow_blanks` setting
             return sum(
                 min(self.count(color), other_pattern.count(color))  # common number (minimum) of current color
-                for color in settings.Peg.all_colors_list[1:]  # without blank Peg
+                for color in settings.Peg.all_pegs_list[1:]  # without blank peg
             )
 
         def calculate_response(self, other_pattern):
@@ -180,7 +201,7 @@ def pattern_class(settings):
         def build_patterns():
             """ Returns list of all possible patterns (when `pre_build_patterns` setting == True) """
 
-            colors_list = settings.Peg.all_colors_list[1:]  # get `colors_list` to be shuffled (copy) without blank Peg
+            colors_list = settings.Peg.all_pegs_list[1:]  # get `colors_list` to be shuffled (copy) without blank peg
 
             # shuffle `colors_list` to build patterns from (before build)
             if settings.shuffle_colors_before_build:
@@ -264,7 +285,7 @@ def pattern_class(settings):
         def gen_patterns():
             """ Generator for all possible patterns in the game (when `pre_build_patterns` setting == False) """
 
-            colors_list = settings.Peg.all_colors_list[1:]  # without blank Peg
+            colors_list = settings.Peg.all_pegs_list[1:]  # without blank peg
             # TODO: use `shuffle_colors_before_build` setting here
 
             colors_number = settings.colors_number

@@ -22,6 +22,7 @@ class Settings:
             colors_number=None,
             pegs_number=None,
             turns_limit=None,
+            use_digits_for_colors=None,
             chosen_solver=None,
             use_itertools=None,
             pre_build_patterns=None,
@@ -49,6 +50,10 @@ class Settings:
         self._turns_limit = self._get_setting(
             Consts.TurnsLimit,
             turns_limit,
+        )
+        self._use_digits_for_colors = self._get_setting(
+            Consts.UseDigitsForColors,
+            use_digits_for_colors,
         )
         self._chosen_solver = self._get_setting(
             Consts.ChosenSolver,
@@ -149,7 +154,7 @@ class Settings:
                 self._all_patterns_gen = map(
                     lambda pattern_tuple: self.Pattern(pattern_tuple),
                     product(  # get `itertools.product` generator
-                        self.Peg.all_colors_list[1:],  # without blank Peg
+                        self.Peg.all_pegs_list[1:],  # without blank peg
                         repeat=self._pegs_number,
                     )
                 )
@@ -249,7 +254,11 @@ class Settings:
     def all_colors_list_formatted(self):
         """ Returns formatted list of all possible colors """
 
-        return f"{{{','.join(peg.__str__() for peg in self.Peg.all_colors_list[1:])}}}"  # without blank Peg
+        return (
+            f"{{"  # '{' char
+            f"{','.join(peg.__str__() for peg in self.Peg.all_pegs_list[1:])}"  # without blank peg
+            f"}}"  # '}' char
+        )
 
     @property
     def all_patterns_list(self):

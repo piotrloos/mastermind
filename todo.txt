@@ -1,10 +1,8 @@
 # do zrobienia w tym sprincie:
 
-# TODO: stworzenie pliku `readme.md`
-# TODO: formatowanie patternów za pomocą małych/dużych liter, liczb, zaczynanie od innej litery
-# TODO: błędne inputy powinny rzucać wyjątkiem
 # TODO: parametr mode przy uruchamianiu Mastermind a nie Game/Helper/Solver
 # TODO: mozliwość restartu gry na tych samych ustawieniach (bez generowania patternów)
+# TODO: stworzenie pliku `readme.md`
 # TODO: testy, testy, testy...
 
 # w następnej kolejności:
