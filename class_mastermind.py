@@ -47,7 +47,7 @@ class Mastermind(metaclass=ABCMeta):
             )
         else:
             if self._solution is None:
-                raise ValueError(
+                raise RuntimeError(
                     f"{self._settings.color.error_on}"
                     f"[Mastermind] No saved solution in this game!"
                     f"{self._settings.color.error_off}"

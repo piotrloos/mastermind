@@ -124,7 +124,7 @@ class Consts(metaclass=ABCMeta):
         name = "colored_prints"
         desc = "enable terminal printings in color"
         default_value = False
-        ask_if_not_given = False
+        ask_if_not_given = True
 
     class PrintTurnsList(metaclass=ABCMeta):
         type = bool

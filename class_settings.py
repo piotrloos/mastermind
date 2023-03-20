@@ -140,6 +140,7 @@ class Settings:
                 f"{self.color.error_off}"
             )
 
+        # pin Classes to Settings instance
         self.Peg = peg_class(self)
         self.Pattern = pattern_class(self)
         self.Response = response_class(self)
@@ -147,11 +148,12 @@ class Settings:
         self.TurnsList = turns_list_class(self)
 
         if self._pre_build_patterns:
-            self._all_patterns_list = self.Pattern.build_patterns()  # build all patterns list (once for several games)
+            # build (and shuffle if enabled) all patterns list - once for several games
+            self._all_patterns_list = self.Pattern.build_patterns()
         else:
             # TODO: try to use `shuffle_colors_before_build` and `shuffle_colors_during_build` settings (if possible)
             if self._use_itertools:
-                self._all_patterns_gen = map(
+                self._all_patterns_gen = map(  # map generator
                     lambda pattern_tuple: self.Pattern(pattern_tuple),
                     product(  # get `itertools.product` generator
                         self.Peg.all_pegs_list[1:],  # without blank peg
@@ -166,10 +168,10 @@ class Settings:
 
     @classmethod
     def _get_setting(cls, setting, value):
-        """ Returns validated value (given as a parameter or inputted by user) for setting and creates the property """
+        """ Returns validated value (given as a parameter or entered by user) for setting and creates the property """
 
         if setting.type is bool:
-            values_to_check = {0, 1}
+            values_to_check = {0, False, 1, True}
             values_to_print = "0/False or 1/True"
         elif setting.type is int:
             values_to_check = range(setting.min_value, setting.max_value + 1)
@@ -180,16 +182,16 @@ class Settings:
             )
 
         if setting.default_value not in values_to_check:
-            raise ValueError(
+            raise RuntimeError(
                 f"[Settings] Default `{setting.name}` value ({setting.default_value}) is incorrect!"
             )
 
-        parameter_flag = True
-        value_str = ""
+        given_as_parameter = True  # flag to decide if the value is given as a parameter or entered by the user
+        value_str = ""  # declare empty input value to ignore errors, although it will not be used before assignment
 
         while value not in values_to_check:
 
-            if parameter_flag:
+            if given_as_parameter:
                 if value is not None:
                     print(
                         f"[Settings] Given `{setting.name}` value ({value}) as a parameter is incorrect!"
@@ -199,13 +201,13 @@ class Settings:
                     f"[Settings] Entered `{setting.name}` value ({value_str}) is incorrect!"
                 )
 
-            if not setting.ask_if_not_given:
-                # print(
-                #     f"Taking default `{setting.name}` value ({setting.default_value})."
-                # )
+            if not setting.ask_if_not_given:  # take default value
+                print(
+                    f"[Settings] Taking default `{setting.name}` value ({setting.default_value})."
+                )
                 value = setting.default_value
-            else:
-                parameter_flag = False
+            else:  # ask the user
+                given_as_parameter = False
                 value_str = input(
                     f"[Settings] Enter `{setting.name}` ({setting.desc}) one value {values_to_print}, "
                     f"or leave empty for default value ({setting.default_value}): "
@@ -228,21 +230,30 @@ class Settings:
                     value = True
                 else:
                     try:
-                        value = int(value_str)
+                        value = int(value_str)  # try to treat value as int
                     except ValueError:
-                        value = value_str
+                        value = value_str  # if error occurred save as is
 
         # add new property with getter function returning setting value and disabled setter and deleter
         # for example let Settings.pegs_number return 4 value
-        setattr(cls, setting.name, property(fget=lambda _cls: value, fset=None, fdel=None))
+        setattr(
+            cls,  # this Settings class
+            setting.name,  # used setting name for property
+            property(
+                fget=lambda _cls: value,  # getter function, omits first given argument `cls` and returns setting value
+                fset=None,  # no setter function (read-only)
+                fdel=None,  # no deleter function (read-only)
+            )
+        )
 
-        return setting.type(value)
+        return setting.type(value)  # returns value to be saved as a field in Settings object
 
     @property
     def patterns_number(self):
         """ Returns number of all possible patterns """
 
-        return self._colors_number ** self._pegs_number
+        # TODO: implement `allow_blanks` and `allow_duplicates` - patterns number will be different
+        return self._colors_number ** self._pegs_number  # power of two values
 
     @property
     def solver_class(self):
@@ -255,9 +266,9 @@ class Settings:
         """ Returns formatted list of all possible colors """
 
         return (
-            f"{{"  # '{' char
+            f"{{"  # one '{' char
             f"{','.join(peg.__str__() for peg in self.Peg.all_pegs_list[1:])}"  # without blank peg
-            f"}}"  # '}' char
+            f"}}"  # one '}' char
         )
 
     @property

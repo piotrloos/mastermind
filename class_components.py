@@ -225,7 +225,8 @@ def pattern_class(settings):
                         map(
                             # create Pattern objects using map function
                             lambda pattern_tuple: progress.item(settings.Pattern(pattern_tuple)),
-                            product(colors_list, repeat=settings.pegs_number)
+                            # wrapped with progress.item function to check if new progress value should be printed
+                            product(colors_list, repeat=settings.pegs_number)  # itertools.product function
                         )
                     )
             else:
@@ -295,7 +296,7 @@ def pattern_class(settings):
 
                 pattern_list = [colors_list[0]] * pegs_number  # get list of pegs with min values
                 peg_index = pegs_number - 1  # set `peg_index` to last peg
-                yield Pattern(tuple(pattern_list))  # yield the first patter
+                yield Pattern(tuple(pattern_list))  # yield the first pattern
 
                 # TODO: try to use `shuffle_colors_during_build` setting here
 
