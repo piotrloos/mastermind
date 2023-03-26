@@ -84,9 +84,9 @@ def main():
         MastermindSolver(settings=settings)
     else:
         raise RuntimeError(
-            # f"{settings.color.error_on}"
+            f"{settings.style.error_on}"
             f"[Mastermind] Given mode `{mode}` is incorrect!"
-            # f"{settings.color.error_off}"
+            f"{settings.style.error_off}"
         )
 
 

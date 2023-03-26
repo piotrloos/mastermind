@@ -14,12 +14,12 @@ class MastermindSolver1:
     def __init__(
             self,
             settings,
-            turns_list,
+            guesses_list,
     ):
         """ (Solver1) Initializes `MastermindSolver1` class object """
 
         self._settings = settings
-        self._turns_list = turns_list
+        self._guesses_list = guesses_list
 
         self._solving_time = 0
 
@@ -27,7 +27,7 @@ class MastermindSolver1:
         if self._settings.pre_build_patterns:
             self._all_patterns = self._settings.all_patterns_list  # get list (by reference)
         else:
-            if self._settings.use_itertools:
+            if self._settings.use_itertools_for_build:
                 self._all_patterns = iter(self._settings.all_patterns_gen)  # init `itertools.product` generator
             else:
                 self._all_patterns = self._settings.all_patterns_gen()  # init my generator
@@ -47,9 +47,9 @@ class MastermindSolver1:
         """ (Solver1) Returns number of possible solutions """
 
         raise NotImplementedError(
-            f"{self._settings.color.error_on}"
+            f"{self._settings.style.error_on}"
             f"It is impossible to calculate number of possible solutions in Solver1!"
-            f"{self._settings.color.error_off}"
+            f"{self._settings.style.error_off}"
         )
 
     @property
@@ -70,26 +70,26 @@ class MastermindSolver1:
         self._solving_time = exe_time  # Solver1 overwrites solving time from one Progress instance per game
 
     def check_possible_solution(self, possible_solution):
-        """ (Solver1) Checks if given possible solution can be a solution based on all previous turns (and not None) """
+        """ (Solver1) Checks if given possible solution can be a solution based on all previous guesses """
 
         if possible_solution is None:
             return False
 
-        return self._check_possible_solution_for_turns(possible_solution)
+        return self._check_possible_solution_for_guesses(possible_solution)
 
-    def _check_possible_solution_for_turns(self, possible_solution):
-        """ (Solver1) Checks if given possible solution can be a solution based on all previous turns """
+    def _check_possible_solution_for_guesses(self, possible_solution):
+        """ (Solver1) Checks if given possible solution can be a solution based on all previous guesses """
 
         # TODO: try to speed up these calculations
         return all(
-            possible_solution.calculate_black_pegs(turn.pattern) == turn.response.black_pegs
+            possible_solution.calculate_black_pegs(guess.pattern) == guess.response.black_pegs
             and
-            possible_solution.calculate_black_white_pegs(turn.pattern) == turn.response.black_white_pegs
-            for turn in self._turns_list
+            possible_solution.calculate_black_white_pegs(guess.pattern) == guess.response.black_white_pegs
+            for guess in self._guesses_list
         )
 
     def calculate_possible_solution(self, *_):
-        """ (Solver1) Calculates the next possible solution after current turn """
+        """ (Solver1) Calculates the next possible solution after current guess """
 
         # TODO: refactor this method to avoid bug in Progress state (when generator is exhausted)
         # TODO: generator exhausted bug
@@ -149,11 +149,11 @@ class MastermindSolver1:
             return None
 
     def _solution_generator(self):
-        """ (Solver1) Yields possible solution based on all previous turns """
+        """ (Solver1) Yields next possible solution based on all previous guesses """
 
         with Progress(
             items_number=self._settings.patterns_number,
-            color=self._settings.color,
+            style=self._settings.style,
             timing=self._settings.progress_timing,
             update_time_func=self.update_solving_time,
             auto_start_stop=False,
@@ -166,26 +166,27 @@ class MastermindSolver1:
 
             for index, pattern in enumerate(self._all_patterns, 1):
 
-                if progress.item(self._check_possible_solution_for_turns(pattern)):  # wrapped the long-taking operation
+                # wrapped the long-taking operation
+                if progress.item(self._check_possible_solution_for_guesses(pattern)):
 
                     progress.stop(
                         finish=False,
-                        summary=f"{self._settings.color.progress_summary_on}"
+                        summary=f"{self._settings.style.progress_summary_on}"
                                 f"Found!"
-                                f"{self._settings.color.progress_summary_off}"
+                                f"{self._settings.style.progress_summary_off}"
                                 f" It is {pattern}.\n"
                                 f"[Solver1] It's index is "
-                                f"{self._settings.color.number_on}"
+                                f"{self._settings.style.number_on}"
                                 f"{index:,}"
-                                f"{self._settings.color.number_off}"
+                                f"{self._settings.style.number_off}"
                                 f" of "
-                                f"{self._settings.color.number_on}"
+                                f"{self._settings.style.number_on}"
                                 f"{self._settings.patterns_number:,}"
-                                f"{self._settings.color.number_off}"
+                                f"{self._settings.style.number_off}"
                                 f" overall ("
-                                f"{self._settings.color.number_on}"
+                                f"{self._settings.style.number_on}"
                                 f"{100 * index / self._settings.patterns_number:.2f}%"
-                                f"{self._settings.color.number_off}"
+                                f"{self._settings.style.number_off}"
                                 f")."
                     )
                     yield pattern
@@ -195,30 +196,30 @@ class MastermindSolver1:
 
             # ensure `index` reached number of all patterns
             assert index == self._settings.patterns_number, (
-                f"{self._settings.color.error_on}"
+                f"{self._settings.style.error_on}"
                 f"[Solver1] Incorrect pattern index value!"
-                f"{self._settings.color.error_off}"
+                f"{self._settings.style.error_off}"
             )
 
             # after yield the last pattern
             progress.stop(
                 finish=True,
-                summary=f"{self._settings.color.progress_summary_on}"
+                summary=f"{self._settings.style.progress_summary_on}"
                         f"Finished."
-                        f"{self._settings.color.progress_summary_off}"
+                        f"{self._settings.style.progress_summary_off}"
                         f"\n"
                         f"[Solver1] Reached index "
-                        f"{self._settings.color.number_on}"
+                        f"{self._settings.style.number_on}"
                         f"{index:,}"
-                        f"{self._settings.color.number_off}"
+                        f"{self._settings.style.number_off}"
                         f" of "
-                        f"{self._settings.color.number_on}"
+                        f"{self._settings.style.number_on}"
                         f"{self._settings.patterns_number:,}"
-                        f"{self._settings.color.number_off}"
+                        f"{self._settings.style.number_off}"
                         f" overall ("
-                        f"{self._settings.color.number_on}"
+                        f"{self._settings.style.number_on}"
                         f"{100 * index / self._settings.patterns_number:.2f}%"
-                        f"{self._settings.color.number_off}"
+                        f"{self._settings.style.number_off}"
                         f")."
             )
 

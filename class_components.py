@@ -1,7 +1,7 @@
 ############################################
 # My version of the famous Mastermind game #
 # class_components.py                      #
-# Mastermind components file               #
+# Mastermind main components file          #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
@@ -11,7 +11,7 @@ from random import randrange
 
 
 def peg_class(settings):
-    """ Function that creates and returns Peg class with given `settings` """
+    """ Creates and returns Peg class with given `settings` """
 
     # build list of peg chars
     peg_chars_list = ['.']  # first char '.' as blank peg
@@ -23,35 +23,35 @@ def peg_class(settings):
         )
 
     peg_chars_list += [chr(i) for i in range(ord('a'), ord('z') + 1)]  # chars from 'a' to 'z'
-    peg_chars_list = peg_chars_list[:(settings.colors_number + 1)]  # save first `colors_number` elements (+ blank peg)
+    peg_chars_list = peg_chars_list[:(settings.peg_colors + 1)]  # save first `peg_colors` elements (+ blank peg)
 
     class Peg(int):
         """ Class for one pattern peg """
 
-        def __init__(self, peg_value):
-            """ Checks if just created peg has valid value """
+        def __init__(self, peg_color):
+            """ Checks if just created peg has valid color """
 
             # TODO: include `allow_blanks` setting
-            if peg_value not in range(0, settings.colors_number + 1):  # with blank peg
+            if peg_color not in range(0, settings.peg_colors + 1):  # with blank peg
                 raise RuntimeError(
-                    f"{settings.color.error_on}"
-                    f"[Peg] Tried to create peg with invalid value!"
-                    f"{settings.color.error_off}"
+                    f"{settings.style.error_on}"
+                    f"[Peg] Tried to create peg with invalid color!"
+                    f"{settings.style.error_off}"
                 )
 
         def __str__(self):
-            """ Formats `peg` to be printed """
+            """ Styles `peg` to be printed """
 
             peg_value = self.__int__()
 
-            if settings.colored_prints:
+            if settings.styled_prints:
 
                 # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 
                 if peg_value == 0:
                     peg_color_code = '30'  # 0 black (blank peg)
                 else:
-                    # TODO: move color definitions to class_colors
+                    # TODO: move color definitions to `class_styles`
                     peg_color_code_list = [
                         '95',   # 0 bright magenta
                         '31',   # 1 red
@@ -93,26 +93,26 @@ def peg_class(settings):
             else:
                 raise ValueError
 
-    Peg.all_pegs_list = list(Peg(peg_value) for peg_value in range(0, settings.colors_number + 1))  # with blank peg
+    Peg.all_pegs_list = list(Peg(peg_value) for peg_value in range(0, settings.peg_colors + 1))  # with blank peg
 
     return Peg
 
 
 def pattern_class(settings):
-    """ Function that creates and returns Pattern class with given `settings` """
+    """ Creates and returns Pattern class with given `settings` """
 
     class Pattern(tuple):
         """ Class for one `pattern` """
 
         def __str__(self):
-            """ Formats `pattern` to be printed """
+            """ Styles `pattern` to be printed """
 
             content = ''.join(peg.__str__() for peg in self)
 
             # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 
-            # TODO: move colors to class_colors
-            if settings.colored_prints:
+            # TODO: move colors to `class_styles`
+            if settings.styled_prints:
                 return (
                     f"\033\13351m"  # enable framed pegs
                     f"{content}"
@@ -132,7 +132,7 @@ def pattern_class(settings):
             # TODO: include `allow_blanks` setting
             return (
                 isinstance(pattern_tuple, tuple)
-                and len(pattern_tuple) == settings.pegs_number
+                and len(pattern_tuple) == settings.pegs_in_pattern
                 and all(
                     pattern_peg in settings.Peg.all_pegs_list[1:]  # without blank peg
                     for pattern_peg in pattern_tuple
@@ -164,8 +164,8 @@ def pattern_class(settings):
             # TODO: include `allow_blanks` setting
             return Pattern(
                 tuple(
-                    settings.Peg.all_pegs_list[randrange(1, settings.colors_number + 1)]  # without blank peg
-                    for _ in range(settings.pegs_number)
+                    settings.Peg.all_pegs_list[randrange(1, settings.peg_colors + 1)]  # without blank peg
+                    for _ in range(settings.pegs_in_pattern)
                 )
             )
 
@@ -211,11 +211,11 @@ def pattern_class(settings):
                 )
 
             # choose imported itertools.product function or my own function
-            if settings.use_itertools:
+            if settings.use_itertools_for_build:
 
                 with Progress(
                     items_number=settings.patterns_number,
-                    color=settings.color,
+                    style=settings.style,
                     title="[Patterns] Building patterns list (using itertools)...",
                     timing=settings.progress_timing,
                 ) as progress:
@@ -226,23 +226,23 @@ def pattern_class(settings):
                             # create Pattern objects using map function
                             lambda pattern_tuple: progress.item(settings.Pattern(pattern_tuple)),
                             # wrapped with progress.item function to check if new progress value should be printed
-                            product(colors_list, repeat=settings.pegs_number)  # itertools.product function
+                            product(colors_list, repeat=settings.pegs_in_pattern)  # itertools.product function
                         )
                     )
             else:
 
                 with Progress(
-                    # number of items is the sum of successive powers of `colors_number`
-                    items_number=sum(settings.colors_number ** i for i in range(1, settings.pegs_number + 1)),
-                    color=settings.color,
+                    # number of items is the sum of successive powers of `peg_colors`
+                    items_number=sum(settings.peg_colors ** i for i in range(1, settings.pegs_in_pattern + 1)),
+                    style=settings.style,
                     title="[Patterns] Building patterns list (using my own function)...",
                     timing=settings.progress_timing,
                 ) as progress:
 
                     all_patterns_list = [()]  # initialize temporary list to be built (containing empty tuple)
 
-                    # iterate for `pegs_number`-1 times
-                    for _ in range(settings.pegs_number - 1):
+                    # iterate for `pegs_in_pattern`-1 times
+                    for _ in range(settings.pegs_in_pattern - 1):
 
                         # make temporary list of tuples
                         all_patterns_list = [
@@ -271,7 +271,7 @@ def pattern_class(settings):
             if settings.shuffle_patterns_after_build:
                 with Progress(
                     items_number=len(all_patterns_list) - 1,
-                    color=settings.color,
+                    style=settings.style,
                     title="[Patterns] Shuffling patterns list...",
                     timing=settings.progress_timing,
                 ) as progress:
@@ -289,28 +289,28 @@ def pattern_class(settings):
             colors_list = settings.Peg.all_pegs_list[1:]  # without blank peg
             # TODO: use `shuffle_colors_before_build` setting here
 
-            colors_number = settings.colors_number
-            pegs_number = settings.pegs_number
+            peg_colors = settings.peg_colors
+            pegs_in_pattern = settings.pegs_in_pattern
 
-            if colors_number > 0:
+            if peg_colors > 0:
 
-                pattern_list = [colors_list[0]] * pegs_number  # get list of pegs with min values
-                peg_index = pegs_number - 1  # set `peg_index` to last peg
+                pattern_list = [colors_list[0]] * pegs_in_pattern  # get list of pegs with min values
+                peg_index = pegs_in_pattern - 1  # set `peg_index` to last peg
                 yield Pattern(tuple(pattern_list))  # yield the first pattern
 
                 # TODO: try to use `shuffle_colors_during_build` setting here
 
-                if pegs_number > 0:
+                if pegs_in_pattern > 0:
 
                     while True:  # infinite loop
 
                         # TODO: big jumps on the most significant pegs (without changing the least significant values)
 
                         peg = pattern_list[peg_index]  # get current peg from pattern_list
-                        if peg < colors_number - 1:  # check if current peg has max value (=can be incremented?)
+                        if peg < peg_colors - 1:  # check if current peg has max value (=can be incremented?)
 
                             pattern_list[peg_index] = colors_list[peg + 1]  # increment current peg
-                            peg_index = pegs_number - 1  # reset `peg_index` to last peg
+                            peg_index = pegs_in_pattern - 1  # reset `peg_index` to last peg
                             yield Pattern(tuple(pattern_list))  # yield current pattern
 
                         else:  # current peg has max value -> need to carry one peg on the left
@@ -324,27 +324,27 @@ def pattern_class(settings):
 
 
 def response_class(settings):
-    """ Function that creates and returns Response class with given `settings` """
+    """ Creates and returns Response class with given `settings` """
 
     class Response(tuple):
         """ Class for one response """
 
         def __str__(self):
-            """ Formats `response` to be printed """
+            """ Styles `response` to be printed """
 
             # https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 
             return (
-                f"{settings.color.response_on}" +
+                f"{settings.style.response_on}" +
                 "{blacks}{whites}{dots} ({black_number}, {white_number})"
                 .format(
                     blacks="●" * self.black_pegs,
                     whites="○" * self.white_pegs,
-                    dots="∙" * (settings.pegs_number - self.black_white_pegs),
+                    dots="∙" * (settings.pegs_in_pattern - self.black_white_pegs),
                     black_number=self.black_pegs,
                     white_number=self.white_pegs,
                 ) +
-                f"{settings.color.response_off}"
+                f"{settings.style.response_off}"
             )
 
         @property
@@ -373,13 +373,13 @@ def response_class(settings):
                 isinstance(response_tuple, tuple)
                 and len(response_tuple) == 2  # (black pegs number, white pegs number)
                 and all(
-                    response_peg in range(0, settings.pegs_number + 1)
+                    response_peg in range(0, settings.pegs_in_pattern + 1)
                     for response_peg in {
                         response_tuple[0],  # black pegs number
                         response_tuple[1],  # white pegs number
                         response_tuple[0] + response_tuple[1],  # sum of black and white pegs
                     }
-                    # all above numbers should be between 0 and `pegs_number`
+                    # all above numbers should be between 0 and `pegs_in_pattern`
                 )
             )
 
@@ -430,78 +430,78 @@ def response_class(settings):
     return Response
 
 
-def turn_class(settings):
-    """ Function that creates and returns Turn class with given `settings` """
+def guess_class(settings):
+    """ Creates and returns Guess class with given `settings` """
 
     if settings:
         pass  # TODO: use settings
 
-    class Turn(tuple):
-        """ Class for one game turn """
+    class Guess(tuple):
+        """ Class for one game guess """
 
         def __str__(self):
-            """ Formats `turn` to be printed """
+            """ Formats `guess` to be printed """
 
             return (
-                f"{self.turn_index:>3d}. {self.pattern} => {self.response}"
+                f"{self.guess_index:>3d}. {self.pattern} => {self.response}"
             )
 
         @property
-        def turn_index(self):
-            """ Returns `turn_index` from turn """
+        def guess_index(self):
+            """ Returns `guess_index` from `guess` """
 
             return self[0]
 
         @property
         def pattern(self):
-            """ Returns `pattern` from turn """
+            """ Returns `pattern` from `guess` """
 
             return self[1]
 
         @property
         def response(self):
-            """ Returns `response` from turn """
+            """ Returns `response` from `guess` """
 
             return self[2]
 
-    return Turn
+    return Guess
 
 
-def turns_list_class(settings):
-    """ Function that creates and returns TurnsList class with given `settings` """
+def guesses_list_class(settings):
+    """ Creates and returns GuessesList class with given `settings` """
 
-    class TurnsList(list):
-        """ CLass for list of all turns in the game """
+    class GuessesList(list):
+        """ CLass for list of all guesses in the game """
 
         def __init__(self):
-            """ Initializes `TurnsList` class object """
+            """ Initializes `GuessesList` class object """
 
             super().__init__()
-            self._turns_index = 0
+            self._guess_index = 0
 
-        def add_turn(self, pattern, response):
-            """ Adds current turn to `TurnsList` """
+        def add_guess(self, pattern, response):
+            """ Adds current `guess` to `GuessesList` """
 
-            self._turns_index += 1
-            turn = settings.Turn((self._turns_index, pattern, response))
-            self.append(turn)
-            return turn
+            self._guess_index += 1
+            guess = settings.Guess((self._guess_index, pattern, response))
+            self.append(guess)
+            return guess
 
-        def print_turns_list(self):
-            """ Prints all turns as a list """
+        def print_guesses_list(self):
+            """ Prints list of all guesses """
 
             print(
-                f"{f'There is 1 turn' if self._turns_index == 1 else f'There are {self._turns_index} turns'} "
+                f"{f'There is 1 guess' if self._guess_index == 1 else f'There are {self._guess_index} guess'} "
                 f"(so far) in this game:"
             )
-            for turn in self:
-                print(turn)
+            for guess in self:
+                print(guess)
             print()
 
         @property
-        def turns_index(self):
-            """ Returns current turns index """
+        def guess_index(self):
+            """ Returns current guesses index """
 
-            return self._turns_index
+            return self._guess_index
 
-    return TurnsList
+    return GuessesList

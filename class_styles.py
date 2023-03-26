@@ -1,7 +1,7 @@
 ############################################
 # My version of the famous Mastermind game #
-# class_colors.py                          #
-# Mastermind terminal colors' settings     #
+# class_styles.py                          #
+# Mastermind terminal styles               #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 

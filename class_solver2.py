@@ -27,14 +27,14 @@ class MastermindSolver2:
             self._possible_solutions_list = self._settings.all_patterns_list.copy()  # get list for filtering (copy)
         else:
             # prepare `all_patterns` list/generator for iteration
-            if self._settings.use_itertools:
+            if self._settings.use_itertools_for_build:
                 all_patterns = iter(self._settings.all_patterns_gen)  # init `itertools.product` generator
             else:
                 all_patterns = self._settings.all_patterns_gen()  # init my generator
 
             with Progress(
                 items_number=self._settings.patterns_number,
-                color=self._settings.color,
+                style=self._settings.style,
                 title="[Solver2] Building list of all patterns from patterns generator...",
                 timing=self._settings.progress_timing,
             ) as progress:
@@ -85,18 +85,18 @@ class MastermindSolver2:
         self._solving_time += exe_time  # Solver2 accumulates solving time from several Progress instances per game
 
     def check_possible_solution(self, possible_solution):
-        """ (Solver2) Checks if given possible solution can be a solution based on all previous turns """
+        """ (Solver2) Checks if given possible solution can be a solution based on all previous guesses """
 
         return possible_solution in self._possible_solutions_list
 
-    def calculate_possible_solution(self, turn, *_):
-        """ (Solver2) Calculates the next possible solution after current turn """
+    def calculate_possible_solution(self, guess, *_):
+        """ (Solver2) Calculates the next possible solution after current guess """
 
         patterns_old_number = self._possible_solutions_number
 
         with Progress(
             items_number=patterns_old_number,
-            color=self._settings.color,
+            style=self._settings.style,
             title="[Solver2] Filtering patterns list...",
             timing=self._settings.progress_timing,
             update_time_func=self.update_solving_time,
@@ -107,9 +107,9 @@ class MastermindSolver2:
                 possible_solution
                 for possible_solution in self._possible_solutions_list
                 if progress.item(
-                    turn.pattern.calculate_black_pegs(possible_solution) == turn.response.black_pegs
+                    guess.pattern.calculate_black_pegs(possible_solution) == guess.response.black_pegs
                     and
-                    turn.pattern.calculate_black_white_pegs(possible_solution) == turn.response.black_white_pegs
+                    guess.pattern.calculate_black_white_pegs(possible_solution) == guess.response.black_white_pegs
                 )
             ]
 
@@ -117,17 +117,17 @@ class MastermindSolver2:
 
         print(
             f"[Solver2] Number of possible solutions is now "
-            f"{self._settings.color.number_on}"
+            f"{self._settings.style.number_on}"
             f"{self._possible_solutions_number:,}"
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_off}"
             f" of "
-            f"{self._settings.color.number_on}"
+            f"{self._settings.style.number_on}"
             f"{patterns_old_number:,}"
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_off}"
             f" (rejected "
-            f"{self._settings.color.number_on}"
+            f"{self._settings.style.number_on}"
             f"{100 * (1 - self._possible_solutions_number / patterns_old_number):.2f}%"
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_off}"
             f" of patterns)."
         )
 
@@ -139,9 +139,9 @@ class MastermindSolver2:
             else:
                 print(
                     f"[Solver2] Since there are only "
-                    f"{self._settings.color.number_on}"
+                    f"{self._settings.style.number_on}"
                     f"{self._possible_solutions_number}"
-                    f"{self._settings.color.number_off}"
+                    f"{self._settings.style.number_off}"
                     f" possible solutions here is a list of them:"
                 )
                 for pattern in self._possible_solutions_list:

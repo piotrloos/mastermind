@@ -30,37 +30,37 @@ class MastermindHelper(Mastermind):
         """ Prints intro """
 
         print(
-            f"{self._settings.color.greeting_on}"
+            f"{self._settings.style.greeting_on}"
             f"#####################################\n"
             f"#   Welcome to Mastermind Helper!   #\n"
             f"#####################################\n"
-            f"{self._settings.color.greeting_off}"
+            f"{self._settings.style.greeting_off}"
         )
         print(
             f"You are CodeBreaker and somebody has prepared "
-            f"{self._settings.color.number_on}"
-            f"{self._settings.pegs_number}"
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_on}"
+            f"{self._settings.pegs_in_pattern}"
+            f"{self._settings.style.number_off}"
             f"-peg pattern using "
-            f"{self._settings.color.number_on}"
-            f"{self._settings.colors_number}"
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_on}"
+            f"{self._settings.peg_colors}"
+            f"{self._settings.style.number_off}"
             f" different colors: "
             f"{self._settings.all_colors_list_formatted}"
             f"."
         )
         print(
             f"I am Helper, I don't know somebody's pattern and I have "
-            f"{self._settings.color.number_on}"
-            f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited number of'}"
-            f"{self._settings.color.number_off}"
-            f" turn{'s' if self._settings.turns_limit != 1 else ''} to help you guess the solution."
+            f"{self._settings.style.number_on}"
+            f"{self._settings.guesses_limit if self._settings.guesses_limit else 'unlimited number of'}"
+            f"{self._settings.style.number_off}"
+            f" turn{'s' if self._settings.guesses_limit != 1 else ''} to help you guess the solution."
         )
         print(
             f"There are "
-            f"{self._settings.color.number_on}"
+            f"{self._settings.style.number_on}"
             f"{self._settings.patterns_number:,}"  # divide number by comma every 3 digits
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_off}"
             f" possible patterns in this game. "
             f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
@@ -70,45 +70,57 @@ class MastermindHelper(Mastermind):
         )
         print(
             f"chosen_solver = "
-            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.style.setting_value_on}"
             f"{self._settings.chosen_solver}"
-            f"{self._settings.color.setting_value_off}"
+            f"{self._settings.style.setting_value_off}"
+        )
+        print(
+            f"pre_build_patterns = "
+            f"{self._settings.style.setting_value_on}"
+            f"{self._settings.pre_build_patterns}"
+            f"{self._settings.style.setting_value_off}"
+        )
+        print(
+            f"use_itertools_for_build = "
+            f"{self._settings.style.setting_value_on}"
+            f"{self._settings.use_itertools_for_build}"
+            f"{self._settings.style.setting_value_off}"
         )
         print(
             f"shuffle_colors_before_build = "
-            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.style.setting_value_on}"
             f"{self._settings.shuffle_colors_before_build}"
-            f"{self._settings.color.setting_value_off}"
+            f"{self._settings.style.setting_value_off}"
         )
         print(
             f"shuffle_colors_during_build = "
-            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.style.setting_value_on}"
             f"{self._settings.shuffle_colors_during_build}"
-            f"{self._settings.color.setting_value_off}"
+            f"{self._settings.style.setting_value_off}"
         )
         print(
             f"shuffle_patterns_after_build = "
-            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.style.setting_value_on}"
             f"{self._settings.shuffle_patterns_after_build}"
-            f"{self._settings.color.setting_value_off}"
+            f"{self._settings.style.setting_value_off}"
         )
         print(
             f"solver1_calc_2nd_solution = "
-            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.style.setting_value_on}"
             f"{self._settings.solver1_calc_2nd_solution}"
-            f"{self._settings.color.setting_value_off}"
+            f"{self._settings.style.setting_value_off}"
         )
         print(
             f"solver2_take_random_pattern = "
-            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.style.setting_value_on}"
             f"{self._settings.solver2_take_random_pattern}"
-            f"{self._settings.color.setting_value_off}"
+            f"{self._settings.style.setting_value_off}"
         )
         print(
             f"solver2_print_possible_solutions_threshold = "
-            f"{self._settings.color.setting_value_on}"
+            f"{self._settings.style.setting_value_on}"
             f"{self._settings.solver2_print_possible_solutions_threshold}"
-            f"{self._settings.color.setting_value_off}"
+            f"{self._settings.style.setting_value_off}"
         )
         print()
         print(
@@ -139,12 +151,12 @@ class MastermindHelper(Mastermind):
 
     @property
     def _helper_prompt(self):
-        """ Returns formatted prompt for `input` function """
+        """ Returns styled prompt for `input` function """
 
         return (
-            f"{self._settings.color.number_on}"
-            f"{self._turns_list.turns_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_on}"
+            f"{self._guesses_list.guess_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
+            f"{self._settings.style.number_off}"
             f" Enter pattern=response (empty pattern means {self._solver.current_possible_solution}): "
         )
 
@@ -154,24 +166,24 @@ class MastermindHelper(Mastermind):
 
         if self._game_status != 0:
             raise PermissionError(
-                f"{self._settings.color.error_on}"
-                f"[Helper] Game is ended! You can't take turn."
-                f"{self._settings.color.error_off}"
+                f"{self._settings.style.error_on}"
+                f"[Helper] Game is ended! You can't take a turn."
+                f"{self._settings.style.error_off}"
             )
 
         if computer_pattern is not None or computer_response is not None:  # computer is playing
 
             if type(computer_pattern) is not self._settings.Pattern:
                 raise RuntimeError(
-                    f"{self._settings.color.error_on}"
+                    f"{self._settings.style.error_on}"
                     f"[Helper] Given computer pattern is not the Pattern class object!"
-                    f"{self._settings.color.error_off}"
+                    f"{self._settings.style.error_off}"
                 )
             elif type(computer_response) is not self._settings.Response:
                 raise RuntimeError(
-                    f"{self._settings.color.error_on}"
+                    f"{self._settings.style.error_on}"
                     f"[Helper] Given computer response is not the Response class object!"
-                    f"{self._settings.color.error_off}"
+                    f"{self._settings.style.error_off}"
                 )
             else:
                 pattern = computer_pattern
@@ -183,9 +195,9 @@ class MastermindHelper(Mastermind):
                 pattern, response = self._settings.Response.decode_pattern_response(user_pattern_response_string)
             except ValueError:
                 raise ValueError(
-                    f"{self._settings.color.error_on}"
+                    f"{self._settings.style.error_on}"
                     f"[Helper] You gave me incorrect pattern=response! Enter again."
-                    f"{self._settings.color.error_off}"
+                    f"{self._settings.style.error_off}"
                 )
             # TODO: suggest the user example pattern=response to enter
             if pattern is None:
@@ -203,15 +215,15 @@ class MastermindHelper(Mastermind):
                 "[Helper] Unfortunately given pattern couldn't be the solution!"
             )
 
-        turn = self._turns_list.add_turn(pattern, response)
+        guess = self._guesses_list.add_guess(pattern, response)
 
-        if self._settings.print_turns_list:
-            self._turns_list.print_turns_list()
+        if self._settings.print_guesses_list:
+            self._guesses_list.print_guesses_list()
 
         # check game end criteria
 
         # check if all response pegs are black
-        if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
+        if response.black_pegs == self._settings.pegs_in_pattern and response.white_pegs == 0:
             if self._solver.check_possible_solution(pattern):
                 self._solution = pattern  # save current pattern as proper solution
                 self._game_status = 1  # solution is found
@@ -219,20 +231,20 @@ class MastermindHelper(Mastermind):
                 self._game_status = 3  # no possible solution found
             return
 
-        # check if the CodeBreaker reached turns limit
-        if self._settings.turns_limit and self._turns_list.turns_index >= self._settings.turns_limit:
-            self._game_status = 2  # reached turns limit
+        # check if the CodeBreaker reached guesses limit
+        if self._settings.guesses_limit and self._guesses_list.guess_index >= self._settings.guesses_limit:
+            self._game_status = 2  # reached guesses limit
             return
 
         # try to find the next possible solution
         # TODO: extract running calc function
-        if self._solver.calculate_possible_solution(turn) is None:
+        if self._solver.calculate_possible_solution(guess) is None:
             self._game_status = 3  # no possible solution found
             return
 
         # otherwise game is still active
 
-        # TODO: print this before turn - temporary disabled
+        # TODO: print this before guess - temporary disabled
         # print(
         #     f"[Helper] One of the possible solution is {self._solver.current_possible_solution}."
         # )
@@ -248,14 +260,14 @@ class MastermindHelper(Mastermind):
             )
             print(
                 f"I found somebody's solution for you in "
-                f"{self._settings.color.number_on}"
-                f"{self._turns_list.turns_index}"
-                f"{self._settings.color.number_off}"
-                f" turn{'s' if self._turns_list.turns_index != 1 else ''}."
+                f"{self._settings.style.number_on}"
+                f"{self._guesses_list.guess_index}"
+                f"{self._settings.style.number_off}"
+                f" guess{'es' if self._guesses_list.guess_index != 1 else ''}."
             )
         elif self._game_status == 2:
             print(
-                "We reached turns limit. Game over!"
+                "We reached guesses limit. Game over!"
             )
         elif self._game_status == 3:
             print(
@@ -265,9 +277,9 @@ class MastermindHelper(Mastermind):
         if self._settings.progress_timing:
             print(
                 f"Total solving time: "
-                f"{self._settings.color.time_on}"
+                f"{self._settings.style.time_on}"
                 f"{self._solving_time:.3f}s"
-                f"{self._settings.color.time_off}"
+                f"{self._settings.style.time_off}"
                 f"."
             )
 

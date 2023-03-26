@@ -5,9 +5,9 @@
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-from class_components import peg_class, pattern_class, response_class, turn_class, turns_list_class
+from class_components import peg_class, pattern_class, response_class, guess_class, guesses_list_class
 from class_consts import Consts
-from class_colors import Color, NoColor
+from class_styles import Color, NoColor
 from class_solver1 import MastermindSolver1
 from class_solver2 import MastermindSolver2
 from itertools import product
@@ -19,53 +19,79 @@ class Settings:
     def __init__(
             self,
             *args,
-            colors_number=None,
-            pegs_number=None,
-            turns_limit=None,
+
+            styled_prints=None,
             use_digits_for_colors=None,
+            progress_timing=None,
+            print_guesses_list=None,
+
+            peg_colors=None,
+            pegs_in_pattern=None,
+            guesses_limit=None,
+
             chosen_solver=None,
-            use_itertools=None,
             pre_build_patterns=None,
+            use_itertools_for_build=None,
             shuffle_colors_before_build=None,
             shuffle_colors_during_build=None,
             shuffle_patterns_after_build=None,
-            progress_timing=None,
+
             solver1_calc_2nd_solution=None,
+
             solver2_take_random_pattern=None,
             solver2_print_possible_solutions_threshold=None,
-            colored_prints=None,
-            print_turns_list=None,
+
             **kwargs,
     ):
         """ Initializes `Settings` class object """
 
-        self._colors_number = self._get_setting(
-            Consts.ColorsNumber,
-            colors_number,
-        )
-        self._pegs_number = self._get_setting(
-            Consts.PegsNumber,
-            pegs_number,
-        )
-        self._turns_limit = self._get_setting(
-            Consts.TurnsLimit,
-            turns_limit,
+        # TERMINAL SETTINGS
+
+        self._styled_prints = self._get_setting(
+            Consts.StyledPrints,
+            styled_prints,
         )
         self._use_digits_for_colors = self._get_setting(
             Consts.UseDigitsForColors,
             use_digits_for_colors,
         )
+        self._progress_timing = self._get_setting(
+            Consts.ProgressTiming,
+            progress_timing,
+        )
+        self._print_guesses_list = self._get_setting(
+            Consts.PrintGuessesList,
+            print_guesses_list,
+        )
+
+        # MASTERMIND SETTINGS
+
+        self._peg_colors = self._get_setting(
+            Consts.PegColors,
+            peg_colors,
+        )
+        self._pegs_in_pattern = self._get_setting(
+            Consts.PegsInPattern,
+            pegs_in_pattern,
+        )
+        self._guesses_limit = self._get_setting(
+            Consts.GuessesLimit,
+            guesses_limit,
+        )
+
+        # SOLVING SETTINGS
+
         self._chosen_solver = self._get_setting(
             Consts.ChosenSolver,
             chosen_solver,
         )
-        self._use_itertools = self._get_setting(
-            Consts.UseItertools,
-            use_itertools,
-        )
         self._pre_build_patterns = self._get_setting(
             Consts.PreBuildPatterns,
             pre_build_patterns,
+        )
+        self._use_itertools_for_build = self._get_setting(
+            Consts.UseItertoolsForBuild,
+            use_itertools_for_build,
         )
         self._shuffle_colors_before_build = self._get_setting(
             Consts.ShuffleColorsBeforeBuild,
@@ -79,14 +105,16 @@ class Settings:
             Consts.ShufflePatternsAfterBuild,
             shuffle_patterns_after_build,
         )
-        self._progress_timing = self._get_setting(
-            Consts.ProgressTiming,
-            progress_timing,
-        )
+
+        # SOLVER #1 SETTINGS
+
         self._solver1_calc_2nd_solution = self._get_setting(
             Consts.Solver1Calc2ndSolution,
             solver1_calc_2nd_solution,
         )
+
+        # SOLVER #2 SETTINGS
+
         self._solver2_take_random_pattern = self._get_setting(
             Consts.Solver2TakeRandomPattern,
             solver2_take_random_pattern,
@@ -95,19 +123,11 @@ class Settings:
             Consts.Solver2PrintPossibleSolutionsThreshold,
             solver2_print_possible_solutions_threshold,
         )
-        self._colored_prints = self._get_setting(
-            Consts.ColoredPrints,
-            colored_prints,
-        )
-        self._print_turns_list = self._get_setting(
-            Consts.PrintTurnsList,
-            print_turns_list,
-        )
 
-        if self._colored_prints:
-            self.color = Color()
+        if self._styled_prints:
+            self.style = Color()
         else:
-            self.color = NoColor()
+            self.style = NoColor()
 
         self._solvers_dict = {
             1: MastermindSolver1,  # patterns checking generator Solver
@@ -116,48 +136,51 @@ class Settings:
 
         for attribute in args:
             print(
-                f"{self.color.error_on}"
+                f"{self.style.error_on}"
                 f"[Settings] Attribute "
-                f"{self.color.attribute_on}"
+                f"{self.style.attribute_on}"
                 f"{attribute}"
-                f"{self.color.attribute_off}"
+                f"{self.style.attribute_off}"
                 f" has not been recognized! Ignoring."
-                f"{self.color.error_off}"
+                f"{self.style.error_off}"
             )
 
         for key, value in kwargs.items():
             print(
-                f"{self.color.error_on}"
+                f"{self.style.error_on}"
                 f"[Settings] Keyword "
-                f"{self.color.attribute_on}"
+                f"{self.style.attribute_on}"
                 f"{key}"
-                f"{self.color.attribute_off}"
+                f"{self.style.attribute_off}"
                 f" and it's value "
-                f"{self.color.attribute_on}"
+                f"{self.style.attribute_on}"
                 f"{value}"
-                f"{self.color.attribute_off}"
+                f"{self.style.attribute_off}"
                 f" has not been recognized! Ignoring."
-                f"{self.color.error_off}"
+                f"{self.style.error_off}"
             )
 
         # pin Classes to Settings instance
         self.Peg = peg_class(self)
         self.Pattern = pattern_class(self)
         self.Response = response_class(self)
-        self.Turn = turn_class(self)
-        self.TurnsList = turns_list_class(self)
+        self.Guess = guess_class(self)
+        self.GuessesList = guesses_list_class(self)
+
+        self._all_patterns_list = None
+        self._all_patterns_gen = None
 
         if self._pre_build_patterns:
             # build (and shuffle if enabled) all patterns list - once for several games
             self._all_patterns_list = self.Pattern.build_patterns()
         else:
             # TODO: try to use `shuffle_colors_before_build` and `shuffle_colors_during_build` settings (if possible)
-            if self._use_itertools:
+            if self._use_itertools_for_build:
                 self._all_patterns_gen = map(  # map generator
                     lambda pattern_tuple: self.Pattern(pattern_tuple),
                     product(  # get `itertools.product` generator
                         self.Peg.all_pegs_list[1:],  # without blank peg
-                        repeat=self._pegs_number,
+                        repeat=self._pegs_in_pattern,  # repeat for every peg in pattern
                     )
                 )
             else:
@@ -235,7 +258,7 @@ class Settings:
                         value = value_str  # if error occurred save as is
 
         # add new property with getter function returning setting value and disabled setter and deleter
-        # for example let Settings.pegs_number return 4 value
+        # for example let Settings.pegs_in_pattern return 4 value
         setattr(
             cls,  # this Settings class
             setting.name,  # used setting name for property
@@ -253,11 +276,11 @@ class Settings:
         """ Returns number of all possible patterns """
 
         # TODO: implement `allow_blanks` and `allow_duplicates` - patterns number will be different
-        return self._colors_number ** self._pegs_number  # power of two values
+        return self._peg_colors ** self._pegs_in_pattern  # `peg_colors` to the power of `pegs_in_pattern`
 
     @property
     def solver_class(self):
-        """ Returns chosen Solver class """
+        """ Returns chosen Solver class (to be called) """
 
         return self._solvers_dict[self._chosen_solver]
 
@@ -273,12 +296,26 @@ class Settings:
 
     @property
     def all_patterns_list(self):
-        """ Returns list of all possible patterns """
+        """ Returns reference to a list of all possible patterns """
 
-        return self._all_patterns_list
+        if self._all_patterns_list is None:
+            raise RuntimeError(
+                f"{self.style.error_on}"
+                f"[Settings] List of all patterns is not generated yet!"
+                f"{self.style.error_off}"
+            )
+        else:
+            return self._all_patterns_list
 
     @property
     def all_patterns_gen(self):
-        """ Returns generator of all possible patterns """
+        """ Returns reference to a generator of all possible patterns """
 
-        return self._all_patterns_gen
+        if self._all_patterns_gen is None:
+            raise RuntimeError(
+                f"{self.style.error_on}"
+                f"[Settings] Generator of all patterns is not defined yet!"
+                f"{self.style.error_off}"
+            )
+        else:
+            return self._all_patterns_gen

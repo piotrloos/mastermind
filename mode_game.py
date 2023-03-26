@@ -34,9 +34,9 @@ class MastermindGame(Mastermind):
                     self._solution = self._settings.Pattern.decode_pattern(solution)
                 except ValueError:
                     raise RuntimeError(
-                        f"{self._settings.color.error_on}"
+                        f"{self._settings.style.error_on}"
                         f"[Game] Given solution pattern is incorrect!"
-                        f"{self._settings.color.error_off}"
+                        f"{self._settings.style.error_off}"
                     )
 
         self._game_intro()
@@ -47,37 +47,37 @@ class MastermindGame(Mastermind):
         """ Prints intro """
 
         print(
-            f"{self._settings.color.greeting_on}"
+            f"{self._settings.style.greeting_on}"
             f"###################################\n"
             f"#   Welcome to Mastermind Game!   #\n"
             f"###################################\n"
-            f"{self._settings.color.greeting_off}"
+            f"{self._settings.style.greeting_off}"
         )
         print(
             f"I am CodeMaker and I have prepared "
-            f"{self._settings.color.number_on}"
-            f"{self._settings.pegs_number}"
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_on}"
+            f"{self._settings.pegs_in_pattern}"
+            f"{self._settings.style.number_off}"
             f"-peg pattern using "
-            f"{self._settings.color.number_on}"
-            f"{self._settings.colors_number}"
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_on}"
+            f"{self._settings.peg_colors}"
+            f"{self._settings.style.number_off}"
             f" different colors: "
             f"{self._settings.all_colors_list_formatted}"
             f"."
         )
         print(
             f"You are CodeBreaker, you don't know my pattern and you have "
-            f"{self._settings.color.number_on}"
-            f"{self._settings.turns_limit if self._settings.turns_limit else 'unlimited number of'}"
-            f"{self._settings.color.number_off}"
-            f" turn{'s' if self._settings.turns_limit != 1 else ''} to guess the solution."
+            f"{self._settings.style.number_on}"
+            f"{self._settings.guesses_limit if self._settings.guesses_limit else 'unlimited number of'}"
+            f"{self._settings.style.number_off}"
+            f" turn{'s' if self._settings.guesses_limit != 1 else ''} to guess the solution."
         )
         print(
             f"There are "
-            f"{self._settings.color.number_on}"
+            f"{self._settings.style.number_on}"
             f"{self._settings.patterns_number:,}"  # divide number by comma every 3 digits
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_off}"
             f" possible patterns in this game. "
             f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
         )
@@ -98,12 +98,12 @@ class MastermindGame(Mastermind):
 
     @property
     def _game_prompt(self):
-        """ Returns formatted prompt for `input` function """
+        """ Returns styled prompt for `input` function """
 
         return (
-            f"{self._settings.color.number_on}"
-            f"{self._turns_list.turns_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
-            f"{self._settings.color.number_off}"
+            f"{self._settings.style.number_on}"
+            f"{self._guesses_list.guess_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
+            f"{self._settings.style.number_off}"
             f" Enter pattern (your guess): "
         )
 
@@ -112,18 +112,18 @@ class MastermindGame(Mastermind):
 
         if self._game_status != 0:
             raise PermissionError(
-                f"{self._settings.color.error_on}"
-                f"[Game] Game is ended! You can't take turn."
-                f"{self._settings.color.error_off}"
+                f"{self._settings.style.error_on}"
+                f"[Game] Game is ended! You can't take a turn."
+                f"{self._settings.style.error_off}"
             )
 
         if computer_pattern is not None:  # computer is playing
 
             if type(computer_pattern) is not self._settings.Pattern:
                 raise RuntimeError(
-                    f"{self._settings.color.error_on}"
+                    f"{self._settings.style.error_on}"
                     f"[Game] Given computer pattern is not the Pattern class object!"
-                    f"{self._settings.color.error_off}"
+                    f"{self._settings.style.error_off}"
                 )
             else:
                 pattern = computer_pattern
@@ -135,9 +135,9 @@ class MastermindGame(Mastermind):
                 pattern = self._settings.Pattern.decode_pattern(user_pattern_string)
             except ValueError:
                 raise ValueError(
-                    f"{self._settings.color.error_on}"
+                    f"{self._settings.style.error_on}"
                     f"[Game] You gave me incorrect pattern! Enter again."
-                    f"{self._settings.color.error_off}"
+                    f"{self._settings.style.error_off}"
                 )
             # TODO: suggest the user example pattern to enter
 
@@ -150,21 +150,21 @@ class MastermindGame(Mastermind):
             # TODO: use Solver1 `check_possible_solution` method here
             #  to print info if given pattern could be the solution (like in Helper)
 
-        self._turns_list.add_turn(pattern, response)
+        self._guesses_list.add_guess(pattern, response)
 
-        if self._settings.print_turns_list:
-            self._turns_list.print_turns_list()
+        if self._settings.print_guesses_list:
+            self._guesses_list.print_guesses_list()
 
         # check game end criteria
 
         # check if all response pegs are black
-        if response.black_pegs == self._settings.pegs_number and response.white_pegs == 0:
+        if response.black_pegs == self._settings.pegs_in_pattern and response.white_pegs == 0:
             self._game_status = 1  # solution is found
             return
 
-        # check if the CodeBreaker reached turns limit
-        if self._settings.turns_limit and self._turns_list.turns_index >= self._settings.turns_limit:
-            self._game_status = 2  # reached turns limit
+        # check if the CodeBreaker reached guesses limit
+        if self._settings.guesses_limit and self._guesses_list.guess_index >= self._settings.guesses_limit:
+            self._game_status = 2  # reached guesses limit
             return
 
         # otherwise game is still active
@@ -175,14 +175,14 @@ class MastermindGame(Mastermind):
         if self._game_status == 1:
             print(
                 f"You found my solution in "
-                f"{self._settings.color.number_on}"
-                f"{self._turns_list.turns_index}"
-                f"{self._settings.color.number_off}"
-                f" turn{'s' if self._turns_list.turns_index != 1 else ''}."
+                f"{self._settings.style.number_on}"
+                f"{self._guesses_list.guess_index}"
+                f"{self._settings.style.number_off}"
+                f" guess{'es' if self._guesses_list.guess_index != 1 else ''}."
             )
         elif self._game_status == 2:
             print(
-                "You reached turns limit. Game over!"
+                "You reached guesses limit. Game over!"
             )
         print(
             f"The solution was {self._solution}."

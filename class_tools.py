@@ -15,7 +15,7 @@ class Progress:
     def __init__(
             self,
             items_number,
-            color,
+            style,
             title=None,
             summary=None,
             timing=True,
@@ -24,31 +24,31 @@ class Progress:
     ):
         """ Initializes Progress class object """
 
-        self._color = color
+        self._style = style
 
         if title is None:
             self._title = (  # default title
-                f"{self._color.progress_title_on}"
+                f"{self._style.progress_title_on}"
                 f"[Progress] Thinking..."
-                f"{self._color.progress_title_off}"
+                f"{self._style.progress_title_off}"
             )
         else:
             self._title = str(title)  # (str) Progress process title to be displayed
 
         if summary is None:
             self._summary = (  # default summary
-                f"{self._color.progress_summary_on}"
+                f"{self._style.progress_summary_on}"
                 f"Done!"
-                f"{self._color.progress_summary_off}"
+                f"{self._style.progress_summary_off}"
             )
         else:
             self._summary = str(summary)  # (str) Progress process summary to be displayed (after finishing)
 
         if items_number < 1:
             raise ValueError(
-                f"{self._color.error_on}"
+                f"{self._style.error_on}"
                 f"[Progress] The Progress process must last for one operation at least!"
-                f"{self._color.error_off}"
+                f"{self._style.error_off}"
             )
 
         self._index = 0  # (int) index of current operation
@@ -93,9 +93,9 @@ class Progress:
         self._print(
             f"\r"  # start from the beginning of line
             f"{self._title} "
-            f"{self._color.progress_value_on}"
+            f"{self._style.progress_value_on}"
             f"{int(round(self._index * self._inv)):3d}%"
-            f"{self._color.progress_value_off}"
+            f"{self._style.progress_value_off}"
         )
 
     def _print_value(self):
@@ -103,9 +103,9 @@ class Progress:
 
         self._print(
             f"\b\b\b\b"  # 4 backspaces and the new value (in the same place)
-            f"{self._color.progress_value_on}"
+            f"{self._style.progress_value_on}"
             f"{int(round(self._index * self._inv)):3d}%"
-            f"{self._color.progress_value_off}"
+            f"{self._style.progress_value_off}"
         )
 
     def _print_summary(self):
@@ -122,23 +122,23 @@ class Progress:
 
         if self._finished:
             raise RuntimeError(
-                f"{self._color.error_on}"
+                f"{self._style.error_on}"
                 f"[Progress] Progress process is finished!"
-                f"{self._color.error_off}"
+                f"{self._style.error_off}"
             )
 
         if should_be_running and not self._running:
             raise RuntimeError(
-                f"{self._color.error_on}"
+                f"{self._style.error_on}"
                 f"[Progress] Progress process is not running!"
-                f"{self._color.error_off}"
+                f"{self._style.error_off}"
             )
 
         if not should_be_running and self._running:
             raise RuntimeError(
-                f"{self._color.error_on}"
+                f"{self._style.error_on}"
                 f"[Progress] Progress process is already running!"
-                f"{self._color.error_off}"
+                f"{self._style.error_off}"
             )
 
     def start(self, title=None):
@@ -177,9 +177,9 @@ class Progress:
             if self._update_time_func is not None:
                 if not callable(self._update_time_func):
                     raise RuntimeError(
-                        f"{self._color.error_on}"
+                        f"{self._style.error_on}"
                         f"[Progress] Given invalid `update_time_func` Solver function!"
-                        f"{self._color.error_off}"
+                        f"{self._style.error_off}"
                     )
                 self._update_time_func(self._total_time)  # send total time to Solver
 
@@ -194,17 +194,17 @@ class Progress:
 
             self._summary += (
                 f"time: "
-                f"{self._color.time_on}"
+                f"{self._style.time_on}"
                 f"{partial_time:.3f}s"  # time in milliseconds
-                f"{self._color.time_off}"
+                f"{self._style.time_off}"
             )
 
             if was_paused and finish:  # check if it was last execution of partial operation
                 self._summary += (
                     f", total time: "
-                    f"{self._color.time_on}"
+                    f"{self._style.time_on}"
                     f"{self._total_time:.3f}s"  # time in milliseconds
-                    f"{self._color.time_off}"
+                    f"{self._style.time_off}"
                 )
 
             self._summary += (

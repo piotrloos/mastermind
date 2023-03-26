@@ -26,13 +26,13 @@ class Mastermind(metaclass=ABCMeta):
         else:
             self._settings = Settings(*args, **kwargs)
 
-        self._turns_list = self._settings.TurnsList()  # initialize list of turns
+        self._guesses_list = self._settings.GuessesList()  # initialize new list of guesses
         self._solution = None  # initialize solution field
-        self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached turns limit, 3:no possible solution
+        self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached guesses limit, 3:no possible solution
 
         self._solver = self._settings.solver_class(  # instantiate Solver class
             self._settings,
-            self._turns_list,
+            self._guesses_list,
         )
 
     @property
@@ -41,16 +41,16 @@ class Mastermind(metaclass=ABCMeta):
 
         if self._game_status == 0:
             raise PermissionError(
-                f"{self._settings.color.error_on}"
+                f"{self._settings.style.error_on}"
                 f"[Mastermind] No access to the solution when game is active!"
-                f"{self._settings.color.error_off}"
+                f"{self._settings.style.error_off}"
             )
         else:
             if self._solution is None:
                 raise RuntimeError(
-                    f"{self._settings.color.error_on}"
+                    f"{self._settings.style.error_on}"
                     f"[Mastermind] No saved solution in this game!"
-                    f"{self._settings.color.error_off}"
+                    f"{self._settings.style.error_off}"
                 )
             else:
                 return self._solution
