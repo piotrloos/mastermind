@@ -309,7 +309,7 @@ def pattern_class(settings):
                         # TODO: big jumps on the most significant pegs (without changing the least significant values)
 
                         peg = pattern_list[peg_index]  # get current peg from pattern_list
-                        if peg < peg_colors - 1:  # check if current peg has max value (=can be incremented?)
+                        if peg < peg_colors:  # check if current peg has max value (=can be incremented?)
 
                             pattern_list[peg_index] = colors_list[peg]  # increment current peg (list from 1 to n)
                             peg_index = pegs_in_pattern - 1  # reset `peg_index` to last peg
