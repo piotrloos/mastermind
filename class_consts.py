@@ -27,7 +27,7 @@ class Consts(metaclass=ABCMeta):
         default_value = True
         ask_if_not_given = False
 
-    # TODO: add new setting `use_progress` (T/F)
+    # TODO: add new `use_progress` bool setting
 
     class ProgressTiming(metaclass=ABCMeta):
         name = "progress_timing"
@@ -71,6 +71,9 @@ class Consts(metaclass=ABCMeta):
         max_value = 32
         default_value = 12
         ask_if_not_given = False
+
+    # TODO: add new `allow_duplicates` bool setting
+    # TODO: add new `allow_blanks` bool setting
 
     # SOLVING SETTINGS
 

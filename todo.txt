@@ -1,7 +1,8 @@
 # do zrobienia w tym sprincie:
 
-# TODO: parametr mode przy uruchamianiu Mastermind a nie Game/Helper/Solver
-# TODO: mozliwość restartu gry na tych samych ustawieniach (bez generowania patternów)
+# TODO: poprawa restartu gry na tych samych ustawieniach (bez generowania patternów)
+# TODO: new game exhausted generator bug (solver=*, prebuild=0, itertools=1)
+# TODO: odd peg bug (solver=*, prebuild=0, itertools=0)
 # TODO: stworzenie pliku `readme.md`
 # TODO: testy, testy, testy...
 
@@ -10,7 +11,6 @@
 # TODO: możliwość wyłączenia Progressu
 # TODO: formatowanie czasu w minutach, sekundach, milisekundach
 # TODO: komunikat o czyszczeniu pamięci na koniec gry
-# TODO: exhausted generator bug
 # TODO: refactor podobnych metod w Game/Helper/Solver
 # TODO: sys.getsizeof() dla listy patternów
 # TODO: typy zmiennych w deklaracjach funkcji (type hints)

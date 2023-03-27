@@ -76,18 +76,37 @@ def main():
 
     settings = Settings(**kwargs)  # initialize Settings object and determine (set or ask for) missing settings
 
-    if mode == "game":
-        MastermindGame(settings=settings)
-    elif mode == "helper":
-        MastermindHelper(settings=settings)
-    elif mode == "solver":
-        MastermindSolver(settings=settings)
-    else:
-        raise RuntimeError(
-            f"{settings.style.error_on}"
-            f"[Mastermind] Given mode `{mode}` is incorrect!"
-            f"{settings.style.error_off}"
-        )
+    # define sets of negative and positive user answers to play again question
+    neg_answers_set = {"0", "false", "f", "no", "n", "x", "-", "exit"}
+    pos_answers_set = {"1", "true", "t", "yes", "y", "v", "+", ""}
+    all_answers_set = neg_answers_set.union(pos_answers_set)
+
+    while True:
+        if mode == "game":
+            MastermindGame(settings=settings)
+        elif mode == "helper":
+            MastermindHelper(settings=settings)
+        elif mode == "solver":
+            MastermindSolver(settings=settings)
+        else:
+            raise RuntimeError(
+                f"{settings.style.error_on}"
+                f"[Mastermind] Given mode `{mode}` is incorrect!"
+                f"{settings.style.error_off}"
+            )
+
+        # ask the user if he wants to play again
+        again_str = None
+        print()
+        while again_str not in all_answers_set:
+            again_str = input(
+                "[Mastermind] Would you like do play again (y/n)? Leave empty for `yes`: "
+            ).strip().lower()
+
+        if again_str in neg_answers_set:
+            break  # exit the game
+        else:
+            print()
 
 
 if __name__ == "__main__":  # run only when it is called directly
