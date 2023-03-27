@@ -286,6 +286,8 @@ def pattern_class(settings):
         def gen_patterns():
             """ Generator for all possible patterns in the game (when `pre_build_patterns` setting == False) """
 
+            # TODO: review this whole generator
+
             colors_list = settings.Peg.all_pegs_list[1:]  # without blank peg
             # TODO: use `shuffle_colors_before_build` setting here
 
@@ -309,7 +311,7 @@ def pattern_class(settings):
                         peg = pattern_list[peg_index]  # get current peg from pattern_list
                         if peg < peg_colors - 1:  # check if current peg has max value (=can be incremented?)
 
-                            pattern_list[peg_index] = colors_list[peg + 1]  # increment current peg
+                            pattern_list[peg_index] = colors_list[peg]  # increment current peg (list from 1 to n)
                             peg_index = pegs_in_pattern - 1  # reset `peg_index` to last peg
                             yield Pattern(tuple(pattern_list))  # yield current pattern
 

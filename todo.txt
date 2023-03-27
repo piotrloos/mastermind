@@ -2,7 +2,7 @@
 
 # TODO: poprawa restartu gry na tych samych ustawieniach (bez generowania patternów)
 # TODO: new game exhausted generator bug (solver=*, prebuild=0, itertools=1)
-# TODO: odd peg bug (solver=*, prebuild=0, itertools=0)
+# TODO: review my pattern generator, include shuffle settings
 # TODO: stworzenie pliku `readme.md`
 # TODO: testy, testy, testy...
 
