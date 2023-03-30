@@ -27,6 +27,8 @@ class Settings:
 
             peg_colors=None,
             pegs_in_pattern=None,
+            allow_blanks=None,
+            allow_duplicates=None,
             guesses_limit=None,
 
             chosen_solver=None,
@@ -73,6 +75,14 @@ class Settings:
         self._pegs_in_pattern = self._get_setting(
             Consts.PegsInPattern,
             pegs_in_pattern,
+        )
+        self._allow_blanks = self._get_setting(
+            Consts.AllowBlanks,
+            allow_blanks,
+        )
+        self._allow_duplicates = self._get_setting(
+            Consts.AllowDuplicates,
+            allow_duplicates,
         )
         self._guesses_limit = self._get_setting(
             Consts.GuessesLimit,

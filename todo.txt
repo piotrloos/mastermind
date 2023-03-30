@@ -3,6 +3,7 @@
 # TODO: poprawa restartu gry na tych samych ustawieniach (bez generowania patternów)
 # TODO: new game exhausted generator bug (solver=*, prebuild=0, itertools=1)
 # TODO: review my pattern generator, include shuffle settings
+# TODO: implementacja opcji: allow_duplicates, allow_blanks
 # TODO: stworzenie pliku `readme.md`
 # TODO: testy, testy, testy...
 
@@ -15,7 +16,6 @@
 # TODO: sys.getsizeof() dla listy patternów
 # TODO: typy zmiennych w deklaracjach funkcji (type hints)
 # TODO: porządek w nazwach metod i pól (__name)
-# TODO: opcje: allow_duplicates, allow_blanks
 # TODO: mierzenie czasu myślenia przez człowieka
 
 # polecenia "shella":

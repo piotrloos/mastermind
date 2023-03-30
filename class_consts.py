@@ -63,6 +63,20 @@ class Consts(metaclass=ABCMeta):
         default_value = 4
         ask_if_not_given = True
 
+    class AllowBlanks(metaclass=ABCMeta):
+        name = "allow_blanks"
+        desc = "enable blank pegs in guesses (not in solution)"
+        type = bool
+        default_value = False
+        ask_if_not_given = False
+
+    class AllowDuplicates(metaclass=ABCMeta):
+        name = "allow_duplicates"
+        desc = "enable duplicating pegs of the same colors in patterns (guesses and solution)"
+        type = bool
+        default_value = True
+        ask_if_not_given = False
+
     class GuessesLimit(metaclass=ABCMeta):
         name = "guesses_limit"
         desc = "set number of guesses allowed in every game (0 = unlimited)"
@@ -71,9 +85,6 @@ class Consts(metaclass=ABCMeta):
         max_value = 32
         default_value = 12
         ask_if_not_given = False
-
-    # TODO: add new `allow_duplicates` bool setting
-    # TODO: add new `allow_blanks` bool setting
 
     # SOLVING SETTINGS
 
