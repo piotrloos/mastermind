@@ -25,12 +25,9 @@ class MastermindSolver1:
 
         # prepare `all_patterns` list/generator for iteration
         if self._settings.pre_build_patterns:
-            self._all_patterns = self._settings.all_patterns_list  # get list (by reference)
+            self._all_patterns = self._settings.all_patterns_list  # get list reference for searching
         else:
-            if self._settings.use_itertools_for_build:
-                self._all_patterns = iter(self._settings.all_patterns_gen)  # init `itertools.product` generator
-            else:
-                self._all_patterns = self._settings.all_patterns_gen()  # init my generator
+            self._all_patterns = self._settings.all_patterns_gen()  # create new `all_patterns_gen` for every new game
 
         self._generator = self._solution_generator()
         self._current_possible_solution = None

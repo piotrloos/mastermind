@@ -23,15 +23,11 @@ class MastermindSolver2:
 
         self._solving_time = 0
 
+        # prepare `possible_solutions_list` to be filtered
         if self._settings.pre_build_patterns:
-            self._possible_solutions_list = self._settings.all_patterns_list.copy()  # get list for filtering (copy)
+            self._possible_solutions_list = self._settings.all_patterns_list.copy()  # get new list for filtering (copy)
         else:
-            # prepare `all_patterns` list/generator for iteration
-            if self._settings.use_itertools_for_build:
-                all_patterns = iter(self._settings.all_patterns_gen)  # init `itertools.product` generator
-            else:
-                all_patterns = self._settings.all_patterns_gen()  # init my generator
-
+            # build list from generator (once per game)
             with Progress(
                 items_number=self._settings.patterns_number,
                 style=self._settings.style,
@@ -39,10 +35,9 @@ class MastermindSolver2:
                 timing=self._settings.progress_timing,
             ) as progress:
 
-                # build list from generator (once per game)
                 self._possible_solutions_list = [
                     progress.item(pattern)
-                    for pattern in all_patterns
+                    for pattern in self._settings.all_patterns_gen()  # create new `all_patterns_gen` for every new game
                 ]
 
         self._get_solution()

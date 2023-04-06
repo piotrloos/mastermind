@@ -95,7 +95,7 @@ class Consts(metaclass=ABCMeta):
         min_value = 1
         max_value = 2
         default_value = 1
-        ask_if_not_given = False
+        ask_if_not_given = True
 
     class PreBuildPatterns(metaclass=ABCMeta):
         name = "pre_build_patterns"

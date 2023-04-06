@@ -1,8 +1,7 @@
 # do zrobienia w tym sprincie:
 
-# TODO: poprawa restartu gry na tych samych ustawieniach (bez generowania patternów)
-# TODO: new game exhausted generator bug (solver=*, prebuild=0, itertools=1)
 # TODO: review my pattern generator, include shuffle settings
+# TODO: wyznaczanie possible solutions dla Solver1 dopiero po rozpoczęciu gry
 # TODO: implementacja opcji: allow_duplicates, allow_blanks
 # TODO: stworzenie pliku `readme.md`
 # TODO: testy, testy, testy...
@@ -38,7 +37,6 @@
 # TODO: Solver1 - liczenie liczby możliwych patternów generatora (kopiowanie generatora wraz ze stanem)
 # TODO: Solver2 - tworzenie tablicy dwuwymiarowej trójstanowej (must be, can be, can't be) dla każdej pozycji i dla każdego koloru
 # TODO: optymalizacja grupowego filtrowania patternów (Solver1 i Solver2)
-# TODO: przyjmowanie własnej listy Pegów
 # TODO: Solver1 - przyspieszenie generatora:
 # TODO:     ocena ważności wyniku i sprawdzanie all() po ważności
 # TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)

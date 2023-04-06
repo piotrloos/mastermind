@@ -186,15 +186,16 @@ class Settings:
         else:
             # TODO: try to use `shuffle_colors_before_build` and `shuffle_colors_during_build` settings (if possible)
             if self._use_itertools_for_build:
-                self._all_patterns_gen = map(  # map generator
-                    lambda pattern_tuple: self.Pattern(pattern_tuple),
-                    product(  # get `itertools.product` generator
+                # assign the reference for itertools.product all patterns generator (without call)
+                self._all_patterns_gen = lambda: map(  # outer lambda function to be called for every new game
+                    lambda pattern_tuple: self.Pattern(pattern_tuple),  # inner lambda function for map generator
+                    product(
                         self.Peg.all_pegs_list[1:],  # without blank peg
                         repeat=self._pegs_in_pattern,  # repeat for every peg in pattern
                     )
                 )
             else:
-                # get reference for my generator (without call)
+                # assign the reference for my all patterns generator (without call)
                 self._all_patterns_gen = self.Pattern.gen_patterns
 
         print()
