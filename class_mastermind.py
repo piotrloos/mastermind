@@ -26,6 +26,8 @@ class Mastermind(metaclass=ABCMeta):
         else:
             self._settings = Settings(*args, **kwargs)
 
+        self._settings.print_settings()
+
         self._guesses_list = self._settings.GuessesList()  # initialize new list of guesses
         self._solution = None  # initialize solution field
         self._game_status = 0  # 0:game is active, 1:solution is found, 2:reached guesses limit, 3:no possible solution

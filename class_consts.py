@@ -36,6 +36,13 @@ class Consts(metaclass=ABCMeta):
         default_value = True
         ask_if_not_given = False
 
+    class PrintSettingsList(metaclass=ABCMeta):
+        name = "print_settings_list"
+        desc = "enable printing list of all settings after starting a game"
+        type = bool
+        default_value = False
+        ask_if_not_given = False
+
     class PrintGuessesList(metaclass=ABCMeta):
         name = "print_guesses_list"
         desc = "enable printing guesses list after each guess"

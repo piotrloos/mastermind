@@ -66,64 +66,6 @@ class MastermindSolver(Mastermind):
         )
         print()
         print(
-            f"Settings:"
-        )
-        print(
-            f"chosen_solver = "
-            f"{self._settings.style.setting_value_on}"
-            f"{self._settings.chosen_solver}"
-            f"{self._settings.style.setting_value_off}"
-        )
-        print(
-            f"pre_build_patterns = "
-            f"{self._settings.style.setting_value_on}"
-            f"{self._settings.pre_build_patterns}"
-            f"{self._settings.style.setting_value_off}"
-        )
-        print(
-            f"use_itertools_for_build = "
-            f"{self._settings.style.setting_value_on}"
-            f"{self._settings.use_itertools_for_build}"
-            f"{self._settings.style.setting_value_off}"
-        )
-        print(
-            f"shuffle_colors_before_build = "
-            f"{self._settings.style.setting_value_on}"
-            f"{self._settings.shuffle_colors_before_build}"
-            f"{self._settings.style.setting_value_off}"
-        )
-        print(
-            f"shuffle_colors_during_build = "
-            f"{self._settings.style.setting_value_on}"
-            f"{self._settings.shuffle_colors_during_build}"
-            f"{self._settings.style.setting_value_off}"
-        )
-        print(
-            f"shuffle_patterns_after_build = "
-            f"{self._settings.style.setting_value_on}"
-            f"{self._settings.shuffle_patterns_after_build}"
-            f"{self._settings.style.setting_value_off}"
-        )
-        print(
-            f"solver1_calc_2nd_solution = "
-            f"{self._settings.style.setting_value_on}"
-            f"{self._settings.solver1_calc_2nd_solution}"
-            f"{self._settings.style.setting_value_off}"
-        )
-        print(
-            f"solver2_take_random_pattern = "
-            f"{self._settings.style.setting_value_on}"
-            f"{self._settings.solver2_take_random_pattern}"
-            f"{self._settings.style.setting_value_off}"
-        )
-        print(
-            f"solver2_print_possible_solutions_threshold = "
-            f"{self._settings.style.setting_value_on}"
-            f"{self._settings.solver2_print_possible_solutions_threshold}"
-            f"{self._settings.style.setting_value_off}"
-        )
-        print()
-        print(
             "Let's play!"
         )
         print()

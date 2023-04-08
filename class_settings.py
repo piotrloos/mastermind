@@ -22,6 +22,7 @@ class Settings:
             styled_prints=None,
             use_digits_for_colors=None,
             progress_timing=None,
+            print_settings_list=None,
             print_guesses_list=None,
 
             peg_colors=None,
@@ -59,6 +60,10 @@ class Settings:
         self._progress_timing = self._get_setting(
             Consts.ProgressTiming,
             progress_timing,
+        )
+        self._print_settings_list = self._get_setting(
+            Consts.PrintSettingsList,
+            print_settings_list,
         )
         self._print_guesses_list = self._get_setting(
             Consts.PrintGuessesList,
@@ -133,6 +138,8 @@ class Settings:
             solver2_print_possible_solutions_threshold,
         )
 
+        # settings interpretation
+
         if self._styled_prints:
             self.style = Color()
         else:
@@ -142,6 +149,8 @@ class Settings:
             1: MastermindSolver1,  # patterns checking generator Solver
             2: MastermindSolver2,  # patterns list filtering Solver
         }
+
+        # print unrecognized settings
 
         for attribute in args:
             print(
@@ -153,7 +162,6 @@ class Settings:
                 f" has not been recognized! Ignoring."
                 f"{self.style.error_off}"
             )
-
         for key, value in kwargs.items():
             print(
                 f"{self.style.error_on}"
@@ -168,22 +176,25 @@ class Settings:
                 f" has not been recognized! Ignoring."
                 f"{self.style.error_off}"
             )
+        print()
 
         # pin Classes to Settings instance
+
         self.Peg = peg_class(self)
         self.Pattern = pattern_class(self)
         self.Response = response_class(self)
         self.Guess = guess_class(self)
         self.GuessesList = guesses_list_class(self)
 
-        self._all_patterns_list = None
-        self._all_patterns_gen = None
+        # prepare all patterns list/generator
 
         if self._pre_build_patterns:
             # build (additionally shuffle if enabled) and save all patterns list - once for several games
             self._all_patterns_list = self.Pattern.build_patterns()
+            self._all_patterns_gen = None
         else:
             # get all patterns generator - once for several games
+            self._all_patterns_list = None
             self._all_patterns_gen = self.Pattern.patterns_generator()
 
         print()
@@ -224,9 +235,9 @@ class Settings:
                 )
 
             if not setting.ask_if_not_given:  # take default value
-                print(
-                    f"[Settings] Taking default `{setting.name}` value ({setting.default_value})."
-                )
+                # print(
+                #     f"[Settings] Taking default `{setting.name}` value ({setting.default_value})."
+                # )
                 value = setting.default_value
             else:  # ask the user
                 given_as_parameter = False
@@ -318,3 +329,147 @@ class Settings:
             )
         else:
             return self._all_patterns_gen
+
+    def print_settings(self):
+        """ Prints list of all settings """
+
+        if self._print_settings_list:
+
+            print(
+                f"TERMINAL SETTINGS:"
+            )
+            print(
+                f"styled_prints = "
+                f"{self.style.setting_value_on}"
+                f"{self._styled_prints}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"use_digits_for_colors = "
+                f"{self.style.setting_value_on}"
+                f"{self._use_digits_for_colors}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"progress_timing = "
+                f"{self.style.setting_value_on}"
+                f"{self._progress_timing}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"print_settings_list = "
+                f"{self.style.setting_value_on}"
+                f"{self._print_settings_list}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"print_guesses_list = "
+                f"{self.style.setting_value_on}"
+                f"{self._print_guesses_list}"
+                f"{self.style.setting_value_off}"
+            )
+            print()
+
+            print(
+                f"MASTERMIND SETTINGS:"
+            )
+            print(
+                f"peg_colors = "
+                f"{self.style.setting_value_on}"
+                f"{self._peg_colors}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"pegs_in_pattern = "
+                f"{self.style.setting_value_on}"
+                f"{self._pegs_in_pattern}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"allow_blanks = "
+                f"{self.style.setting_value_on}"
+                f"{self._allow_blanks}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"allow_duplicates = "
+                f"{self.style.setting_value_on}"
+                f"{self._allow_duplicates}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"guesses_limit = "
+                f"{self.style.setting_value_on}"
+                f"{self._guesses_limit}"
+                f"{self.style.setting_value_off}"
+            )
+            print()
+
+            print(
+                f"SOLVING SETTINGS:"
+            )
+            print(
+                f"chosen_solver = "
+                f"{self.style.setting_value_on}"
+                f"{self._chosen_solver}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"pre_build_patterns = "
+                f"{self.style.setting_value_on}"
+                f"{self._pre_build_patterns}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"use_itertools_for_build = "
+                f"{self.style.setting_value_on}"
+                f"{self._use_itertools_for_build}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"shuffle_colors_before_build = "
+                f"{self.style.setting_value_on}"
+                f"{self._shuffle_colors_before_build}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"shuffle_colors_during_build = "
+                f"{self.style.setting_value_on}"
+                f"{self._shuffle_colors_during_build}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"shuffle_patterns_after_build = "
+                f"{self.style.setting_value_on}"
+                f"{self._shuffle_patterns_after_build}"
+                f"{self.style.setting_value_off}"
+            )
+            print()
+
+            print(
+                f"SOLVER #1 SETTINGS:"
+            )
+            print(
+                f"solver1_calc_2nd_solution = "
+                f"{self.style.setting_value_on}"
+                f"{self._solver1_calc_2nd_solution}"
+                f"{self.style.setting_value_off}"
+            )
+            print()
+
+            print(
+                f"SOLVER #2 SETTINGS:"
+            )
+            print(
+                f"solver2_take_random_pattern = "
+                f"{self.style.setting_value_on}"
+                f"{self._solver2_take_random_pattern}"
+                f"{self.style.setting_value_off}"
+            )
+            print(
+                f"solver2_print_possible_solutions_threshold = "
+                f"{self.style.setting_value_on}"
+                f"{self._solver2_print_possible_solutions_threshold}"
+                f"{self.style.setting_value_off}"
+            )
+            print()
