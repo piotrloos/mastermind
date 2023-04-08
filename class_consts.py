@@ -106,7 +106,7 @@ class Consts(metaclass=ABCMeta):
 
     class UseItertoolsForBuild(metaclass=ABCMeta):
         name = "use_itertools_for_build"
-        desc = "enable using built-in itertools product function to generate patterns"
+        desc = "enable using built-in itertools function to generate patterns"
         type = bool
         default_value = True
         ask_if_not_given = False
