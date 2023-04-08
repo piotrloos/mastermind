@@ -10,7 +10,6 @@ from class_consts import Consts
 from class_styles import Color, NoColor
 from class_solver1 import MastermindSolver1
 from class_solver2 import MastermindSolver2
-from itertools import product
 
 
 class Settings:
@@ -181,22 +180,11 @@ class Settings:
         self._all_patterns_gen = None
 
         if self._pre_build_patterns:
-            # build (and shuffle if enabled) all patterns list - once for several games
+            # build (additionally shuffle if enabled) and save all patterns list - once for several games
             self._all_patterns_list = self.Pattern.build_patterns()
         else:
-            # TODO: try to use `shuffle_colors_before_build` and `shuffle_colors_during_build` settings (if possible)
-            if self._use_itertools_for_build:
-                # assign the reference for itertools.product all patterns generator (without call)
-                self._all_patterns_gen = lambda: map(  # outer lambda function to be called for every new game
-                    lambda pattern_tuple: self.Pattern(pattern_tuple),  # inner lambda function for map generator
-                    product(
-                        self.Peg.all_pegs_list[1:],  # without blank peg
-                        repeat=self._pegs_in_pattern,  # repeat for every peg in pattern
-                    )
-                )
-            else:
-                # assign the reference for my all patterns generator (without call)
-                self._all_patterns_gen = self.Pattern.gen_patterns
+            # get all patterns generator - once for several games
+            self._all_patterns_gen = self.Pattern.patterns_generator()
 
         print()
 

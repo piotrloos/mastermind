@@ -1,17 +1,20 @@
 # do zrobienia w tym sprincie:
 
 # TODO: review my pattern generator, include shuffle settings
+# TODO: refactor podobnych metod w Game/Helper/Solver
+# TODO: rename pegs and colors into colorpegs
+# TODO: setting for printing settings during starting a game
 # TODO: wyznaczanie possible solutions dla Solver1 dopiero po rozpoczęciu gry
-# TODO: implementacja opcji: allow_duplicates, allow_blanks
 # TODO: stworzenie pliku `readme.md`
+# TODO: stworzenie pliku requirements.txt
 # TODO: testy, testy, testy...
 
 # w następnej kolejności:
 
+# TODO: implementacja opcji: allow_duplicates, allow_blanks
 # TODO: możliwość wyłączenia Progressu
 # TODO: formatowanie czasu w minutach, sekundach, milisekundach
 # TODO: komunikat o czyszczeniu pamięci na koniec gry
-# TODO: refactor podobnych metod w Game/Helper/Solver
 # TODO: sys.getsizeof() dla listy patternów
 # TODO: typy zmiennych w deklaracjach funkcji (type hints)
 # TODO: porządek w nazwach metod i pól (__name)

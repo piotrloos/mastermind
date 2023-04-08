@@ -25,9 +25,10 @@ class MastermindSolver2:
 
         # prepare `possible_solutions_list` to be filtered
         if self._settings.pre_build_patterns:
-            self._possible_solutions_list = self._settings.all_patterns_list.copy()  # get new list for filtering (copy)
+            # get copy of the already built patterns list for filtering inplace
+            self._possible_solutions_list = self._settings.all_patterns_list.copy()
         else:
-            # build list from generator (once per game)
+            # build new list from generator (for every new game)
             with Progress(
                 items_number=self._settings.patterns_number,
                 style=self._settings.style,
@@ -36,8 +37,8 @@ class MastermindSolver2:
             ) as progress:
 
                 self._possible_solutions_list = [
-                    progress.item(pattern)
-                    for pattern in self._settings.all_patterns_gen()  # create new `all_patterns_gen` for every new game
+                    progress.item(pattern)  # wrapped to check the progress
+                    for pattern in self._settings.all_patterns_gen()  # launch new generator (for every new game)
                 ]
 
         self._get_solution()
@@ -74,10 +75,10 @@ class MastermindSolver2:
 
         return self._solving_time
 
-    def update_solving_time(self, exe_time):
+    def update_solving_time(self, exec_time):
         """ (Solver2) Updates execution time by the Progress instance """
 
-        self._solving_time += exe_time  # Solver2 accumulates solving time from several Progress instances per game
+        self._solving_time += exec_time  # Solver2 accumulates solving time from several Progress instances per game
 
     def check_possible_solution(self, possible_solution):
         """ (Solver2) Checks if given possible solution can be a solution based on all previous guesses """
@@ -97,11 +98,12 @@ class MastermindSolver2:
             update_time_func=self.update_solving_time,
         ) as progress:
 
+            # filter the patterns list
             # TODO: try to speed up these calculations
             self._possible_solutions_list = [
                 possible_solution
                 for possible_solution in self._possible_solutions_list
-                if progress.item(
+                if progress.item(  # wrapped to check the progress
                     guess.pattern.calculate_black_pegs(possible_solution) == guess.response.black_pegs
                     and
                     guess.pattern.calculate_black_white_pegs(possible_solution) == guess.response.black_white_pegs

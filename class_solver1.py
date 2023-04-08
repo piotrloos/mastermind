@@ -25,9 +25,9 @@ class MastermindSolver1:
 
         # prepare `all_patterns` list/generator for iteration
         if self._settings.pre_build_patterns:
-            self._all_patterns = self._settings.all_patterns_list  # get list reference for searching
+            self._all_patterns = self._settings.all_patterns_list  # get already built list reference for searching
         else:
-            self._all_patterns = self._settings.all_patterns_gen()  # create new `all_patterns_gen` for every new game
+            self._all_patterns = self._settings.all_patterns_gen()  # launch new generator (for every new game)
 
         self._generator = self._solution_generator()
         self._current_possible_solution = None
@@ -37,13 +37,14 @@ class MastermindSolver1:
 
         self._progress_title = ""
 
+        # TODO: move it to be displayed after starting a game, not during Solver1 creation
         self.calculate_possible_solution()  # get 1st possible solution
 
     @property
     def possible_solutions_number(self):
         """ (Solver1) Returns number of possible solutions """
 
-        raise NotImplementedError(
+        raise RuntimeError(
             f"{self._settings.style.error_on}"
             f"It is impossible to calculate number of possible solutions in Solver1!"
             f"{self._settings.style.error_off}"
@@ -61,10 +62,10 @@ class MastermindSolver1:
 
         return self._solving_time
 
-    def update_solving_time(self, exe_time):
+    def update_solving_time(self, exec_time):
         """ (Solver1) Updates execution time by the Progress instance """
 
-        self._solving_time = exe_time  # Solver1 overwrites solving time from one Progress instance per game
+        self._solving_time = exec_time  # Solver1 updates (overwrites) solving time from one Progress instance per game
 
     def check_possible_solution(self, possible_solution):
         """ (Solver1) Checks if given possible solution can be a solution based on all previous guesses """
@@ -87,9 +88,6 @@ class MastermindSolver1:
 
     def calculate_possible_solution(self, *_):
         """ (Solver1) Calculates the next possible solution after current guess """
-
-        # TODO: refactor this method to avoid bug in Progress state (when generator is exhausted)
-        # TODO: generator exhausted bug
 
         if self.check_possible_solution(self._current_possible_solution):
             print(
@@ -163,8 +161,9 @@ class MastermindSolver1:
 
             for index, pattern in enumerate(self._all_patterns, 1):
 
-                # wrapped the long-taking operation
-                if progress.item(self._check_possible_solution_for_guesses(pattern)):
+                if progress.item(  # wrapped to check the progress
+                        self._check_possible_solution_for_guesses(pattern)
+                ):
 
                     progress.stop(
                         finish=False,
