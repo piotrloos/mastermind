@@ -1,12 +1,11 @@
 # do zrobienia w tym sprincie:
 
-# TODO: review my pattern generator, include shuffle settings
 # TODO: refactor podobnych metod w Game/Helper/Solver
-# TODO: rename pegs and colors into colorpegs
-# TODO: setting for printing settings during starting a game
 # TODO: wyznaczanie possible solutions dla Solver1 dopiero po rozpoczęciu gry
+# TODO: rename pegs and colors into colorpegs
+
 # TODO: stworzenie pliku `readme.md`
-# TODO: stworzenie pliku requirements.txt
+# TODO: stworzenie pliku `requirements.txt`
 # TODO: testy, testy, testy...
 
 # w następnej kolejności:

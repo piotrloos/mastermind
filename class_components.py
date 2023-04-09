@@ -202,9 +202,10 @@ def pattern_class(settings):
             """ Builds and returns a list of all possible patterns
             (when `pre_build_patterns` == True) """
 
-            pegs_list = settings.Peg.all_pegs_list[1:]  # copy `pegs_list` without blank peg to be shuffled
+            # copy `pegs_list` without blank peg to be saved (and shuffled if enabled)
+            pegs_list = settings.Peg.all_pegs_list[1:]
 
-            # shuffle `pegs_list` to build patterns from (before build)
+            # shuffle `pegs_list` to build patterns from (before build) - if enabled
             if settings.shuffle_colors_before_build:
                 shuffle(
                     pegs_list,  # small list
@@ -333,42 +334,74 @@ def pattern_class(settings):
             """ Returns generator for all possible patterns in the game using my own function
             (when `pre_build_patterns` == False and `use_itertools_for_build` == False) """
 
-            # TODO: review this whole generator
-            # TODO: use pegs_list instead of colors_list, save pegs_list for every position in pattern
+            # copy `pegs_list` without blank peg to be saved (and shuffled if enabled)
+            pegs_list = settings.Peg.all_pegs_list[1:]
 
-            colors_list = settings.Peg.all_pegs_list[1:]  # without blank peg
-            # TODO: use `shuffle_colors_before_build` setting here
+            # shuffle `pegs_list` to build patterns from (before build) - if enabled
+            if settings.shuffle_colors_before_build:
+                shuffle(
+                    pegs_list,  # small list
+                    progress=None,  # without progress shown (quick operation)
+                )
 
-            peg_colors = settings.peg_colors
-            pegs_in_pattern = settings.pegs_in_pattern
+            # create 2-dimensional matrix (dict values are lists) to keep `pegs_list` for every peg position in pattern
+            pegs_lists_matrix = {}
 
-            if peg_colors > 0:
+            for peg_index in range(0, settings.pegs_in_pattern):  # `peg_index` from 0 to `pegs_in_pattern` - 1
+                pegs_lists_matrix[peg_index] = pegs_list.copy()  # copy and save `pegs_list` for current `peg_index`
 
-                pattern_list = [colors_list[0]] * pegs_in_pattern  # get list of pegs with min values
-                peg_index = pegs_in_pattern - 1  # set `peg_index` to last peg
-                yield Pattern(tuple(pattern_list))  # yield the first pattern
+                # shuffle `pegs_list` for current peg (during build) - if enabled
+                if settings.shuffle_colors_during_build:
+                    shuffle(
+                        pegs_lists_matrix[peg_index],  # small list
+                        progress=None,  # without progress shown (quick operation)
+                    )
 
-                # TODO: try to use `shuffle_colors_during_build` setting here
+            # to run faster the list like odometer with int values is used, instead of Pattern objects with Peg objects
+            # conversion into mastermind objects and translation to shuffled value will occur during yielding a result
+            # length of the odometer is `pegs_in_pattern` (indexed from 0), values are from 0 to `pegs_colors` - 1
+            odometer = [0] * settings.pegs_in_pattern
 
-                if pegs_in_pattern > 0:
+            # yield the first pattern
+            yield Pattern(  # create Pattern object
+                tuple(  # from pattern tuple
+                    map(  # where int values are converted into stored Peg objects from `pegs_list`
+                        lambda odo_tuple: pegs_lists_matrix[odo_tuple[0]][odo_tuple[1]],  # matrix[index][value]
+                        enumerate(odometer, 0),  # iterates and returns `odo_tuple` (index, value) from odometer
+                    )
+                )
+            )
 
-                    while True:  # infinite loop
+            # set `odo_index` to the least significant peg (initial position)
+            odo_index = settings.pegs_in_pattern - 1
 
-                        # TODO: big jumps on the most significant pegs (without changing the least significant values)
+            while True:  # infinite loop
 
-                        peg = pattern_list[peg_index]  # get current peg from pattern_list
-                        if peg < peg_colors:  # check if current peg has max value (=can be incremented?)
+                # TODO: big jumps on the most significant pegs (without changing the least significant pegs)
 
-                            pattern_list[peg_index] = colors_list[peg]  # increment current peg (list from 1 to n)
-                            peg_index = pegs_in_pattern - 1  # reset `peg_index` to last peg
-                            yield Pattern(tuple(pattern_list))  # yield current pattern
+                # check if current peg can be incremented (= peg has not max value yet)
+                if odometer[odo_index] < settings.peg_colors - 1:
 
-                        else:  # current peg has max value -> need to carry one peg on the left
+                    odometer[odo_index] += 1  # increment current peg
+                    odo_index = settings.pegs_in_pattern - 1  # reset `odo_index` to the least significant peg
 
-                            pattern_list[peg_index] = colors_list[0]  # reset current peg to min value
-                            peg_index -= 1  # move `peg_index` to the left
-                            if peg_index < 0:
-                                break  # if `peg_index` reached first peg exit the loop
+                    # yield current pattern after one increment
+                    yield Pattern(  # create Pattern object
+                        tuple(  # from pattern tuple
+                            map(  # where int values are converted into stored Peg objects from `pegs_list`
+                                lambda odo_tuple: pegs_lists_matrix[odo_tuple[0]][odo_tuple[1]],  # matrix[index][value]
+                                enumerate(odometer, 0),  # iterates and returns `odo_tuple` (index, value) from odometer
+                            )
+                        )
+                    )
+
+                else:  # current peg has max value -> need to carry one peg on the left
+
+                    odometer[odo_index] = 0  # reset current peg to min value
+                    odo_index -= 1  # move `odo_index` to the left
+                    if odo_index < 0:
+                        # if `peg_index` reached the most significant peg (= all pegs have max value) finish generation
+                        break
 
             # when using patterns generator it is impossible to use `shuffle_patterns_after_build` setting
 
