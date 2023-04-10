@@ -76,15 +76,15 @@ In my game you can specify various settings that affects a game. They are groupe
 
 * `int` **chosen_solver** (default value `1`). Choose index of the implemented Solvers. #1 = patterns checking generator Solver, #2 = patterns list filtering Solver. They are described above.
 
-* `bool` **pre_build_patterns** (default value `False`). Enables building possible patterns list for several games at once. Useful when you play several games one by one using the same settings. This setting can take a lot of RAM to keep all the patterns in memory. When disabled the patterns will be generated real-time during computer solving, but it can be slower and not efficent from the Mastermind's point of view (list of the patterns cannot be shuffled).
+* `bool` **pre_build_patterns** (default value `False`). Enables building possible patterns list for several games at once. Useful when you play several games one by one using the same settings. This setting can take a lot of RAM to keep all the patterns in memory. When disabled the patterns will be generated real-time during computer solving, but it can be slower and not efficient from the Mastermind's point of view (list of the patterns cannot be shuffled).
 
 * `bool` **use_itertools_for_build** (default value `True`). Enables Python built-in itertools module to generate patterns. It is a bit faster than my generating function, but it doesn't handle all shuffling settings below.
 
-* `bool` **shuffle_colors_before_build** (default value `False`). Enables one-time color pegs order shuffling before pattern generation is started. It doesn't change the efficency of guessing, but allows not to start always with the first minimum (the same one color) pattern.
+* `bool` **shuffle_colors_before_build** (default value `False`). Enables one-time color pegs order shuffling before pattern generation is started. It doesn't change the efficiency of guessing, but allows not to start always with the first minimum (the same one color) pattern.
 
-* `bool` **shuffle_colors_during_build** (default value `False`). Enables color pegs order shuffling for every peg in pattern. It can improve the efficency of guessing, when the codebreaker starts from mixed color pattern. This setting is unused when itertools module is used.
+* `bool` **shuffle_colors_during_build** (default value `False`). Enables color pegs order shuffling for every peg in pattern. It can improve the efficiency of guessing, when the codebreaker starts from mixed color pattern. This setting is unused when itertools module is used.
 
-* `bool` **shuffle_patterns_after_build** (default value `False`). Enables one-time patterns order shuffling after the pattern list is built. You can achieve the best guessing efficency, but first you must pre build patterns and keep them in memory. Patterns shuffling is impossible for pattern real-time generators. In Solver #2 you can use instead `solver2_take_random_pattern` setting which is faster.
+* `bool` **shuffle_patterns_after_build** (default value `False`). Enables one-time patterns order shuffling after the pattern list is built. You can achieve the best guessing efficiency, but first you must pre build patterns and keep them in memory. Patterns shuffling is impossible for pattern real-time generators. In Solver #2 you can use instead `solver2_take_random_pattern` setting which is faster.
 
 ### Solver #1 settings
 
@@ -92,10 +92,10 @@ In my game you can specify various settings that affects a game. They are groupe
 
 ### Solver #2 settings
 
-* `bool` **solver2_take_random_pattern** (default value `False`). Enables taking random pattern from the possible solutions list, which is more efficent from the Mastermind's point of view. It is similar to `shuffle_patterns_after_build` setting, but it can be used only for Solver #2, which has the whole list. When disabled Solver #2 takes the first possible solution from the list.
+* `bool` **solver2_take_random_pattern** (default value `False`). Enables taking random pattern from the possible solutions list, which is more efficient from the Mastermind's point of view. It is similar to `shuffle_patterns_after_build` setting, but it can be used only for Solver #2, which has the whole list. When disabled Solver #2 takes the first possible solution from the list.
 
 * `int` **solver2_print_possible_solutions_threshold** (default value `10`). Sets the maximum number of patterns in the possible solutions list, which will be printed after filtering the list. You can see patterns which still can be a solution after each turn. Set to `0` if you want to disable this printing.
 
 ### Note
 
-Please keep in mind that not every settings combinations are possible. You won't get an error, however some less significant settings will be omited.
+Please keep in mind that not every settings combinations are possible. You won't get an error, however some less significant settings will be omitted.

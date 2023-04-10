@@ -1,11 +1,10 @@
 ############################################
 # My version of the famous Mastermind game #
-# class_tools.py                           #
-# Utility functions for Mastermind         #
+# class_progress.py                        #
+# Progress utility for Mastermind          #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-from random import randrange
 from time import time
 
 
@@ -227,16 +226,3 @@ class Progress:
             self._threshold_int = int(round(self._threshold))  # (int) round the threshold to be compared with index
 
         return wrapped_value
-
-
-def shuffle(lst, progress=None):
-    """ Shuffles iterable `lst` in place, handles Progress object if given """
-
-    length = len(lst)
-
-    for i in range(length - 1):
-        j = randrange(i, length)
-        lst[i], lst[j] = lst[j], lst[i]
-
-        if progress is not None:
-            progress.item()

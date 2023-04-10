@@ -113,28 +113,28 @@ class Consts(metaclass=ABCMeta):
 
     class UseItertoolsForBuild(metaclass=ABCMeta):
         name = "use_itertools_for_build"
-        desc = "enable using built-in itertools function to generate patterns"
+        desc = "enable using built-in itertools module to generate patterns"
         type = bool
         default_value = True
         ask_if_not_given = False
 
     class ShuffleColorsBeforeBuild(metaclass=ABCMeta):
         name = "shuffle_colors_before_build"
-        desc = "enable shuffling colors before patterns list building"
+        desc = "enable color pegs shuffling before patterns list building"
         type = bool
         default_value = False
         ask_if_not_given = False
 
     class ShuffleColorsDuringBuild(metaclass=ABCMeta):
         name = "shuffle_colors_during_build"
-        desc = "enable shuffling colors during patterns list building"
+        desc = "enable color pegs shuffling during patterns list building"
         type = bool
         default_value = False
         ask_if_not_given = False
 
     class ShufflePatternsAfterBuild(metaclass=ABCMeta):
         name = "shuffle_patterns_after_build"
-        desc = "enable shuffling patterns after patterns list building"
+        desc = "enable patterns shuffling after patterns list building"
         type = bool
         default_value = False
         ask_if_not_given = False

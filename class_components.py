@@ -5,7 +5,8 @@
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-from class_tools import Progress, shuffle
+from class_progress import Progress
+from class_shuffle import shuffle
 import itertools
 from random import randrange
 

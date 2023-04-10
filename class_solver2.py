@@ -5,7 +5,7 @@
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
-from class_tools import Progress
+from class_progress import Progress
 from random import randrange
 
 
