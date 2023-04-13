@@ -1,51 +1,48 @@
-# do zrobienia w tym sprincie:
+# this sprint:
 
-# TODO: refactor podobnych metod w Game/Helper/Solver
-# TODO: wyznaczanie possible solutions dla Solver1 dopiero po rozpoczęciu gry
+# TODO: refactor similar methods in Game/Helper/Solver
+# TODO: show possible solutions for Solver1 right after starting a game
+
+# TODO: create file `requirements.txt`?
+# TODO: tests, tests, tests...
+
+# next sprint:
+
+# TODO: implementation settings: allow_duplicates, allow_blanks
 # TODO: rename pegs and colors into colorpegs
+# TODO: setting for disabling Progress
+# TODO: time formatting in minutes, seconds, miliseconds
+# TODO: releasing the memory after game ends
+# TODO: info about sys.getsizeof() for patterns list
+# TODO: type hints in variables, method and functions declarations
+# TODO: clean up in method and property names (__name)
+# TODO: measuring time for human thinking
 
-# TODO: stworzenie pliku `readme.md`
-# TODO: stworzenie pliku `requirements.txt`
-# TODO: testy, testy, testy...
+# shell commands:
 
-# w następnej kolejności:
+# TODO: !next: next possible solution in Helper
+# TODO: !help: possible commands, instruction etc.
+# TODO: !exit: exit the game
+# TODO: !list: list of possible solutions in Helper (only Solver2?)
+# TODO: !undo: undo last turn (possible after filtering?)
+# TODO: !giveup: give up, show solution (new `_game_status`?)
+# TODO: !restart: restart game with the same solution (the same settings)
+# TODO: !reset: restart game with new solution (the same settings)
+# TODO: !shuffle: shuffling patterns list
+# TODO: !sort: sorting patterns list (undo shuffle)
+# TODO: !settings: show settings
 
-# TODO: implementacja opcji: allow_duplicates, allow_blanks
-# TODO: możliwość wyłączenia Progressu
-# TODO: formatowanie czasu w minutach, sekundach, milisekundach
-# TODO: komunikat o czyszczeniu pamięci na koniec gry
-# TODO: sys.getsizeof() dla listy patternów
-# TODO: typy zmiennych w deklaracjach funkcji (type hints)
-# TODO: porządek w nazwach metod i pól (__name)
-# TODO: mierzenie czasu myślenia przez człowieka
+# future ideas:
 
-# polecenia "shella":
-
-# TODO: możliwość wpisywania poleceń:
-# TODO: !next: inna propozycja rozwiązania w Helperze
-# TODO: !help: pomoc, możliwe polecenia, instrukcja gry
-# TODO: !exit: skrót do wyjścia z gry
-# TODO: !list: lista możliwych rozwiązań w Helperze (tylko Solver2?)
-# TODO: !undo: cofnięcie ostatniego ruchu
-# TODO: !pass: opcja poddania się (nowy `_game_status`)
-# TODO: !restart: restart gry z tym samym rozwiązaniem
-# TODO: !reset: restart gry z nowym rozwiązaniem przy tych samych ustawieniach
-# TODO: !shuffle: wymieszanie listy patternów
-# TODO: !sort: posortowanie listy patternów
-# TODO: !settings: wyświetlenie parametrów gry
-
-# później, pomysły itp.:
-
-# TODO: Solver1 - liczenie liczby możliwych patternów generatora (kopiowanie generatora wraz ze stanem)
-# TODO: Solver2 - tworzenie tablicy dwuwymiarowej trójstanowej (must be, can be, can't be) dla każdej pozycji i dla każdego koloru
-# TODO: optymalizacja grupowego filtrowania patternów (Solver1 i Solver2)
-# TODO: Solver1 - przyspieszenie generatora:
-# TODO:     ocena ważności wyniku i sprawdzanie all() po ważności
-# TODO:     szybkie odrzucenie błędnych patternów (przeskok generatora o najbardziej znaczący peg)
-# TODO:     wielowątkowość
-# TODO: poziom printowania komunikatów
-# TODO: rozdzielenie klas `Game` i `Solver` na część ludzką dziedziczoną po części komputerowej
-# TODO: możliwość gry komputera samego ze sobą
-# TODO: testy czasowe, wielokrotne uruchamianie gry i mierzenie czasu
-# TODO: Solver3 - python-constraint
-# TODO: Solver4 - mój algorytm rozwiązywania
+# TODO: Solver1 - counting the number of generator's possible solutions (copying gen with state)
+# TODO: Solver2 - create 2-dim matrix 3-state (must be, can be, can't be) for every peg position and every color
+# TODO: optimisation for grouped filtering patterns (Solver1 and Solver2)
+# TODO: Solver1 - speed up calculations:
+# TODO:     rating for result, filtering by all() based on priority
+# TODO:     changing the most significant peg
+# TODO:     multithreading
+# TODO: printing levels - error, warning, info, prompt
+# TODO: divide classes `Game` and `Solver` to be inherit (HumanGame(Game))
+# TODO: computer vs computer
+# TODO: time tests for different settings in loop
+# TODO: Solver3 - my solving algorithm based on python-constraint
