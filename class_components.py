@@ -77,6 +77,12 @@ def peg_class(settings):
                     f"({peg_chars_list[peg_value]})"
                 )
 
+        @property
+        def char(self):
+            """ Returns the char representing current Peg """
+
+            return peg_chars_list[self.__int__()]
+
         @classmethod
         def decode_peg(cls, peg_char):
             """ Returns Peg object converted from entered `peg_char` by the user """

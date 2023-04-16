@@ -99,7 +99,7 @@ class MastermindHelper(Mastermind):
             f"{self._settings.style.number_on}"
             f"{self._guesses_list.guess_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
             f"{self._settings.style.number_off}"
-            f" Enter pattern=response (empty pattern means {self._solver.current_possible_solution}): "
+            f" Enter `pattern=response` (empty pattern means {self._solver.current_possible_solution}): "
         )
 
     # TODO: refactor with `solver_take_turn`
@@ -118,13 +118,13 @@ class MastermindHelper(Mastermind):
             if type(computer_pattern) is not self._settings.Pattern:
                 raise RuntimeError(
                     f"{self._settings.style.error_on}"
-                    f"[Helper] Given computer pattern is not the Pattern class object!"
+                    f"[Helper] Given `computer_pattern` is not the Pattern class object!"
                     f"{self._settings.style.error_off}"
                 )
             elif type(computer_response) is not self._settings.Response:
                 raise RuntimeError(
                     f"{self._settings.style.error_on}"
-                    f"[Helper] Given computer response is not the Response class object!"
+                    f"[Helper] Given `computer_response` is not the Response class object!"
                     f"{self._settings.style.error_off}"
                 )
             else:
@@ -138,10 +138,12 @@ class MastermindHelper(Mastermind):
             except ValueError:
                 raise ValueError(
                     f"{self._settings.style.error_on}"
-                    f"[Helper] You gave me incorrect pattern=response! Enter again."
+                    f"[Helper] You gave me incorrect `pattern=response`! Try something like `" +
+                    self._settings.Peg.all_pegs_list[1].char * self._settings.pegs_in_pattern +
+                    f"=1,0`. Enter again."
                     f"{self._settings.style.error_off}"
                 )
-            # TODO: suggest the user example pattern=response to enter
+
             if pattern is None:
                 pattern = self._solver.current_possible_solution  # get `pattern` if user enters "=response" only
 

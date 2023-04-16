@@ -7,6 +7,7 @@
 # next sprint:
 
 # TODO: implementation settings: allow_duplicates, allow_blanks
+# TODO: move guess_index from guesses_list object to game object
 # TODO: rename pegs and colors into colorpegs
 # TODO: setting for disabling Progress
 # TODO: time formatting in minutes, seconds, miliseconds

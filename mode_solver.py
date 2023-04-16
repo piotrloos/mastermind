@@ -99,7 +99,7 @@ class MastermindSolver(Mastermind):
             f"{self._settings.style.number_on}"
             f"{self._guesses_list.guess_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
             f"{self._settings.style.number_off}"
-            f" Enter response for pattern {self._solver.current_possible_solution}: "
+            f" Enter `response` for pattern {self._solver.current_possible_solution}: "
         )
 
     # TODO: refactor with `helper_take_turn`
@@ -118,7 +118,7 @@ class MastermindSolver(Mastermind):
             if type(computer_response) is not self._settings.Response:
                 raise RuntimeError(
                     f"{self._settings.style.error_on}"
-                    f"[Solver] Given computer response is not the Response class object!"
+                    f"[Solver] Given `computer_response` is not the Response class object!"
                     f"{self._settings.style.error_off}"
                 )
             else:
@@ -131,10 +131,9 @@ class MastermindSolver(Mastermind):
             except ValueError:
                 raise ValueError(
                     f"{self._settings.style.error_on}"
-                    f"[Solver] You gave me incorrect response! Enter again."
+                    f"[Solver] You gave me incorrect `response`! Try something like `1,0`. Enter again."
                     f"{self._settings.style.error_off}"
                 )
-            # TODO: suggest the user example response to enter
 
         pattern = self._solver.current_possible_solution
         print()

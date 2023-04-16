@@ -104,7 +104,7 @@ class MastermindGame(Mastermind):
             f"{self._settings.style.number_on}"
             f"{self._guesses_list.guess_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
             f"{self._settings.style.number_off}"
-            f" Enter pattern (your guess): "
+            f" Enter `pattern` (your guess): "
         )
 
     def _game_take_turn(self, user_pattern_string, computer_pattern=None):
@@ -122,7 +122,7 @@ class MastermindGame(Mastermind):
             if type(computer_pattern) is not self._settings.Pattern:
                 raise RuntimeError(
                     f"{self._settings.style.error_on}"
-                    f"[Game] Given computer pattern is not the Pattern class object!"
+                    f"[Game] Given `computer_pattern` is not the Pattern class object!"
                     f"{self._settings.style.error_off}"
                 )
             else:
@@ -136,10 +136,11 @@ class MastermindGame(Mastermind):
             except ValueError:
                 raise ValueError(
                     f"{self._settings.style.error_on}"
-                    f"[Game] You gave me incorrect pattern! Enter again."
+                    f"[Game] You gave me incorrect `pattern`! Try something like `" +
+                    self._settings.Peg.all_pegs_list[1].char * self._settings.pegs_in_pattern +
+                    f"`. Enter again."
                     f"{self._settings.style.error_off}"
                 )
-            # TODO: suggest the user example pattern to enter
 
             response = pattern.calculate_response(self._solution)
             print(
