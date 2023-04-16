@@ -2,8 +2,6 @@
 
 # TODO: refactor similar methods in Game/Helper/Solver
 # TODO: show possible solutions for Solver1 right after starting a game
-
-# TODO: create file `requirements.txt`?
 # TODO: tests, tests, tests...
 
 # next sprint:
