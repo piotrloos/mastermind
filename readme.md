@@ -8,9 +8,10 @@ The Mastermind game is quite simple but entertaining code, to present my skills 
 * OOP principles - encapsulation, polymorphism
 * class inheritance, overriding methods, abstract methods, meta classes
 * method properties, decorators, class and static methods
+* Python closures
 * iterators, generators, map and lambda functions
 * list comprehensions
-* exception raises and catches, assertions
+* exceptions raises and catches, assertions
 * context managers
 * tuple, dict and function arguments (\*args, \*\*kwargs) unpacking
 * colored output in terminal
@@ -18,7 +19,7 @@ The Mastermind game is quite simple but entertaining code, to present my skills 
 
 ## Mastermind rules
 
-Mastermind is a code-breaking game for two players. In my program one of the players is computer.
+Mastermind is a code-breaking game for two players. In my program one of the players is the computer.
 One player becomes the codemaker, the other the codebreaker. The codemaker chooses a pattern of 4 pegs (by default) using 6 different color pegs (by default).
 The solution pattern is visible to the codemaker, but not to the codebreaker.
 
@@ -35,9 +36,9 @@ In computer solving modes the game also could end after being convinced that the
 
 * **`game`**: In this mode the codemaker is the computer - prepares the solution pattern and returns you the responses. The codebreaker is you - you enter the patterns and try to guess the solution. Since you are the one who guesses, choosing a Solver and defining his settings is unnecessary.
 
-* **`solver`**: In this mode the codemaker is you - you have prepared the solution pattern and you give the computer responses for every guess. The codebreaker is computer and he guesses the pattern using one of the two different Solvers #1 or #2 (described below). Sometimes the computer is sure that his guess is the proper solution and tells about it.
+* **`solver`**: In this mode the codemaker is you - you have prepared the solution pattern and you give the computer responses for every guess. The codebreaker is the computer and he guesses the pattern using one of the two different Solvers #1 or #2 (described below). Sometimes the computer is sure that his guess is the proper solution and tells you about it.
 
-* **`helper`**: In this mode the computer helps you to guess the solution pattern when you are playing with someone else. Very similar to `solver` mode. You enter every guess you made and his response, and then computer gives you one of the possible solutions using the same Solvers as in `solver` mode. You can enter any pattern and response, or just a response based on the previously proposed pattern.
+* **`helper`**: In this mode the computer helps you to guess the solution pattern when you are playing with someone else. Very similar to `solver` mode. You enter every guess you made and his response, and then the computer gives you one of the possible solutions using the same Solvers as in `solver` mode. You can enter any pattern and response, or just a response based on the previously proposed pattern.
 
 ## Solvers
 
@@ -45,7 +46,7 @@ In computer solving modes the game also could end after being convinced that the
 
 * **`Solver #2`** = patterns list filtering Solver. This Solver prepares list of all possible solutions (which can take a lot of memory) and reduces it after each guess. So, first turns can take some time, but the closer the solution this Solver is, the faster he can give possible solutions. This Solver can be more efficient from the Mastermind's point of view than `Solver #1`, because he can take random pattern from the list (see `solver2_take_random_pattern` setting) and get the response that rejects more patterns. Additionally, this Solver can print the remaining possible solutions list (see `solver2_print_possible_solutions_threshold` setting) if there are only few of them.
 
-* **`Solver #3`** = logic thinking Solver using constraints. Not implemented yet!
+* **`Solver #3`** = logic thinking Solver using constraint module. Not implemented yet!
 
 ## Settings
 
@@ -112,7 +113,9 @@ If you don't want to be asked you can give some settings as a parameter launchin
 ./main.py mode=solver peg_colors=8 pegs_in_pattern=6 chosen_solver=2 pre_build_patterns=1 use_itertools_for_build=0 solver2_take_random_pattern=1 styled_prints=1
 ```
 
-You can also manually call the proper Mastermind class
+Running `main.py` you will be asked if you want to play again after the current game is ended. The settings will be the same. If there were patterns generated they will not be generated again.
+
+You can also manually call once the proper Mastermind class
 
 * MastermindGame()
 * MastermindSolver()
@@ -133,3 +136,5 @@ MastermindSolver(
 ```
 
 ## Have fun :)
+
+Piotr Loos (c) 2023
