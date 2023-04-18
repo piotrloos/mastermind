@@ -104,6 +104,9 @@ def main():
             ).strip().lower()
 
         if again_str in neg_answers_set:
+            print(
+                "[Mastermind] Thanks for playing. Bye!"
+            )
             break  # exit the game
         else:
             print()

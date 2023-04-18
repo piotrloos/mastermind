@@ -23,6 +23,20 @@ class MastermindGame(Mastermind):
 
         super().__init__(*args, **kwargs)  # initialize Mastermind class object
 
+        self._mode = "game"
+
+        class GameStrings:
+            greeting = "Welcome to Mastermind Game!"
+            codemaker_be = "I am"
+            codemaker_have = "I have"
+            codemaker_adjective = "my"
+            codebreaker_be = "You are"
+            codebreaker = "you"
+            codebreaker_helper = "you"
+            codebreaker_verb = "guess"
+
+        self._strings = GameStrings
+
         if type(solution) is self._settings.Pattern:
             self._solution = solution
         else:
@@ -39,53 +53,9 @@ class MastermindGame(Mastermind):
                         f"{self._settings.style.error_off}"
                     )
 
-        self._game_intro()
+        self._intro()
         self._game_loop()
-        self._game_outro()
-
-    def _game_intro(self):
-        """ Prints intro """
-
-        print(
-            f"{self._settings.style.greeting_on}"
-            f"###################################\n"
-            f"#   Welcome to Mastermind Game!   #\n"
-            f"###################################\n"
-            f"{self._settings.style.greeting_off}"
-        )
-        print(
-            f"I am CodeMaker and I have prepared "
-            f"{self._settings.style.number_on}"
-            f"{self._settings.pegs_in_pattern}"
-            f"{self._settings.style.number_off}"
-            f"-peg pattern using "
-            f"{self._settings.style.number_on}"
-            f"{self._settings.peg_colors}"
-            f"{self._settings.style.number_off}"
-            f" different colors: "
-            f"{self._settings.all_colors_list_formatted}"
-            f"."
-        )
-        print(
-            f"You are CodeBreaker, you don't know my pattern and you have "
-            f"{self._settings.style.number_on}"
-            f"{self._settings.guesses_limit if self._settings.guesses_limit else 'unlimited number of'}"
-            f"{self._settings.style.number_off}"
-            f" turn{'s' if self._settings.guesses_limit != 1 else ''} to guess the solution."
-        )
-        print(
-            f"There are "
-            f"{self._settings.style.number_on}"
-            f"{self._settings.patterns_number:,}"  # divide number by comma every 3 digits
-            f"{self._settings.style.number_off}"
-            f" possible patterns in this game. "
-            f"Example pattern is {self._settings.Pattern.get_random_pattern()}."
-        )
-        print()
-        print(
-            "Let's play!"
-        )
-        print()
+        self._outro()
 
     def _game_loop(self):
         """ Main `Game` loop """
@@ -169,25 +139,3 @@ class MastermindGame(Mastermind):
             return
 
         # otherwise game is still active
-
-    def _game_outro(self):
-        """ Prints outro """
-
-        if self._game_status == 1:
-            print(
-                f"You found my solution in "
-                f"{self._settings.style.number_on}"
-                f"{self._guesses_list.guess_index}"
-                f"{self._settings.style.number_off}"
-                f" guess{'es' if self._guesses_list.guess_index != 1 else ''}."
-            )
-        elif self._game_status == 2:
-            print(
-                "You reached guesses limit. Game over!"
-            )
-        print(
-            f"The solution was {self._solution}."
-        )
-        print(
-            "Thanks for playing!"
-        )
