@@ -1,7 +1,7 @@
 ############################################
 # My version of the famous Mastermind game #
 # mode_helper.py                           #
-# Mastermind Helper                        #
+# Mastermind Helper mode                   #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
@@ -10,8 +10,6 @@ from class_mastermind import Mastermind
 
 class MastermindHelper(Mastermind):
     """ Contains Mastermind Helper mode, inherits from Mastermind class """
-
-    # TODO: refactor MastermindGame, MastermindHelper, MastermindSolver into one class
 
     def __init__(
             self,
@@ -37,43 +35,11 @@ class MastermindHelper(Mastermind):
         self._strings = HelperStrings
 
         self._intro()
-        self._helper_loop()
+        self._loop()
         self._outro()
 
-    def _helper_loop(self):
-        """ Main `Helper` loop """
-
-        while not self._game_status:
-            try:
-                self._helper_take_turn(input(self._helper_prompt))
-            except ValueError as err:
-                print(err)
-
-    @property
-    def _possible_solutions_number(self):
-        """ Returns number of possible solutions """
-
-        return self._solver.possible_solutions_number
-
-    @property
-    def _solving_time(self):
-        """ Returns total solving time """
-
-        return self._solver.solving_time
-
-    @property
-    def _helper_prompt(self):
-        """ Returns styled prompt for `input` function """
-
-        return (
-            f"{self._settings.style.number_on}"
-            f"{self._guesses_list.guess_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
-            f"{self._settings.style.number_off}"
-            f" Enter `pattern=response` (empty pattern means {self._solver.current_possible_solution}): "
-        )
-
-    # TODO: refactor with `solver_take_turn`
-    def _helper_take_turn(self, user_pattern_response_string, computer_pattern=None, computer_response=None):
+    # TODO: refactor with Solver's `_take_turn`
+    def _take_turn(self, user_input, computer_pattern=None, computer_response=None):
         """ Takes a turn in Helper mode (with `pattern` and `response` from user) """
 
         if self._game_status != 0:
@@ -104,13 +70,13 @@ class MastermindHelper(Mastermind):
         else:  # user is playing
 
             try:
-                pattern, response = self._settings.Response.decode_pattern_response(user_pattern_response_string)
+                pattern, response = self._settings.Response.decode_pattern_response(user_input)
             except ValueError:
                 raise ValueError(
                     f"{self._settings.style.error_on}"
                     f"[Helper] You gave me incorrect `pattern=response`! Try something like `" +
                     self._settings.Peg.all_pegs_list[1].char * self._settings.pegs_in_pattern +
-                    f"=1,0`. Enter again."
+                    f"=1,0` or just `=1,0`. Enter again."
                     f"{self._settings.style.error_off}"
                 )
 

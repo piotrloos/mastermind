@@ -1,7 +1,7 @@
 ############################################
 # My version of the famous Mastermind game #
 # mode_game.py                             #
-# Mastermind Game                          #
+# Mastermind Game mode                     #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
@@ -10,8 +10,6 @@ from class_mastermind import Mastermind
 
 class MastermindGame(Mastermind):
     """ Contains Mastermind Game mode, inherits from Mastermind class """
-
-    # TODO: refactor MastermindGame, MastermindHelper, MastermindSolver into one class
 
     def __init__(
             self,
@@ -54,30 +52,10 @@ class MastermindGame(Mastermind):
                     )
 
         self._intro()
-        self._game_loop()
+        self._loop()
         self._outro()
 
-    def _game_loop(self):
-        """ Main `Game` loop """
-
-        while not self._game_status:
-            try:
-                self._game_take_turn(input(self._game_prompt))
-            except ValueError as err:
-                print(err)
-
-    @property
-    def _game_prompt(self):
-        """ Returns styled prompt for `input` function """
-
-        return (
-            f"{self._settings.style.number_on}"
-            f"{self._guesses_list.guess_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
-            f"{self._settings.style.number_off}"
-            f" Enter `pattern` (your guess): "
-        )
-
-    def _game_take_turn(self, user_pattern_string, computer_pattern=None):
+    def _take_turn(self, user_input, computer_pattern=None):
         """ Takes a turn as the CodeMaker (with `user_pattern_string` or `computer_pattern` from CodeBreaker) """
 
         if self._game_status != 0:
@@ -102,7 +80,7 @@ class MastermindGame(Mastermind):
         else:  # user is playing
 
             try:
-                pattern = self._settings.Pattern.decode_pattern(user_pattern_string)
+                pattern = self._settings.Pattern.decode_pattern(user_input)
             except ValueError:
                 raise ValueError(
                     f"{self._settings.style.error_on}"

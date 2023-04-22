@@ -35,7 +35,6 @@ class Mastermind(metaclass=ABCMeta):
         self._mode = None  # should be overwritten by child class
         self._strings = None  # should be overwritten by child class
 
-        # TODO: disable Solver in game mode
         self._solver = self._settings.solver_class(  # instantiate Solver class
             self._settings,
             self._guesses_list,
@@ -100,6 +99,44 @@ class Mastermind(metaclass=ABCMeta):
         )
         print()
 
+    def _loop(self):
+        """ Contains main Mastermind loop """
+
+        while not self._game_status:  # game_status == 0 means game is active
+            try:
+                self._take_turn(user_input=input(self._prompt))  # ask the user for input and then take a turn
+            except ValueError as err:  # catch only wrong input by the user
+                print(err)
+
+    @property
+    def _prompt(self):
+        """ Returns styled prompt for `input` function """
+
+        if self._mode == "game":
+            text = f"Enter `pattern` (your guess): "
+        elif self._mode == "solver":
+            text = f"Enter `response` for pattern {self._solver.current_possible_solution}: "
+        elif self._mode == "helper":
+            text = f"Enter `pattern=response` (empty pattern means {self._solver.current_possible_solution}): "
+        else:
+            raise RuntimeError(
+                f"{self._settings.style.error_on}"
+                f"[Mastermind] Given mode `{self._mode}` is incorrect!"
+                f"{self._settings.style.error_off}"
+            )
+
+        return (
+            f"{self._settings.style.number_on}"
+            f"{self._guesses_list.guess_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
+            f"{self._settings.style.number_off} {text}"
+        )
+
+    def _take_turn(self, user_input, computer_input=None):
+        """ Takes a turn (to be overridden by child class) """
+
+        # TODO: refactor common method parts here
+        pass
+
     @property
     def solution(self):
         """ Returns solution pattern (only when game is ended) """
@@ -152,9 +189,9 @@ class Mastermind(metaclass=ABCMeta):
 
         if self._mode in ("solver", "helper") and self._settings.progress_timing:
             print(
-                f"Total solving time: "
+                f"Total computer solving time: "
                 f"{self._settings.style.time_on}"
-                f"{self._solving_time:.3f}s"
+                f"{self._solver.solving_time:.3f}s"
                 f"{self._settings.style.time_off}"
                 f"."
             )

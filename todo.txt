@@ -1,7 +1,7 @@
 # this sprint:
 
-# TODO: refactor similar methods in Game/Helper/Solver
-# TODO: show possible solutions for Solver1 right after starting a game
+# TODO: finish refactoring `take_turn` method in Game/Helper/Solver
+# TODO: fix show possible solutions for Solver1 right after starting a game
 # TODO: tests, tests, tests...
 
 # next sprint:
@@ -33,6 +33,7 @@
 
 # future ideas:
 
+# TODO: graphics GUI - tkinter or pygame
 # TODO: Solver1 - counting the number of generator's possible solutions (copying gen with state)
 # TODO: Solver2 - create 2-dim matrix 3-state (must be, can be, can't be) for every peg position and every color
 # TODO: optimisation for grouped filtering patterns (Solver1 and Solver2)

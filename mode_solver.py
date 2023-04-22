@@ -1,7 +1,7 @@
 ############################################
 # My version of the famous Mastermind game #
 # mode_solver.py                           #
-# Mastermind Solver                        #
+# Mastermind Solver mode                   #
 #           Piotr Loos (c) 2019-2021, 2023 #
 ############################################
 
@@ -10,8 +10,6 @@ from class_mastermind import Mastermind
 
 class MastermindSolver(Mastermind):
     """ Contains Mastermind Solver mode, inherits from Mastermind class """
-
-    # TODO: refactor MastermindGame, MastermindHelper, MastermindSolver into one class
 
     def __init__(
             self,
@@ -37,43 +35,11 @@ class MastermindSolver(Mastermind):
         self._strings = SolverStrings
 
         self._intro()
-        self._solver_loop()
+        self._loop()
         self._outro()
 
-    def _solver_loop(self):
-        """ Main `Solver` loop """
-
-        while not self._game_status:
-            try:
-                self._solver_take_turn(input(self._solver_prompt))
-            except ValueError as err:
-                print(err)
-
-    @property
-    def _possible_solutions_number(self):
-        """ Returns number of possible solutions """
-
-        return self._solver.possible_solutions_number
-
-    @property
-    def _solving_time(self):
-        """ Returns total solving time """
-
-        return self._solver.solving_time
-
-    @property
-    def _solver_prompt(self):
-        """ Returns styled prompt for `input` function """
-
-        return (
-            f"{self._settings.style.number_on}"
-            f"{self._guesses_list.guess_index + 1:>3d}."  # formatted as minimum 3 chars (spaces before number)
-            f"{self._settings.style.number_off}"
-            f" Enter `response` for pattern {self._solver.current_possible_solution}: "
-        )
-
-    # TODO: refactor with `helper_take_turn`
-    def _solver_take_turn(self, user_response_string, computer_response=None):
+    # TODO: refactor with Helper's `_take_turn`
+    def _take_turn(self, user_input, computer_response=None):
         """ Takes a turn as the CodeBreaker (with `user_response_string` or `computer_response` from CodeMaker) """
 
         if self._game_status != 0:
@@ -97,7 +63,7 @@ class MastermindSolver(Mastermind):
         else:  # user is playing
 
             try:
-                response = self._settings.Response.decode_response(user_response_string)
+                response = self._settings.Response.decode_response(user_input)
             except ValueError:
                 raise ValueError(
                     f"{self._settings.style.error_on}"
